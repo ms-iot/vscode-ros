@@ -7,7 +7,7 @@ import * as debug from "./debug";
 import * as master from "./master";
 import * as pfs from "./promise-fs";
 import * as utils from "./utils";
-import { dirname } from "path";
+import * as path from "path";
 import * as vscode from "vscode";
 
 /**
@@ -90,20 +90,18 @@ export function deactivate() {
  * auto-generated files.
  */
 async function determineBuildSystem(dir: string): Promise<void> {
-    while (dir && dirname(dir) !== dir) {
+    while (dir && path.dirname(dir) !== dir) {
         if (await pfs.exists(`${dir}/.catkin_workspace`)) {
             baseDir = dir;
             buildSystem = BuildSystem.CatkinMake;
-
             return;
         } else if (await pfs.exists(`${dir}/.catkin_tools`)) {
             baseDir = dir;
             buildSystem = BuildSystem.CatkinTools;
-
             return;
         }
 
-        dir = dirname(dir);
+        dir = path.dirname(dir);
     }
 
     buildSystem = BuildSystem.None;
@@ -161,7 +159,14 @@ async function sourceRosAndWorkspace(): Promise<void> {
 
     if (distro) {
         try {
-            env = await utils.sourceSetupFile(`/opt/ros/${distro}/setup.bash`, {});
+            let setupScript: string;
+            if (process.platform === "win32") {
+                setupScript = `C:\\opt\\ros\\${distro}\\x64\\setup.bat`;
+            }
+            else {
+                setupScript = `/opt/ros/${distro}/setup.bash`;
+            }
+            env = await utils.sourceSetupFile(setupScript, {});
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
         }
@@ -177,11 +182,17 @@ async function sourceRosAndWorkspace(): Promise<void> {
     }
 
     // Source the workspace setup over the top.
-    const workspaceSetup = `${baseDir}/devel/setup.bash`;
+    let wsSetupScript: string;
+    if (process.platform === "win32") {
+        wsSetupScript = `${baseDir}\\devel_isolated\\setup.bat`;
+    }
+    else {
+        wsSetupScript = `${baseDir}/devel/setup.bash`;
+    }
 
-    if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(workspaceSetup)) {
+    if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(wsSetupScript)) {
         try {
-            env = await utils.sourceSetupFile(workspaceSetup, env);
+            env = await utils.sourceSetupFile(wsSetupScript, env);
         } catch (err) {
             vscode.window.showWarningMessage("Could not source the workspace setup file.");
         }

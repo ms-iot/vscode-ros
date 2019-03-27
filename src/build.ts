@@ -70,5 +70,5 @@ export async function updateCppProperties(): Promise<void> {
  * Updates the python autocomplete path to support ROS.
  */
 export function updatePythonPath() {
-    vscode.workspace.getConfiguration().update(PYTHON_AUTOCOMPLETE_PATHS, extension.env.PYTHONPATH.split(":"));
+    vscode.workspace.getConfiguration().update(PYTHON_AUTOCOMPLETE_PATHS, extension.env.PYTHONPATH.split(path.delimiter));
 }
