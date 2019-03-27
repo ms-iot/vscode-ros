@@ -207,8 +207,5 @@
     "mocha": "^2.3.3",
     "typescript": "^2.0.3",
     "vscode": "^1.0.0"
-  },
-  "extensionDependencies": [
-    "ajshort.msg"
-  ]
+  }
 }

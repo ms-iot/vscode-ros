@@ -20,7 +20,7 @@ export async function createConfigFiles() {
 
   // Ensure the ".vscode" directory exists then update the C++ path.
   const dir = path.join(vscode.workspace.rootPath, ".vscode");
-  
+
   if (!await pfs.exists(dir)) {
     await pfs.mkdir(dir);
   }
@@ -70,5 +70,5 @@ export async function updateCppProperties(): Promise<void> {
  * Updates the python autocomplete path to support ROS.
  */
 export function updatePythonPath() {
-  vscode.workspace.getConfiguration().update(PYTHON_AUTOCOMPLETE_PATHS, extension.env.PYTHONPATH.split(":"));
+  vscode.workspace.getConfiguration().update(PYTHON_AUTOCOMPLETE_PATHS, extension.env.PYTHONPATH.split(path.delimiter));
 }

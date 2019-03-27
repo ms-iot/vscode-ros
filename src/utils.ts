@@ -1,8 +1,10 @@
-import * as extension from "./extension";
-import * as pfs from "./promise-fs";
-import * as cp from "child_process";
+import * as child_process from "child_process";
 import * as _ from "underscore";
 import * as vscode from "vscode";
+import * as os from "os";
+
+import * as extension from "./extension";
+import * as pfs from "./promise-fs";
 
 /**
  * Gets the ROS config section.
@@ -16,9 +18,23 @@ export function getConfig(): vscode.WorkspaceConfiguration {
  */
 export function sourceSetupFile(filename: string, env?: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    cp.exec(`bash -c "source '${filename}' && env"`, { env }, (err, out) => {
-      if (!err) {
-        resolve(out.split("\n").reduce((env, line) => {
+    let exportEnvCommand: string;
+    if (process.platform === "win32") {
+      exportEnvCommand = `cmd /c "\"${filename}\" && set"`;
+    }
+    else {
+      exportEnvCommand = `bash -c "source '${filename}' && env"`;
+    }
+
+    let processOptions = {
+      cwd: extension.baseDir,
+      env: env,
+      shell: "cmd",
+      windowsHide: false,
+    };
+    child_process.exec(exportEnvCommand, processOptions, (error, stdout, _stderr) => {
+      if (!error) {
+        resolve(stdout.split(os.EOL).reduce((env, line) => {
           const index = line.indexOf("=");
 
           if (index !== -1) {
@@ -28,7 +44,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
           return env;
         }, {}));
       } else {
-        reject(err);
+        reject(error);
       }
     });
   });
@@ -45,7 +61,7 @@ export function getDistros(): Promise<string[]> {
  * Gets a map of package names to paths.
  */
 export function getPackages(): Promise<{ [name: string]: string }> {
-  return new Promise((resolve, reject) => cp.exec("rospack list", { env: extension.env }, (err, out) => {
+  return new Promise((resolve, reject) => child_process.exec("rospack list", { env: extension.env }, (err, out) => {
     if (!err) {
       resolve(_.object(out.trim().split("\n").map(line => line.split(" ", 2))));
     } else {
@@ -58,7 +74,7 @@ export function getPackages(): Promise<{ [name: string]: string }> {
  * Gets include dirs using `catkin_find`.
  */
 export function getIncludeDirs(): Promise<string[]> {
-  return new Promise((c, e) => cp.exec("catkin_find --include", { env: extension.env }, (err, out) =>
+  return new Promise((c, e) => child_process.exec("catkin_find --include", { env: extension.env }, (err, out) =>
     err ? e(err) : c(out.trim().split("\n"))
   ));
 }
@@ -70,7 +86,7 @@ export function findPackageExecutables(packageName: string): Promise<string[]> {
   const dirs = `catkin_find --without-underlays --libexec --share '${packageName}'`;
   const command = `find $(${dirs}) -type f -executable`;
 
-  return new Promise((c, e) => cp.exec(command, { env: extension.env }, (err, out) =>
+  return new Promise((c, e) => child_process.exec(command, { env: extension.env }, (err, out) =>
     err ? e(err) : c(out.trim().split("\n"))
   ));
 }
@@ -82,7 +98,7 @@ export function findPackageLaunchFiles(packageName: string): Promise<string[]> {
   const dirs = `catkin_find --without-underlays --share '${packageName}'`;
   const command = `find $(${dirs}) -type f -name *.launch`;
 
-  return new Promise((c, e) => cp.exec(command, { env: extension.env }, (err, out) => {
+  return new Promise((c, e) => child_process.exec(command, { env: extension.env }, (err, out) => {
     err ? e(err) : c(out.trim().split("\n"));
   }));
 }
