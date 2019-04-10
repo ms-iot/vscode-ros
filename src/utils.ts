@@ -47,7 +47,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
                 reject(error);
             }
         });
-    };
+    });
 }
 
 /**
