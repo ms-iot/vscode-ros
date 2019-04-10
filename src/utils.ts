@@ -1,6 +1,7 @@
 import * as child_process from "child_process";
 import * as _ from "underscore";
 import * as vscode from "vscode";
+import * as path from "path";
 import * as os from "os";
 
 import * as extension from "./extension";
@@ -63,7 +64,7 @@ export function getDistros(): Promise<string[]> {
 export function getPackages(): Promise<{ [name: string]: string }> {
     return new Promise((resolve, reject) => child_process.exec("rospack list", { env: extension.env }, (err, out) => {
         if (!err) {
-            resolve(_.object(out.trim().split("\n").map(line => line.split(" ", 2))));
+            resolve(_.object(out.trim().split(os.EOL).map(line => line.split(" ", 2))));
         } else {
             reject(err);
         }
@@ -80,26 +81,44 @@ export function getIncludeDirs(): Promise<string[]> {
 }
 
 /**
- * Gets the full path to any executables for a package.
+ * list full paths to all executables inside a package
  */
 export function findPackageExecutables(packageName: string): Promise<string[]> {
-    const dirs = `catkin_find --without-underlays --libexec --share '${packageName}'`;
-    const command = `find $(${dirs}) -type f -executable`;
+    let command: string;
+    if (process.platform === "win32") {
+        const commandFindPackagePaths = `catkin_find --without-underlays --libexec ${packageName}`;
+        let paths = child_process.execSync(commandFindPackagePaths, { env: extension.env }).toString();
+        let normalizedPath = path.win32.normalize(paths.trim().split(os.EOL)[0]);
+        command = `where /r "${normalizedPath}" *.exe`;
+    }
+    else {
+        const dirs = `catkin_find --without-underlays --libexec --share '${packageName}'`;
+        command = `find $(${dirs}) -type f -executable`;
+    }
 
     return new Promise((c, e) => child_process.exec(command, { env: extension.env }, (err, out) =>
-        err ? e(err) : c(out.trim().split("\n"))
+        err ? e(err) : c(out.trim().split(os.EOL))
     ));
 }
 
 /**
- * Finds all `.launch` files for a package..
+ * list all .launch files inside a package
  */
 export function findPackageLaunchFiles(packageName: string): Promise<string[]> {
-    const dirs = `catkin_find --without-underlays --share '${packageName}'`;
-    const command = `find $(${dirs}) -type f -name *.launch`;
+    let command: string;
+    if (process.platform === "win32") {
+        const commandFindPackagePaths = `catkin_find --without-underlays --share ${packageName}`;
+        let paths = child_process.execSync(commandFindPackagePaths, { env: extension.env }).toString();
+        let normalizedPath = path.win32.normalize(paths.trim().split(os.EOL)[0]);
+        command = `where /r "${normalizedPath}" *.launch`;
+    }
+    else {
+        const dirs = `catkin_find --without-underlays --share '${packageName}'`;
+        command = `find $(${dirs}) -type f -name *.launch`;
+    }
 
     return new Promise((c, e) => child_process.exec(command, { env: extension.env }, (err, out) => {
-        err ? e(err) : c(out.trim().split("\n"));
+        err ? e(err) : c(out.trim().split(os.EOL));
     }));
 }
 

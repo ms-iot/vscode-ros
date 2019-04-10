@@ -3,7 +3,6 @@ import * as _ from "underscore";
 import * as vscode from "vscode";
 import * as xmlrpc from "xmlrpc";
 
-import * as constants from "./constants";
 import * as extension from "./extension";
 import * as pfs from "./promise-fs";
 
@@ -123,7 +122,7 @@ export class StatusBarItem {
     public constructor(private api: XmlRpcApi) {
         this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
         this.item.text = "$(question) ROS master";
-        this.item.command = constants.CMD_SHOW_MASTER_STATUS;
+        this.item.command = extension.RosCommands.ShowMasterStatus;
     }
 
     public activate() {
