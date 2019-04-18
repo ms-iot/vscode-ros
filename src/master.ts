@@ -2,14 +2,11 @@ import * as child_process from "child_process";
 import * as _ from "underscore";
 import * as vscode from "vscode";
 import * as xmlrpc from "xmlrpc";
+import * as path from "path";
 
 import * as extension from "./extension";
-import * as pfs from "./promise-fs";
 
-/**
- * Spawns a new roscore process.
- */
-export function startCore() {
+export function launchCore() {
     let newProcessOptions = {
         cwd: extension.baseDir,
         env: extension.env,
@@ -33,7 +30,7 @@ export function startCore() {
 /**
  * Kills the roscore process.
  */
-export function stopCore(api: XmlRpcApi) {
+export function terminateCore(api: XmlRpcApi) {
     if (process.platform === "win32") {
         api.getPid().then(pid => child_process.exec(`taskkill /pid ${pid} /f`));
     }
@@ -42,13 +39,77 @@ export function stopCore(api: XmlRpcApi) {
     }
 }
 
-/**
- * Shows the master status in an editor view.
- */
-export function showMasterStatus() {
-    return vscode.commands.executeCommand(
-        "vscode.previewHtml", vscode.Uri.parse("ros-master:"), undefined, "ROS Master"
+export function launchMonitor(context: vscode.ExtensionContext) {
+    const panel = vscode.window.createWebviewPanel(
+        "rosMasterStatus",
+        "ROS Master Status",
+        vscode.ViewColumn.Two,
+        {
+            enableScripts: true,
+        }
     );
+
+    let stylesheet = vscode.Uri.file(path.join(context.extensionPath, "assets", "masterMonitorStyle.css")).with({
+        scheme: "vscode-resource"
+    });
+    let script = vscode.Uri.file(path.join(context.extensionPath, "assets", "masterMonitor.js")).with({
+        scheme: "vscode-resource"
+    });
+
+    panel.webview.html = getMasterStatusWebviewContent(stylesheet, script);
+
+    const masterApi = new XmlRpcApi(extension.env.ROS_MASTER_URI);
+    masterApi.check().then((status) => {
+        if (status) {
+            let getParameters = masterApi.getParam("/");
+            let getSystemState = masterApi.getSystemState();
+
+            Promise.all([getParameters, getSystemState]).then(([parameters, systemState]) => {
+                let parametersJSON = JSON.stringify(parameters);
+                let systemStateJSON = JSON.stringify(systemState);
+
+                panel.webview.postMessage({
+                    status: status,
+                    parameters: parametersJSON,
+                    systemState: systemStateJSON,
+                });
+            });
+        }
+        else {
+            panel.webview.postMessage({
+                status: status,
+            });
+        }
+    });
+    // setInterval(() => {
+    //     api.check().then((status) => {
+    //         update();
+    //     });
+    // }, 200);
+}
+
+function getMasterStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Uri): string {
+    return `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="${stylesheet.toString()}" />
+
+    <script src="${script.toString()}"></script>
+</head>
+
+<body>
+    <h1>ROS Master Status</h1>
+    <h2 id="master-status">-</h2>
+
+    <div id="parameters"></div>
+    <div id="topics"></div>
+    <div id="services"></div>
+</body>
+
+</html>
+`;
 }
 
 const CALLER_ID = "vscode-ros";
@@ -143,30 +204,5 @@ export class StatusBarItem {
 
         this.item.text = (status ? "$(check)" : "$(x)") + " ROS master";
         this.status = status;
-    }
-}
-
-/**
- * Shows parameters, topics and services in an editor view.
- */
-export class StatusDocumentProvider implements vscode.TextDocumentContentProvider {
-    public constructor(private context: vscode.ExtensionContext, private api: XmlRpcApi) {
-    }
-
-    public async provideTextDocumentContent(uri: vscode.Uri, token: vscode.CancellationToken) {
-        const templateFilename = this.context.asAbsolutePath("templates/master-status.html");
-        const template = _.template(await pfs.readFile(templateFilename, "utf-8"));
-
-        let status = await this.api.check();
-        let data = <any>{ status, context: this.context };
-
-        if (status) {
-            const state = await this.api.getSystemState();
-            const params = await this.api.getParam("/");
-
-            data = { ...data, ...state, params };
-        }
-
-        return template(data);
     }
 }
