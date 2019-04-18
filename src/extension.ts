@@ -139,12 +139,10 @@ function activateEnvironment(context: vscode.ExtensionContext) {
     // Set up the master.
     const masterApi = new master.XmlRpcApi(env.ROS_MASTER_URI);
     const masterStatusItem = new master.StatusBarItem(masterApi);
-    const masterStatusProvider = new master.StatusDocumentProvider(context, masterApi);
 
     masterStatusItem.activate();
 
     subscriptions.push(masterStatusItem);
-    subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("ros-master", masterStatusProvider));
     subscriptions.push(vscode.workspace.registerTaskProvider("catkin", new CatkinTaskProvider()));
     subscriptions.push(vscode.debug.registerDebugConfigurationProvider("ros", new debug.RosDebugConfigProvider()));
 
@@ -153,9 +151,9 @@ function activateEnvironment(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(RosCommands.CreateCatkinPackage, catkin.createPackage),
         vscode.commands.registerCommand(RosCommands.CreateTerminal, utils.createTerminal),
         vscode.commands.registerCommand(RosCommands.GetDebugSettings, debug.getDebugSettings),
-        vscode.commands.registerCommand(RosCommands.ShowMasterStatus, master.showMasterStatus),
-        vscode.commands.registerCommand(RosCommands.StartRosCore, master.startCore),
-        vscode.commands.registerCommand(RosCommands.TerminateRosCore, () => master.stopCore(masterApi)),
+        vscode.commands.registerCommand(RosCommands.ShowMasterStatus, () => { master.launchMonitor(context) }),
+        vscode.commands.registerCommand(RosCommands.StartRosCore, master.launchCore),
+        vscode.commands.registerCommand(RosCommands.TerminateRosCore, () => { master.terminateCore(masterApi) }),
         vscode.commands.registerCommand(RosCommands.UpdateCppProperties, build.updateCppProperties),
         vscode.commands.registerCommand(RosCommands.UpdatePythonPath, build.updatePythonPath),
         vscode.commands.registerCommand(RosCommands.Rosrun, rosrundelegate),
