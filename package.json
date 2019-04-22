@@ -24,39 +24,49 @@
   "contributes": {
     "commands": [
       {
-        "category": "ROS",
         "command": "ros.createCatkinPackage",
-        "title": "Create Catkin Package"
+                "title": "Create Catkin Package",
+                "category": "ROS"
       },
       {
-        "category": "ROS",
         "command": "ros.createTerminal",
-        "title": "Create Terminal"
+                "title": "Create Terminal",
+                "category": "ROS"
       },
       {
-        "category": "ROS",
+                "command": "ros.rosrun",
+                "title": "rosrun",
+                "category": "ROS"
+            },
+            {
+                "command": "ros.roslaunch",
+                "title": "roslaunch",
+                "category": "ROS"
+            },
+            {
         "command": "ros.showMasterStatus",
-        "title": "Show Master Status"
+                "title": "Show Master Status",
+                "category": "ROS"
       },
       {
-        "category": "ROS",
         "command": "ros.startCore",
-        "title": "Start Core"
+                "title": "Start Core",
+                "category": "ROS"
       },
       {
-        "category": "ROS",
         "command": "ros.stopCore",
-        "title": "Stop Core"
+                "title": "Stop Core",
+                "category": "ROS"
       },
       {
-        "category": "ROS",
         "command": "ros.updateCppProperties",
-        "title": "Update C++ Properties"
+                "title": "Update C++ Properties",
+                "category": "ROS"
       },
       {
-        "category": "ROS",
         "command": "ros.updatePythonPath",
-        "title": "Update Python Path"
+                "title": "Update Python Path",
+                "category": "ROS"
       }
     ],
     "configuration": {

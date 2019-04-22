@@ -1,23 +1,42 @@
-import * as constants from "./constants";
-import * as extension from "./extension";
-import * as pfs from "./promise-fs";
-import * as cp from "child_process";
+import * as child_process from "child_process";
 import * as _ from "underscore";
 import * as vscode from "vscode";
 import * as xmlrpc from "xmlrpc";
 
-/**
- * Spawns a new roscore process.
- */
-export function startCore() {
-  cp.spawn("roscore", [], { env: extension.env });
+import * as extension from "./extension";
+import * as pfs from "./promise-fs";
+
+export function launchCore() {
+    let newProcessOptions = {
+        cwd: extension.baseDir,
+        env: extension.env,
+        shell: "cmd",
+        windowsHide: false
+    };
+
+    const masterProcess = child_process.spawn("roscore", [], newProcessOptions);
+
+    masterProcess.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+    masterProcess.stderr.on('data', (data) => {
+        console.log(`stderr: ${data}`);
+    });
+    masterProcess.on('close', (code) => {
+        console.log(`child process exited with code ${code}`);
+    });
 }
 
 /**
  * Kills the roscore process.
  */
-export function stopCore(api: XmlRpcApi) {
-  api.getPid().then(pid => cp.exec(`kill $(ps -o ppid= -p '${pid}')`));
+export function terminateCore(api: XmlRpcApi) {
+    if (process.platform === "win32") {
+        api.getPid().then(pid => child_process.exec(`taskkill /pid ${pid} /f`));
+}
+    else {
+        api.getPid().then(pid => child_process.exec(`kill $(ps -o ppid= -p '${pid}')`));
+    }
 }
 
 /**
@@ -100,7 +119,7 @@ export class StatusBarItem {
   public constructor(private api: XmlRpcApi) {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
     this.item.text = "$(question) ROS master";
-    this.item.command = constants.CMD_SHOW_MASTER_STATUS;
+        this.item.command = extension.Commands.ShowMasterStatus;
   }
 
   public activate() {
