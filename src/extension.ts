@@ -1,5 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import * as fs from "fs";
+import * as os from "os";
 
 import * as build from "./build";
 import * as catkin from "./catkin";
@@ -259,6 +261,30 @@ async function sourceRosAndWorkspace(): Promise<void> {
         }
     }
 
+    await saveRosEnvironment();
+
     // Notify listeners the environment has changed.
     onEnvChanged.fire();
+}
+
+async function saveRosEnvironment(): Promise<void> {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    const workspaceFolder = workspaceFolders[0];
+    const workspaceFolderOnDiskPath = workspaceFolder.uri.fsPath;
+    if (env instanceof Object) {
+        fs.mkdir(path.join(workspaceFolderOnDiskPath, ".vscode-ros"), (err) => {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                let envFile = fs.createWriteStream(path.join(workspaceFolderOnDiskPath, ".vscode-ros", "ros.env"));
+                for (let e in env) {
+                    if (env.hasOwnProperty(e)) {
+                        envFile.write(e + "=" + env[e] + os.EOL);
+                    }
+                }
+                envFile.close();
+            }
+        });
+    }
 }
