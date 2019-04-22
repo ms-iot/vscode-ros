@@ -40,7 +40,7 @@ export let onDidChangeEnv = onEnvChanged.event;
  */
 let subscriptions = <vscode.Disposable[]>[];
 
-export enum RosCommands {
+export enum Commands {
     CreateCatkinPackage = "ros.createCatkinPackage",
     CreateTerminal = "ros.createTerminal",
     GetDebugSettings = "ros.getDebugSettings",
@@ -150,14 +150,14 @@ function activateEnvironment(context: vscode.ExtensionContext) {
 
     // register plugin commands
   subscriptions.push(
-        vscode.commands.registerCommand(RosCommands.CreateCatkinPackage, catkin.createPackage),
-        vscode.commands.registerCommand(RosCommands.CreateTerminal, utils.createTerminal),
-        vscode.commands.registerCommand(RosCommands.GetDebugSettings, debug.getDebugSettings),
-        vscode.commands.registerCommand(RosCommands.ShowMasterStatus, () => { master.showMasterStatus() }),
-        vscode.commands.registerCommand(RosCommands.StartRosCore, master.launchCore),
-        vscode.commands.registerCommand(RosCommands.TerminateRosCore, () => { master.terminateCore(masterApi) }),
-        vscode.commands.registerCommand(RosCommands.UpdateCppProperties, build.updateCppProperties),
-        vscode.commands.registerCommand(RosCommands.UpdatePythonPath, build.updatePythonPath)
+        vscode.commands.registerCommand(Commands.CreateCatkinPackage, catkin.createPackage),
+        vscode.commands.registerCommand(Commands.CreateTerminal, utils.createTerminal),
+        vscode.commands.registerCommand(Commands.GetDebugSettings, debug.getDebugSettings),
+        vscode.commands.registerCommand(Commands.ShowMasterStatus, () => { master.showMasterStatus() }),
+        vscode.commands.registerCommand(Commands.StartRosCore, master.launchCore),
+        vscode.commands.registerCommand(Commands.TerminateRosCore, () => { master.terminateCore(masterApi) }),
+        vscode.commands.registerCommand(Commands.UpdateCppProperties, build.updateCppProperties),
+        vscode.commands.registerCommand(Commands.UpdatePythonPath, build.updatePythonPath)
   );
 
   // Generate config files if they don't already exist.
