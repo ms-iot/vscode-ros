@@ -54,51 +54,51 @@ export enum Commands {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-  // Activate if we're in a catkin workspace.
-  await determineBuildSystem(vscode.workspace.rootPath);
+    // Activate if we're in a catkin workspace.
+    await determineBuildSystem(vscode.workspace.rootPath);
 
-  if (buildSystem == BuildSystem.None) {
-    return;
-  }
-
-  console.log(`Activating ROS extension in "${baseDir}"`);
-
-  // Activate components when the ROS env is changed.
-  context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
-
-  // Activate components which don't require the ROS env.
-  context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(
-    "cpp", new CppFormatter()
-  ));
-
-  // Source the environment, and re-source on config change.
-  let config = utils.getConfig();
-
-  context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
-    const updatedConfig = utils.getConfig();
-    const fields = Object.keys(config).filter(k => !(config[k] instanceof Function));
-    const changed = fields.some(key => updatedConfig[key] !== config[key]);
-
-    if (changed) {
-      sourceRosAndWorkspace();
+    if (buildSystem == BuildSystem.None) {
+        return;
     }
 
-    config = updatedConfig;
-  }));
+    console.log(`Activating ROS extension in "${baseDir}"`);
 
-  sourceRosAndWorkspace();
+    // Activate components when the ROS env is changed.
+    context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
+
+    // Activate components which don't require the ROS env.
+    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(
+        "cpp", new CppFormatter()
+    ));
+
+    // Source the environment, and re-source on config change.
+    let config = utils.getConfig();
+
+    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
+        const updatedConfig = utils.getConfig();
+        const fields = Object.keys(config).filter(k => !(config[k] instanceof Function));
+        const changed = fields.some(key => updatedConfig[key] !== config[key]);
+
+        if (changed) {
+            sourceRosAndWorkspace();
+        }
+
+        config = updatedConfig;
+    }));
+
+    sourceRosAndWorkspace();
 
     // await platformHelper.setup();
 
-  return {
-    getBaseDir: () => baseDir,
-    getEnv: () => env,
-    onDidChangeEnv: (listener: () => any, thisArg: any) => onDidChangeEnv(listener, thisArg),
-  };
+    return {
+        getBaseDir: () => baseDir,
+        getEnv: () => env,
+        onDidChangeEnv: (listener: () => any, thisArg: any) => onDidChangeEnv(listener, thisArg),
+    };
 }
 
 export function deactivate() {
-  subscriptions.forEach(disposable => disposable.dispose());
+    subscriptions.forEach(disposable => disposable.dispose());
 }
 
 /**
@@ -107,49 +107,49 @@ export function deactivate() {
  */
 async function determineBuildSystem(dir: string): Promise<void> {
     while (dir && path.dirname(dir) !== dir) {
-    if (await pfs.exists(`${dir}/.catkin_workspace`)) {
-      baseDir = dir;
-      buildSystem = BuildSystem.CatkinMake;
-      return;
-    } else if (await pfs.exists(`${dir}/.catkin_tools`)) {
-      baseDir = dir;
-      buildSystem = BuildSystem.CatkinTools;
-      return;
-    }
+        if (await pfs.exists(`${dir}/.catkin_workspace`)) {
+            baseDir = dir;
+            buildSystem = BuildSystem.CatkinMake;
+            return;
+        } else if (await pfs.exists(`${dir}/.catkin_tools`)) {
+            baseDir = dir;
+            buildSystem = BuildSystem.CatkinTools;
+            return;
+        }
 
         dir = path.dirname(dir);
-  }
+    }
 
-  buildSystem = BuildSystem.None;
+    buildSystem = BuildSystem.None;
 }
 
 /**
  * Activates components which require a ROS env.
  */
 function activateEnvironment(context: vscode.ExtensionContext) {
-  // Clear existing disposables.
-  while (subscriptions.length > 0) {
-    subscriptions.pop().dispose();
-  }
+    // Clear existing disposables.
+    while (subscriptions.length > 0) {
+        subscriptions.pop().dispose();
+    }
 
-  if (typeof env.ROS_ROOT === "undefined") {
-    return;
-  }
+    if (typeof env.ROS_ROOT === "undefined") {
+        return;
+    }
 
-  // Set up the master.
-  const masterApi = new master.XmlRpcApi(env.ROS_MASTER_URI);
-  const masterStatusItem = new master.StatusBarItem(masterApi);
-  const masterStatusProvider = new master.StatusDocumentProvider(context, masterApi);
+    // Set up the master.
+    const masterApi = new master.XmlRpcApi(env.ROS_MASTER_URI);
+    const masterStatusItem = new master.StatusBarItem(masterApi);
+    const masterStatusProvider = new master.StatusDocumentProvider(context, masterApi);
 
-  masterStatusItem.activate();
+    masterStatusItem.activate();
 
-  subscriptions.push(masterStatusItem);
-  subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("ros-master", masterStatusProvider));
-  subscriptions.push(vscode.workspace.registerTaskProvider("catkin", new CatkinTaskProvider()));
-  subscriptions.push(vscode.debug.registerDebugConfigurationProvider("ros", new debug.RosDebugConfigProvider()));
+    subscriptions.push(masterStatusItem);
+    subscriptions.push(vscode.workspace.registerTextDocumentContentProvider("ros-master", masterStatusProvider));
+    subscriptions.push(vscode.workspace.registerTaskProvider("catkin", new CatkinTaskProvider()));
+    subscriptions.push(vscode.debug.registerDebugConfigurationProvider("ros", new debug.RosDebugConfigProvider()));
 
     // register plugin commands
-  subscriptions.push(
+    subscriptions.push(
         vscode.commands.registerCommand(Commands.CreateCatkinPackage, catkin.createPackage),
         vscode.commands.registerCommand(Commands.CreateTerminal, utils.createTerminal),
         vscode.commands.registerCommand(Commands.GetDebugSettings, debug.getDebugSettings),
@@ -158,23 +158,23 @@ function activateEnvironment(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(Commands.TerminateRosCore, () => { master.terminateCore(masterApi) }),
         vscode.commands.registerCommand(Commands.UpdateCppProperties, build.updateCppProperties),
         vscode.commands.registerCommand(Commands.UpdatePythonPath, build.updatePythonPath)
-  );
+    );
 
-  // Generate config files if they don't already exist.
-  build.createConfigFiles();
+    // Generate config files if they don't already exist.
+    build.createConfigFiles();
 }
 
 /**
  * Loads the ROS environment, and prompts the user to select a distro if required.
  */
 async function sourceRosAndWorkspace(): Promise<void> {
-  env = undefined;
+    env = undefined;
 
-  const config = utils.getConfig();
-  const distro = config.get("distro", "");
+    const config = utils.getConfig();
+    const distro = config.get("distro", "");
 
-  if (distro) {
-    try {
+    if (distro) {
+        try {
             let setupScript: string;
             if (process.platform === "win32") {
                 setupScript = `C:\\opt\\ros\\${distro}\\x64\\setup.bat`;
@@ -183,21 +183,21 @@ async function sourceRosAndWorkspace(): Promise<void> {
                 setupScript = `/opt/ros/${distro}/setup.bash`;
             }
             env = await utils.sourceSetupFile(setupScript, {});
-    } catch (err) {
-      vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
-    }
-  } else if (typeof process.env.ROS_ROOT !== "undefined") {
-    env = process.env;
-  } else {
-    const message = "The ROS distro is not configured.";
-    const configure = "Configure";
+        } catch (err) {
+            vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
+        }
+    } else if (typeof process.env.ROS_ROOT !== "undefined") {
+        env = process.env;
+    } else {
+        const message = "The ROS distro is not configured.";
+        const configure = "Configure";
 
-    if (await vscode.window.showErrorMessage(message, configure) === configure) {
-      config.update("distro", await vscode.window.showQuickPick(utils.getDistros()));
+        if (await vscode.window.showErrorMessage(message, configure) === configure) {
+            config.update("distro", await vscode.window.showQuickPick(utils.getDistros()));
+        }
     }
-  }
 
-  // Source the workspace setup over the top.
+    // Source the workspace setup over the top.
     let wsSetupScript: string;
     if (process.platform === "win32") {
         wsSetupScript = `${baseDir}\\devel_isolated\\setup.bat`;
@@ -207,13 +207,13 @@ async function sourceRosAndWorkspace(): Promise<void> {
     }
 
     if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(wsSetupScript)) {
-    try {
+        try {
             env = await utils.sourceSetupFile(wsSetupScript, env);
-    } catch (err) {
-      vscode.window.showWarningMessage("Could not source the workspace setup file.");
+        } catch (err) {
+            vscode.window.showWarningMessage("Could not source the workspace setup file.");
+        }
     }
-  }
 
-  // Notify listeners the environment has changed.
-  onEnvChanged.fire();
+    // Notify listeners the environment has changed.
+    onEnvChanged.fire();
 }
