@@ -35,12 +35,12 @@
             },
             {
                 "command": "ros.rosrun",
-                "title": "rosrun",
+                "title": "Run a ROS executable (rosrun)",
                 "category": "ROS"
             },
             {
                 "command": "ros.roslaunch",
-                "title": "roslaunch",
+                "title": "Run a ROS launch file (roslaunch)",
                 "category": "ROS"
             },
             {
