@@ -1,214 +1,214 @@
 {
-  "name": "ros",
-  "displayName": "ROS",
-  "icon": "assets/icon.png",
-  "description": "Development support for Robot Operating System (ROS)",
-  "version": "0.3.0",
-  "publisher": "ajshort",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ajshort/vscode-ros.git"
-  },
-  "engines": {
-    "vscode": "^1.18.0"
-  },
-  "categories": [
-    "Debuggers",
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./out/src/extension",
-  "contributes": {
-    "commands": [
-      {
-        "category": "ROS",
-        "command": "ros.createCatkinPackage",
-        "title": "Create Catkin Package"
-      },
-      {
-        "category": "ROS",
-        "command": "ros.createTerminal",
-        "title": "Create Terminal"
-      },
-      {
-        "category": "ROS",
-        "command": "ros.showMasterStatus",
-        "title": "Show Master Status"
-      },
-      {
-        "category": "ROS",
-        "command": "ros.startCore",
-        "title": "Start Core"
-      },
-      {
-        "category": "ROS",
-        "command": "ros.stopCore",
-        "title": "Stop Core"
-      },
-      {
-        "category": "ROS",
-        "command": "ros.updateCppProperties",
-        "title": "Update C++ Properties"
-      },
-      {
-        "category": "ROS",
-        "command": "ros.updatePythonPath",
-        "title": "Update Python Path"
-      }
-    ],
-    "configuration": {
-      "type": "object",
-      "title": "ROS",
-      "properties": {
-        "ros.distro": {
-          "type": "string",
-          "description": "ROS distro name to use (kinetic, jade, ...)"
-        }
-      }
+    "name": "ros",
+    "displayName": "ROS",
+    "icon": "assets/icon.png",
+    "description": "Development support for Robot Operating System (ROS)",
+    "version": "0.3.0",
+    "publisher": "ajshort",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ajshort/vscode-ros.git"
     },
-    "debuggers": [
-      {
-        "type": "ros",
-        "label": "ROS",
-        "program": "./out/src/debugger/main.js",
-        "runtime": "node",
-        "variables": {
-          "debugSettings": "ros.getDebugSettings"
-        },
-        "configurationAttributes": {
-          "launch": {
-            "required": [
-              "command",
-              "package",
-              "target"
-            ],
+    "engines": {
+        "vscode": "^1.18.0"
+    },
+    "categories": [
+        "Debuggers",
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "category": "ROS",
+                "command": "ros.createCatkinPackage",
+                "title": "Create Catkin Package"
+            },
+            {
+                "category": "ROS",
+                "command": "ros.createTerminal",
+                "title": "Create Terminal"
+            },
+            {
+                "category": "ROS",
+                "command": "ros.showMasterStatus",
+                "title": "Show Master Status"
+            },
+            {
+                "category": "ROS",
+                "command": "ros.startCore",
+                "title": "Start Core"
+            },
+            {
+                "category": "ROS",
+                "command": "ros.stopCore",
+                "title": "Stop Core"
+            },
+            {
+                "category": "ROS",
+                "command": "ros.updateCppProperties",
+                "title": "Update C++ Properties"
+            },
+            {
+                "category": "ROS",
+                "command": "ros.updatePythonPath",
+                "title": "Update Python Path"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "ROS",
             "properties": {
-              "command": {
-                "type": "string",
-                "description": "Whether to run a launch file or executable",
-                "enum": [
-                  "roslaunch",
-                  "rosrun"
-                ],
-                "default": "roslaunch"
-              },
-              "package": {
-                "type": "string",
-                "description": "The package name",
-                "default": ""
-              },
-              "target": {
-                "type": "string",
-                "description": "The launch file or executable name",
-                "default": ""
-              },
-              "args": {
-                "type": "array",
-                "description": "Arguments to pass to the launch or run command",
-                "default": []
-              },
-              "debugSettings": {
-                "type": "string",
-                "description": "The stringified debug settings",
-                "default": "${command:debugSettings}"
-              }
+                "ros.distro": {
+                    "type": "string",
+                    "description": "ROS distro name to use (kinetic, jade, ...)"
+                }
             }
-          }
         },
-        "configurationSnippets": [
-          {
-            "label": "ROS: roslaunch",
-            "description": "Runs a launch file using roslaunch",
-            "body": {
-              "type": "ros",
-              "command": "roslaunch",
-              "name": "",
-              "package": "",
-              "target": ".launch",
-              "debugSettings": "${command:debugSettings}"
+        "debuggers": [
+            {
+                "type": "ros",
+                "label": "ROS",
+                "program": "./out/src/debugger/main.js",
+                "runtime": "node",
+                "variables": {
+                    "debugSettings": "ros.getDebugSettings"
+                },
+                "configurationAttributes": {
+                    "launch": {
+                        "required": [
+                            "command",
+                            "package",
+                            "target"
+                        ],
+                        "properties": {
+                            "command": {
+                                "type": "string",
+                                "description": "Whether to run a launch file or executable",
+                                "enum": [
+                                    "roslaunch",
+                                    "rosrun"
+                                ],
+                                "default": "roslaunch"
+                            },
+                            "package": {
+                                "type": "string",
+                                "description": "The package name",
+                                "default": ""
+                            },
+                            "target": {
+                                "type": "string",
+                                "description": "The launch file or executable name",
+                                "default": ""
+                            },
+                            "args": {
+                                "type": "array",
+                                "description": "Arguments to pass to the launch or run command",
+                                "default": []
+                            },
+                            "debugSettings": {
+                                "type": "string",
+                                "description": "The stringified debug settings",
+                                "default": "${command:debugSettings}"
+                            }
+                        }
+                    }
+                },
+                "configurationSnippets": [
+                    {
+                        "label": "ROS: roslaunch",
+                        "description": "Runs a launch file using roslaunch",
+                        "body": {
+                            "type": "ros",
+                            "command": "roslaunch",
+                            "name": "",
+                            "package": "",
+                            "target": ".launch",
+                            "debugSettings": "${command:debugSettings}"
+                        }
+                    },
+                    {
+                        "label": "ROS: rosrun",
+                        "description": "Runs an executable using rosrun",
+                        "body": {
+                            "type": "ros",
+                            "command": "rosrun",
+                            "name": "",
+                            "package": "",
+                            "target": "",
+                            "debugSettings": "${command:debugSettings}"
+                        }
+                    }
+                ]
             }
-          },
-          {
-            "label": "ROS: rosrun",
-            "description": "Runs an executable using rosrun",
-            "body": {
-              "type": "ros",
-              "command": "rosrun",
-              "name": "",
-              "package": "",
-              "target": "",
-              "debugSettings": "${command:debugSettings}"
+        ],
+        "languages": [
+            {
+                "id": "xml",
+                "extensions": [
+                    "launch",
+                    "srdf",
+                    "test",
+                    "urdf",
+                    "xacro"
+                ]
+            },
+            {
+                "id": "yaml",
+                "extensions": [
+                    "rviz"
+                ]
             }
-          }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "ros.createCatkinPackage",
+                    "when": "explorerResourceIsFolder"
+                }
+            ]
+        },
+        "problemMatchers": [
+            {
+                "name": "$catkin-gcc",
+                "fileLocation": "absolute",
+                "owner": "catkin",
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         ]
-      }
-    ],
-    "languages": [
-      {
-        "id": "xml",
-        "extensions": [
-          "launch",
-          "srdf",
-          "test",
-          "urdf",
-          "xacro"
-        ]
-      },
-      {
-        "id": "yaml",
-        "extensions": [
-          "rviz"
-        ]
-      }
-    ],
-    "menus": {
-      "explorer/context": [
-        {
-          "command": "ros.createCatkinPackage",
-          "when": "explorerResourceIsFolder"
-        }
-      ]
     },
-    "problemMatchers": [
-      {
-        "name": "$catkin-gcc",
-        "fileLocation": "absolute",
-        "owner": "catkin",
-        "pattern": {
-          "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-          "file": 1,
-          "line": 2,
-          "column": 3,
-          "severity": 4,
-          "message": 5
-        }
-      }
+    "scripts": {
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "vscode:prepublish": "tsc -p ./"
+    },
+    "dependencies": {
+        "underscore": "^1.8.3",
+        "vscode-debugadapter": "^1.15.0",
+        "vscode-debugprotocol": "^1.15.0",
+        "xmlrpc": "^1.3.2"
+    },
+    "devDependencies": {
+        "@types/mocha": "^2.2.32",
+        "@types/node": "^6.0.40",
+        "@types/underscore": "^1.7.36",
+        "@types/xmlrpc": "^1.3.2",
+        "mocha": "^2.3.3",
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0"
+    },
+    "extensionDependencies": [
+        "ajshort.msg"
     ]
-  },
-  "scripts": {
-    "compile": "tsc -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "vscode:prepublish": "tsc -p ./"
-  },
-  "dependencies": {
-    "underscore": "^1.8.3",
-    "vscode-debugadapter": "^1.15.0",
-    "vscode-debugprotocol": "^1.15.0",
-    "xmlrpc": "^1.3.2"
-  },
-  "devDependencies": {
-    "@types/mocha": "^2.2.32",
-    "@types/node": "^6.0.40",
-    "@types/underscore": "^1.7.36",
-    "@types/xmlrpc": "^1.3.2",
-    "mocha": "^2.3.3",
-    "typescript": "^2.0.3",
-    "vscode": "^1.0.0"
-  },
-  "extensionDependencies": [
-    "ajshort.msg"
-  ]
 }
