@@ -88,7 +88,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     sourceRosAndWorkspace();
 
-    await platformHelper.setup();
+    // await platformHelper.setup();
 
     return {
         getBaseDir: () => baseDir,
