@@ -1,6 +1,6 @@
 {
     "name": "vscode-ros",
-    "version": "0.4.0-alpha",
+    "version": "0.4.0",
     "publisher": "ms-riot",
     "engines": {
         "vscode": "^1.26.0"
