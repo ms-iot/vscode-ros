@@ -1,6 +1,6 @@
 import * as vscode from "vscode"
 
-export async function performPlatformSetup(): Promise<void>
+export async function setup(): Promise<void>
 {
     if (process.platform === "win32")
     {

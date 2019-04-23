@@ -122,7 +122,7 @@ export class StatusBarItem {
     public constructor(private api: XmlRpcApi) {
         this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
         this.item.text = "$(question) ROS master";
-        this.item.command = extension.RosCommands.ShowMasterStatus;
+        this.item.command = extension.Commands.ShowMasterStatus;
     }
 
     public activate() {
