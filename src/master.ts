@@ -6,7 +6,7 @@ import * as path from "path";
 
 import * as extension from "./extension";
 
-export function launchCore() {
+export function startCore() {
     let newProcessOptions = {
         cwd: extension.baseDir,
         env: extension.env,
@@ -27,10 +27,7 @@ export function launchCore() {
     });
 }
 
-/**
- * Kills the roscore process.
- */
-export function terminateCore(api: XmlRpcApi) {
+export function stopCore(api: XmlRpcApi) {
     if (process.platform === "win32") {
         api.getPid().then(pid => child_process.exec(`taskkill /pid ${pid} /f`));
     }
@@ -81,11 +78,6 @@ export function launchMonitor(context: vscode.ExtensionContext) {
             });
         }
     });
-    // setInterval(() => {
-    //     api.check().then((status) => {
-    //         update();
-    //     });
-    // }, 200);
 }
 
 function getMasterStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Uri): string {
