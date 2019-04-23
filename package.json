@@ -1,26 +1,26 @@
 {
     "name": "ros",
-    "displayName": "ROS",
-    "icon": "assets/icon.png",
-    "description": "Development support for Robot Operating System (ROS)",
     "version": "0.3.0",
     "publisher": "ajshort",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/ajshort/vscode-ros.git"
-    },
     "engines": {
         "vscode": "^1.26.0"
     },
+    "displayName": "ROS",
+    "description": "Development support for Robot Operating System (ROS)",
+    "icon": "assets/icon.png",
     "categories": [
         "Debuggers",
         "Other"
     ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ajshort/vscode-ros.git"
+    },
+    "license": "MIT",
+    "main": "./out/src/extension",
     "activationEvents": [
         "*"
     ],
-    "main": "./out/src/extension",
     "contributes": {
         "commands": [
             {
