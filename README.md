@@ -1,4 +1,8 @@
-# ROS VSCode Extension
+# ROS Extension for Visual Studio Code
+
+**This fork from https://github.com/ajshort/vscode-ros is experimental.**
+
+**This is still work in progress; it is still unstable and anything could be changed/removed.**
 
 This [Visual Studio Code (VSCode)][vscode] extension provides support for [Robot Operating System (ROS)][ros]
 development.
@@ -36,54 +40,16 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 
 ## Commands
 
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Command</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Create Catkin Package</td>
-      <td><code>ros.createCatkinPackage</code></td>
-      <td>
-        Create a catkin package. You can right click on a folder in the explorer to create it in a specific location.
-      </td>
-    </tr>
-    <tr>
-      <td>Create Terminal</td>
-      <td><code>ros.createTerminal</code></td>
-      <td>Create a terminal with ROS sourced.</td>
-    </tr>
-    <tr>
-      <td>Show Master Status</td>
-      <td><code>ros.showMasterStatus</code></td>
-      <td>Open a detail view showing details about the ROS master.</td>
-    </tr>
-    <tr>
-      <td>Start Core</td>
-      <td><code>ros.startCore</code></td>
-      <td>Spawn a ROS core</td>
-    </tr>
-    <tr>
-      <td>Stop Core</td>
-      <td><code>ros.stopCore</code></td>
-      <td>Kill the ROS core</td>
-    </tr>
-    <tr>
-      <td>Update C++ Properties</td>
-      <td><code>ros.updateCppProperties</code></td>
-      <td>Update the C++ include path to include ROS.</td>
-    </tr>
-    <tr>
-      <td>Update Python Path</td>
-      <td><code>ros.updatePythonPath</code></td>
-      <td>Update the Python path to include ROS.</td>
-    </tr>
-  </tbody>
-</table>
+| Name | Command | Description | Supported on Windows? |
+|:---:|:---:|:---|:---:|
+| Create Catkin Package | `ros.createCatkinPackage` | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. | [] |
+| Create Terminal | `ros.createTerminal` | Create a terminal with ROS sourced. | [x] |
+| Show Master Status | `ros.showMasterStatus` | Open a detail view showing details about the ROS master. | [x] |
+| Start Core | `ros.startCore` | Spawn a ROS core | [x] |
+| Stop Core | `ros.stopCore` | Terminate the ROS core | [x] |
+| Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. | [] |
+| Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. | [] |
+
 
 [issues]: https://github.com/ajshort/vscode-ros/issues
 [repo]: https://github.com/ajshort/vscode-ros
