@@ -22,7 +22,7 @@ distro if this can't be done automatically.
 
 To start ROS master, use the "ROS: Start Core" command. The "ROS master" indicator in the bottom left will show if the
 master is currently running, and you can click on this to view parameters etc. If you hit F5 you can create a debug
-configuration to run a `rosrun` or `roslaunch` command.
+configuration to run a `rosrun` or `roslaunch` command (*not yet supported on Windows*).
 
 The first time you open the workspace the extension will automatically create build and test tasks and update the
 C++ and Python paths. You can re-run this process later using the appropriate commands.
