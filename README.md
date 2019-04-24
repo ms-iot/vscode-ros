@@ -42,13 +42,13 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 
 | Name | Command | Description | Supported on Windows? |
 |:---:|:---:|:---|:---:|
-| Create Catkin Package | `ros.createCatkinPackage` | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. | [] |
-| Create Terminal | `ros.createTerminal` | Create a terminal with ROS sourced. | [x] |
-| Show Master Status | `ros.showMasterStatus` | Open a detail view showing details about the ROS master. | [x] |
-| Start Core | `ros.startCore` | Spawn a ROS core | [x] |
-| Stop Core | `ros.stopCore` | Terminate the ROS core | [x] |
-| Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. | [] |
-| Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. | [] |
+| Create Catkin Package | `ros.createCatkinPackage` | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. | |
+| Create Terminal | `ros.createTerminal` | Create a terminal with ROS sourced. | &check; |
+| Show Master Status | `ros.showMasterStatus` | Open a detail view showing details about the ROS master. | &check; |
+| Start Core | `ros.startCore` | Spawn a ROS core | &check; |
+| Stop Core | `ros.stopCore` | Terminate the ROS core | &check; |
+| Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. | |
+| Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. | |
 
 
 [issues]: https://github.com/ajshort/vscode-ros/issues
