@@ -55,29 +55,31 @@ export function launchMonitor(context: vscode.ExtensionContext) {
 
     panel.webview.html = getMasterStatusWebviewContent(stylesheet, script);
 
-    const masterApi = new XmlRpcApi(extension.env.ROS_MASTER_URI);
-    masterApi.check().then((status) => {
-        if (status) {
-            let getParameters = masterApi.getParam("/");
-            let getSystemState = masterApi.getSystemState();
+    setInterval(() => {
+        const masterApi = new XmlRpcApi(extension.env.ROS_MASTER_URI);
+        masterApi.check().then((status: boolean) => {
+            if (status) {
+                let getParameters = masterApi.getParam("/");
+                let getSystemState = masterApi.getSystemState();
 
-            Promise.all([getParameters, getSystemState]).then(([parameters, systemState]) => {
-                let parametersJSON = JSON.stringify(parameters);
-                let systemStateJSON = JSON.stringify(systemState);
+                Promise.all([getParameters, getSystemState]).then(([parameters, systemState]) => {
+                    let parametersJSON = JSON.stringify(parameters);
+                    let systemStateJSON = JSON.stringify(systemState);
 
+                    panel.webview.postMessage({
+                        status: status,
+                        parameters: parametersJSON,
+                        systemState: systemStateJSON,
+                    });
+                });
+            }
+            else {
                 panel.webview.postMessage({
                     status: status,
-                    parameters: parametersJSON,
-                    systemState: systemStateJSON,
                 });
-            });
-        }
-        else {
-            panel.webview.postMessage({
-                status: status,
-            });
-        }
-    });
+            }
+        });
+    }, 100);
 }
 
 function getMasterStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Uri): string {
