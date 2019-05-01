@@ -1,0 +1,10 @@
+trigger:
+- master
+
+jobs:
+- job: Compile
+
+  steps:
+    - script: |
+        set
+      displayName: Show all environment variables
