@@ -1,0 +1,40 @@
+name: $(BuildID).$(Date:yyMMdd)$(Rev:.r)
+
+trigger:
+- master
+
+variables:
+  nodeVersion: '>=10.15.3'
+  npmVersion: 'latest'
+
+jobs:
+- job: Compile
+
+  steps:
+    - script: |
+        set
+      displayName: Show all environment variables
+      condition: eq(variables['system.debug'], 'true')
+
+    - task: NodeTool@0
+      displayName: Setup Node.js environment
+      inputs:
+        versionSpec: $(nodeVersion)
+
+    - task: Npm@1
+      displayName: Override npm version to $(npmVersion)
+      inputs:
+        command: custom
+        verbose: true
+        customCommand: "install --global npm@$(npmVersion)"
+
+    - task: Npm@1
+      displayName: Workspace setup based on package-lock.json
+      inputs:
+        command: custom
+        verbose: true
+        customCommand: "ci"
+
+    - script: |
+        tsc -p ./
+      displayName: Compile src
