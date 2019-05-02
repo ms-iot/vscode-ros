@@ -1,7 +1,35 @@
 name: $(BuildID).$(Date:yyMMdd)$(Rev:.r)
 
+# auto-trigger build on merge
 trigger:
-- master
+  batch: false
+  branches:
+    include:
+      [
+        "master",
+      ]
+  paths:
+    exclude:
+      [
+        ".vscode",
+        ".github",
+        "*.md",
+      ]
+
+# auto-trigger build on pull request
+pr:
+  branches:
+    include:
+      [
+        "master",
+      ]
+  paths:
+    exclude:
+      [
+        ".vscode",
+        ".github",
+        "*.md",
+      ]
 
 variables:
   nodeVersion: '>=10.15.3'
