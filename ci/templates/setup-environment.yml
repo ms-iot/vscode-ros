@@ -2,7 +2,7 @@ steps:
   - bash: |
       printenv
     displayName: 'Dump environment variables'
-    condition: eq(variables['system.debug'], 'true')
+    condition: and(succeeded(), eq(variables['system.debug'], 'true'))
 
   - task: NodeTool@0
     displayName: 'Use Node version: $(nodeVersion)'
@@ -21,4 +21,4 @@ steps:
       echo Node Version = `node --version`
       echo NPM Version = `npm --version`
     displayName: 'Check environment versions'
-    condition: eq(variables['system.debug'], 'true')
+    condition: and(succeeded(), eq(variables['system.debug'], 'true'))
