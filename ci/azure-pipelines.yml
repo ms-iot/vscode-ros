@@ -6,14 +6,14 @@ trigger:
   branches:
     include:
       [
-        "master",
+        'master',
       ]
   paths:
     exclude:
       [
-        ".vscode",
-        ".github",
-        "*.md",
+        '.vscode',
+        '.github',
+        '*.md',
       ]
 
 # auto-trigger build on pull request
@@ -21,14 +21,14 @@ pr:
   branches:
     include:
       [
-        "master",
+        'master',
       ]
   paths:
     exclude:
       [
-        ".vscode",
-        ".github",
-        "*.md",
+        '.vscode',
+        '.github',
+        '*.md',
       ]
 
 variables:
@@ -36,18 +36,6 @@ variables:
   npmVersion: 'latest'
 
 jobs:
-- job: Build_Windows
-  pool:
-    vmImage: 'windows-2019'
-    demands: npm
-  steps:
-    - template: templates/setup-environment.yml
-    - template: templates/install-dependencies.yml
-    - template: templates/compile.yml
-    - script: |
-        node node_modules/vscode/bin/test
-      displayName: 'Run tests'
-
 - job: Build_Ubuntu
   pool:
     vmImage: 'ubuntu-16.04'
@@ -78,10 +66,22 @@ jobs:
         node node_modules/vscode/bin/test
       displayName: 'Run tests'
 
-- job: Publish
+- job: Build_Windows
   dependsOn:
-  - Build_Windows
-  - Build_Ubuntu
-  - Build_macOS
+    [
+      'Build_Ubuntu',
+      'Build_macOS',
+    ]
+  pool:
+    vmImage: 'windows-2019'
+    demands: npm
   steps:
+    - template: templates/setup-environment.yml
+    - template: templates/install-dependencies.yml
+    - template: templates/compile.yml
+    - script: |
+        node node_modules/vscode/bin/test
+      displayName: 'Run tests'
+
+    # only publish artifact once
     - template: templates/package-artifact.yml
