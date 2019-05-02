@@ -9,7 +9,7 @@ variables:
 jobs:
 - job: Windows
   pool:
-    name: windows-2019
+    vmImage: 'windows-2019'
     demands: npm
   steps:
     - script: |
