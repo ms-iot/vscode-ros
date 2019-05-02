@@ -49,3 +49,11 @@ jobs:
     - script: |
         node node_modules/vscode/bin/test
       displayName: 'Run tests'
+
+- job: Publish
+  dependsOn:
+  - Build:Windows
+  - Build:Ubuntu
+  - BUild:macOS
+  steps:
+    - template: templates/package-artifact.yml

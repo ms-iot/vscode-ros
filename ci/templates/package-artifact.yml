@@ -1,0 +1,40 @@
+steps:
+  - script: |
+      npm install --global vsce
+    displayName: 'Install vsce'
+    # condition:
+    #   and(
+    #     succeeded(),
+    #     eq(variables['build'], 'true')
+    #   )
+
+  - script: |
+      npm run package:dev
+    displayName: 'Create dev-version .vsix package'
+    # condition:
+    #   and(
+    #     succeeded(),
+    #     eq(variables['build'], 'true')
+    #   )
+
+  - task: CopyFiles@2
+    inputs:
+      contents: "*.vsix"
+      targetFolder: $(Build.ArtifactStagingDirectory)
+    displayName: "Stage .vsix"
+    # condition:
+    #   and(
+    #     succeeded(),
+    #     eq(variables['build'], 'true')
+    #   )
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathtoPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: VSIX
+    displayName: "Publish .vsix to Arifacts"
+    # condition:
+    #   and(
+    #     succeeded(),
+    #     eq(variables['build'], 'true')
+    #   )

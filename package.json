@@ -213,6 +213,7 @@
     "scripts": {
         "buildOnce": "tsc -p ./",
         "compile": "tsc -watch -p ./",
+        "package:dev": "vsce package -o vscode-ros-dev.vsix",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "vscode:prepublish": "tsc -p ./"
     },
