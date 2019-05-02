@@ -13,5 +13,5 @@ jobs:
     vmImage: 'windows-2019'
     demands: npm
   steps:
-    - template: ./templates/dependency-setup.yml
-    - template: ./templates/build-and-run-tests.yml
+    - template: dependency-setup.yml
+    - template: build-and-run-tests.yml
