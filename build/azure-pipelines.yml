@@ -39,5 +39,5 @@ jobs:
           run buildOnce
 
     - script: |
-        node node_modules/vscome/bin/test
+        node node_modules/vscode/bin/test
       displayName: 'Run tests'
