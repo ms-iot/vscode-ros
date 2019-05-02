@@ -1,5 +1,9 @@
 # ROS Extension for Visual Studio Code
 
+[![Build Status](https://dev.azure.com/kejxu/ROS%20on%20Windows/_apis/build/status/vscode-ros.ci-validation?branchName=master)](https://dev.azure.com/kejxu/ROS%20on%20Windows/_build/latest?definitionId=5&branchName=master)
+
+## About this extension
+
 **This fork from https://github.com/ajshort/vscode-ros is experimental.**
 
 **This is still work in progress; it is still unstable and anything could be changed/removed.**
