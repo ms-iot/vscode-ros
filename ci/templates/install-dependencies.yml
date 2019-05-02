@@ -3,6 +3,6 @@ steps:
     displayName: 'Install dependencies with package-lock.json'
     inputs:
       command: custom
-      verbose: true
+      verbose: false
       customCommand: |
         ci

@@ -3,6 +3,6 @@ steps:
     displayName: 'Compile sources'
     inputs:
       command: custom
-      verbose: true
+      verbose: false
       customCommand: |
         run buildOnce

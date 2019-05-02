@@ -13,7 +13,7 @@ steps:
     displayName: "Use NPM version: $(npmVersion)"
     inputs:
         command: custom
-        verbose: true
+        verbose: false
         customCommand: |
           install -g npm@$(npmVersion)
 
