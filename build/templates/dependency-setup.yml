@@ -1,0 +1,25 @@
+steps:
+  - bash: |
+      printenv
+    displayName: 'Dump environment variables'
+    condition: eq(variables['system.debug'], 'true')
+
+  - task: NodeTool@0
+    displayName: 'Use Node version: $(nodeVersion)'
+    inputs:
+      versionSpec: $(nodeVersion)
+
+  - task: Npm@1
+    displayName: "Use NPM version: $(npmVersion)"
+    inputs:
+        command: custom
+        verbose: true
+        customCommand: |
+          install -g npm@$(npmVersion)
+
+  - bash: |
+      echo ===Dependency Versions===
+      echo Node Version = `node --version`
+      echo NPM Version = `npm --version`
+    displayName: 'Check environment versions'
+    condition: eq(variables['system.debug'], 'true')
