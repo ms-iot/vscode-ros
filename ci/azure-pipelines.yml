@@ -8,7 +8,7 @@ variables:
   npmVersion: 'latest'
 
 jobs:
-- job: Windows
+- job: Build_Windows
   pool:
     vmImage: 'windows-2019'
     demands: npm
@@ -20,7 +20,7 @@ jobs:
         node node_modules/vscode/bin/test
       displayName: 'Run tests'
 
-- job: Ubuntu
+- job: Build_Ubuntu
   pool:
     vmImage: 'ubuntu-16.04'
     demands: npm
@@ -38,7 +38,7 @@ jobs:
       env:
         DISPLAY: :10
 
-- job: macOS
+- job: Build_macOS
   pool:
     vmImage: 'macOS-10.14'
     demands: npm
@@ -52,8 +52,8 @@ jobs:
 
 - job: Publish
   dependsOn:
-  - Build:Windows
-  - Build:Ubuntu
-  - BUild:macOS
+  - Build_Windows
+  - Build_Ubuntu
+  - Build_macOS
   steps:
     - template: templates/package-artifact.yml
