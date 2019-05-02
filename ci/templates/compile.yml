@@ -1,0 +1,8 @@
+steps:
+  - task: Npm@1
+    displayName: 'Compile sources'
+    inputs:
+      command: custom
+      verbose: true
+      customCommand: |
+        run buildOnce

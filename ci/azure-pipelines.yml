@@ -1,0 +1,44 @@
+name: $(BuildID).$(Date:yyMMdd)$(Rev:.r)
+
+trigger:
+- master
+
+variables:
+  nodeVersion: '>=10.15.3'
+  npmVersion: 'latest'
+
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'windows-2019'
+    demands: npm
+  steps:
+    - template: templates/setup-environment.yml
+    - template: templates/install-dependencies.yml
+    - template: templates/compile.yml
+    - template: templates/run-tests.yml
+
+- job: Ubuntu
+  pool:
+    vmImage: 'ubuntu-16.04'
+    demands: npm
+  steps:
+    - template: templates/setup-environment.yml
+    - template: templates/install-dependencies.yml
+    - template: templates/compile.yml
+    - script: |
+        set -e
+        /usr/bin/Xvfb :10 -ac >> /tmp/Xvfb.out 2>&1 &
+        disown -ar
+      displayName: 'Start svfb'
+    - template: templates/run-tests.yml
+
+- job: macOS
+  pool:
+    vmImage: 'macOS-10.14'
+    demands: npm
+  steps:
+    - template: templates/setup-environment.yml
+    - template: templates/install-dependencies.yml
+    - template: templates/compile.yml
+    - template: templates/run-tests.yml

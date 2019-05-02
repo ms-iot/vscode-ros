@@ -18,7 +18,6 @@ steps:
           install -g npm@$(npmVersion)
 
   - bash: |
-      echo ===Dependency Versions===
       echo Node Version = `node --version`
       echo NPM Version = `npm --version`
     displayName: 'Check environment versions'

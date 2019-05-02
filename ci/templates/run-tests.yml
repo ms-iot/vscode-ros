@@ -1,0 +1,4 @@
+steps:
+  - script: |
+      node node_modules/vscode/bin/test
+    displayName: 'Run tests'

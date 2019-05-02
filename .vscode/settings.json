@@ -1,5 +1,10 @@
-// Place your settings in this file to overwrite default and user settings.
+// Workspace settings used to overwrite default and user settings
 {
+    // build
+    "files.associations": {
+        "**/ci/**/*.yml": "azure-pipelines"
+    },
+
     "files.exclude": {
         "out": false // set this to true to hide the "out" folder with the compiled JS files
     },
