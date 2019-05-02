@@ -1,6 +1,4 @@
 steps:
-  - template: templates/dependency-setup.yml
-
   - task: Npm@1
     displayName: 'Install dependencies with package-lock.json'
     inputs:
