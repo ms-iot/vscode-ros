@@ -63,8 +63,17 @@ The ROS Extension for Visual Studio Code collects usage data and sends it to Mic
 
 This extension respects the `telemetry.enableTelemetry` setting, learn more about [this option](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting). -->
 
+## Contributors
 
-[issues]: https://github.com/ajshort/vscode-ros/issues
-[repo]: https://github.com/ajshort/vscode-ros
+A big ***Thank you!*** to everyone that have helped make this extension better!
+
+- Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
+- James Giller ([@JamesGiller](https://github.com/JamesGiller))
+
+<!-- link to files -->
+[changelog]: CHANGELOG.md
+[contributing]: CONTRIBUTING.md
+
+<!-- link to external sites -->
 [ros]: http://ros.org
 [vscode]: https://code.visualstudio.com
