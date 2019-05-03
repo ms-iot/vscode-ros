@@ -1,3 +1,6 @@
+// Copyright (c) Andrew Short. All rights reserved.
+// Licensed under the MIT License.
+
 import * as child_process from "child_process";
 import * as _ from "underscore";
 import * as vscode from "vscode";

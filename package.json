@@ -19,7 +19,7 @@
         "ros",
         "robot"
     ],
-    "license": "MIT",
+    "license": "SEE LICENSE IN LICENSE",
     "homepage": "https://github.com/ms-iot/vscode-ros",
     "repository": {
         "type": "git",

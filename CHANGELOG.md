@@ -7,14 +7,14 @@
 
 ## 0.2.0
 
-* Require VSCode 1.18.
+* Require `vscode` 1.18
 * Add support for catkin tools alongside catkin_make (thanks to @JamesGiller).
 * Remove some unimplemented commands.
 * Add "ROS: Create Terminal" command.
 
 ## 0.1.0
 
-* Require vscode 1.14
+* Require `vscode` 1.14
 * Automatically discover catkin make tasks.
 * Don't error when no args are specified (#3).
 

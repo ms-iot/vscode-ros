@@ -1,3 +1,6 @@
+// Copyright (c) Andrew Short. All rights reserved.
+// Licensed under the MIT License.
+
 import * as fs from "fs";
 
 function call(fn: Function, ...args: any[]): Promise<any> {

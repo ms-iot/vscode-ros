@@ -1,3 +1,6 @@
+// Copyright (c) Andrew Short. All rights reserved.
+// Licensed under the MIT License.
+
 import * as extension from "./extension";
 import * as utils from "./utils";
 import { basename } from "path";

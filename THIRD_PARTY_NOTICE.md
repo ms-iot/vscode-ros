@@ -1,4 +1,14 @@
-# MIT License
+# THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+*Do Not Translate or Localize*
+
+This project (`ms-iot/vscode-ros`) is created as a fork from the original project ([`ajshort/vscode-ros`](https://github.com/ajshort/vscode-ros)). Copyright headers based on the original license were added to the source code from the original project.
+
+The original copyright notice and the license under which Microsoft received such third party material are set forth below. Microsoft reserves all other rights not expressly granted, whether by implication, estoppel or otherwise.
+
+## `ajshort/vscode-ros` ORIGINAL LICENSE
+```
+MIT License
 
 Copyright &copy; 2016 Andrew Short
 
@@ -14,3 +24,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```

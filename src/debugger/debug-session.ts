@@ -1,3 +1,6 @@
+// Copyright (c) Andrew Short. All rights reserved.
+// Licensed under the MIT License.
+
 import * as cp from "child_process";
 import * as adapter from "vscode-debugadapter";
 import { DebugProtocol as Protocol } from "vscode-debugprotocol";

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 function removeAllChildElements(e) {
     while (e.firstChild) {
         e.removeChild(e.firstChild);

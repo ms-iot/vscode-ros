@@ -2,17 +2,12 @@
 
 [![Build Status](https://dev.azure.com/kejxu/ROS%20on%20Windows/_apis/build/status/vscode-ros.ci-validation?branchName=master)](https://dev.azure.com/kejxu/ROS%20on%20Windows/_build/latest?definitionId=5&branchName=master)
 
-## About this extension
 
-**This fork from https://github.com/ajshort/vscode-ros is experimental.**
+The ROS Extension for [Visual Studio Code (VSCode)][vscode] provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
 
-**This is still work in progress; it is still unstable and anything could be changed/removed.**
+***This fork from https://github.com/ajshort/vscode-ros is currently experimental.***
 
-This [Visual Studio Code (VSCode)][vscode] extension provides support for [Robot Operating System (ROS)][ros]
-development.
-
-* [Repository][repo]
-* [Issues][issues]
+***This is still work in progress; it is still unstable and anything could be changed/removed.***
 
 ## Getting Started
 
@@ -53,6 +48,20 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 | Stop Core | `ros.stopCore` | Terminate the ROS core | &check; |
 | Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. | |
 | Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. | |
+
+<!-- ## Roadmap -->
+
+## Reporting Security Issues
+
+Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
+
+Further information, including the [MSRC PGP](https://technet.microsoft.com/en-us/security/dn606155) key, can be found in the [Security TechCenter](https://technet.microsoft.com/en-us/security/default).
+
+<!-- ## Data and Telemetry
+
+The ROS Extension for Visual Studio Code collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](https://privacy.microsoft.com/en-us/privacystatement) to learn more.
+
+This extension respects the `telemetry.enableTelemetry` setting, learn more about [this option](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting). -->
 
 
 [issues]: https://github.com/ajshort/vscode-ros/issues
