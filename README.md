@@ -1,6 +1,6 @@
 # ROS Extension for Visual Studio Code
 
-[![Build Status](https://dev.azure.com/kejxu/ROS%20on%20Windows/_apis/build/status/vscode-ros.ci-validation?branchName=master)](https://dev.azure.com/kejxu/ROS%20on%20Windows/_build/latest?definitionId=5&branchName=master)
+[![Build Status](https://dev.azure.com/ros-win/ros-win/_apis/build/status/vscode-ros.ci?branchName=master)](https://dev.azure.com/ros-win/ros-win/_build/latest?definitionId=57&branchName=master)
 
 
 The ROS Extension for [Visual Studio Code (VSCode)][vscode] provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
