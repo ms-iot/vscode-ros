@@ -8,6 +8,8 @@ trigger:
     - master
   paths:
     exclude:
+    - .vscode/*
+    - .github/*
     - CHANGELOG.md
     - CONTRIBUTING.md
     - LICENSE
@@ -22,6 +24,8 @@ pr:
     - master
   paths:
     exclude:
+    - .vscode/*
+    - .github/*
     - CHANGELOG.md
     - CONTRIBUTING.md
     - LICENSE
