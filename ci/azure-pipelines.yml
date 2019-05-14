@@ -91,7 +91,7 @@ stages:
   condition:
     and(
       succeeded(),
-      in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI')
+      in(variables['build.reason'], 'Manual', 'IndividualCI', 'BatchedCI')
     )
   jobs:
   - job: package_artifact
@@ -113,8 +113,8 @@ stages:
     condition:
       and(
         succeeded(),
-        in(variables['Build.Reason'], 'Manual'),
-        eq(variables['build.release'], true)
+        in(variables['build.reason'], 'Manual'),
+        eq(variables['build.release'], 'true')
       )
     steps:
       - template: templates/setup-environment.yml

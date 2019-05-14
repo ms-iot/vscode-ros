@@ -4,6 +4,12 @@ steps:
     displayName: 'Dump environment variables'
     condition: and(succeeded(), eq(variables['system.debug'], 'true'))
 
+  - bash: |
+      echo "build.reason: $(build.reason)"
+      echo "build.release: $(build.release)"
+    displayName: 'Dump pipeline variables'
+    condition: and(succeeded(), eq(variables['system.debug'], 'true'))
+
   - task: NodeTool@0
     displayName: 'Use Node version: $(nodeVersion)'
     inputs:
