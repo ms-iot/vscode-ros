@@ -6,7 +6,6 @@ trigger:
   branches:
     include:
     - master
-    - cd_pipeline
   paths:
     exclude:
     - CHANGELOG.md
@@ -21,7 +20,6 @@ pr:
   branches:
     include:
     - master
-    - cd_pipeline
   paths:
     exclude:
     - CHANGELOG.md
