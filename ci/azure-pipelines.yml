@@ -35,8 +35,8 @@ variables:
   npmVersion: 'latest'
 
 stages:
-- stage: buildandtest
-  displayName: Build and Test
+- stage: build
+  displayName: Build
   jobs:
   - job: build_windows
     displayName: Windows
@@ -86,12 +86,16 @@ stages:
           node node_modules/vscode/bin/test
         displayName: 'Run tests'
 
-  - job: PublishArtifact
-    displayName: Publish Artifact
-    dependsOn:
-    - build_windows
-    - build_ubuntu
-    - build_macos
+- stage: package
+  displayName: Package
+  condition:
+    and(
+      succeeded(),
+      in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI')
+    )
+  jobs:
+  - job: PackageArtifact
+    displayName: Artifact
     pool:
       vmImage: 'ubuntu-16.04'
       demands: npm
