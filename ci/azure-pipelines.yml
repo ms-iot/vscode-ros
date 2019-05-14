@@ -86,15 +86,15 @@ stages:
           node node_modules/vscode/bin/test
         displayName: 'Run tests'
 
-- stage: package
-  displayName: Package
+- stage: publish
+  displayName: Publish
   condition:
     and(
       succeeded(),
       in(variables['Build.Reason'], 'Manual', 'IndividualCI', 'BatchedCI')
     )
   jobs:
-  - job: PackageArtifact
+  - job: package_artifact
     displayName: Artifact
     pool:
       vmImage: 'ubuntu-16.04'
@@ -104,3 +104,27 @@ stages:
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
       - template: templates/package-artifact.yml
+
+  - job: publish_extension
+    displayName: Extension
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: npm
+    condition:
+      and(
+        succeeded(),
+        in(variables['Build.Reason'], 'Manual'),
+        eq(variables['build.release'], true)
+      )
+    steps:
+      - template: templates/setup-environment.yml
+      - template: templates/install-dependencies.yml
+      - template: templates/compile.yml
+      - script: |
+          npm install --global vsce
+        displayName: 'Install vsce'
+      - script: |
+          vsce publish -p $env:PUBLISHER_TOKEN
+        displayName: 'Publish extension'
+        env:
+          PUBLISHER_TOKEN: $(build.release.token_kejxu)
