@@ -36,24 +36,6 @@ variables:
   npmVersion: 'latest'
 
 jobs:
-- job: Build_Ubuntu
-  pool:
-    vmImage: 'ubuntu-16.04'
-    demands: npm
-  steps:
-    - template: templates/setup-environment.yml
-    - template: templates/install-dependencies.yml
-    - template: templates/compile.yml
-    - script: |
-        set -e
-        /usr/bin/Xvfb :10 -ac >> /tmp/Xvfb.out 2>&1 &
-        disown -ar
-      displayName: 'Start xvfb'
-    - script: 'node node_modules/vscode/bin/test'
-      displayName: 'Run tests'
-      env:
-        DISPLAY: :10
-
 - job: Build_macOS
   pool:
     vmImage: 'macOS-10.14'
@@ -83,5 +65,23 @@ jobs:
         node node_modules/vscode/bin/test
       displayName: 'Run tests'
 
-    # only publish artifact once
+- job: Build_Ubuntu
+  pool:
+    vmImage: 'ubuntu-16.04'
+    demands: npm
+  steps:
+    - template: templates/setup-environment.yml
+    - template: templates/install-dependencies.yml
+    - template: templates/compile.yml
+    - script: |
+        set -e
+        /usr/bin/Xvfb :10 -ac >> /tmp/Xvfb.out 2>&1 &
+        disown -ar
+      displayName: 'Start xvfb'
+    - script: 'node node_modules/vscode/bin/test'
+      displayName: 'Run tests'
+      env:
+        DISPLAY: :10
+
+    # only publish artifact (once) from Ubuntu
     - template: templates/package-artifact.yml
