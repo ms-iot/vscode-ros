@@ -1,0 +1,21 @@
+steps:
+  - checkout:
+      none
+
+  - template: templates/setup-environment.yml
+
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Download .vsix Artifacts'
+    inputs:
+      artifactName: VSIX
+      downloadPath: $(System.DefaultWorkingDirectory)
+
+  - script: |
+      npm install --global vsce
+    displayName: 'Install vsce'
+
+  - script: |
+      vsce publish -p $env:PUBLISHER_TOKEN --packagePath ./VSIX/*.vsix
+    displayName: 'Publish extension'
+    env:
+      PUBLISHER_TOKEN: $(build.release.token_kejxu)
