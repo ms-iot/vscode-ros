@@ -1,4 +1,4 @@
-name: $(BuildID).$(Date:yyMMdd)$(Rev:.r)
+name: $(BuildID).$(Date:yyMMdd)
 
 # CI triggers
 trigger:
@@ -118,15 +118,22 @@ stages:
         in(variables['build.reason'], 'Manual'),
         eq(variables['build.release'], 'true')
       )
+    dependsOn:
+      package_artifact
     steps:
+      - checkout:
+          none
       - template: templates/setup-environment.yml
-      - template: templates/install-dependencies.yml
-      - template: templates/compile.yml
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Download .vsix Artifacts'
+        inputs:
+          artifactName: VSIX
+          downloadPath: $(System.DefaultWorkingDirectory)
       - script: |
           npm install --global vsce
         displayName: 'Install vsce'
       - script: |
-          vsce publish -p $env:PUBLISHER_TOKEN
+          vsce publish -p $env:PUBLISHER_TOKEN --packagePath *.vsix
         displayName: 'Publish extension'
         env:
           PUBLISHER_TOKEN: $(build.release.token_kejxu)
