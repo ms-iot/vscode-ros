@@ -96,10 +96,10 @@ stages:
       in(variables['build.reason'], 'Manual', 'IndividualCI', 'BatchedCI')
     )
   jobs:
-  - job: publish_windows
+  - job: publish_ubuntu
     displayName: Extension
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'ubuntu-16.04'
       demands: npm
     steps:
       - template: templates/setup-environment.yml
