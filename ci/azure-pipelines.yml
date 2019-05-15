@@ -107,7 +107,7 @@ stages:
       - template: templates/compile.yml
       - template: templates/package-artifact.yml
       - script: |
-          vsce publish -p $env:PUBLISHER_TOKEN --packagePath ./VSIX/*.vsix
+          vsce publish -p $env:PUBLISHER_TOKEN
         displayName: 'Publish extension'
         env:
           PUBLISHER_TOKEN: $(build.release.token_kejxu)
