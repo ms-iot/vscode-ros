@@ -133,10 +133,7 @@ stages:
           npm install --global vsce
         displayName: 'Install vsce'
       - script: |
-          find . -iname "*"
-        displayName: 'List all files in current directory'
-      - script: |
-          vsce publish -p $env:PUBLISHER_TOKEN --packagePath *.vsix
+          vsce publish -p $env:PUBLISHER_TOKEN --packagePath ./VSIX/*.vsix
         displayName: 'Publish extension'
         env:
           PUBLISHER_TOKEN: $(build.release.token_kejxu)
