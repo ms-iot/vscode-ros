@@ -1,36 +1,57 @@
 # Release Instructions
 
-## Working with a fork
-```
-git pull upstream <branch>
-git checkout -b <task_branch>
-```
+The following instructions are intended for developers responsible for maintaining this repository.
 
-### Syncing tags with parent repo:
-```
-git fetch upstream
-git push origin --tags
-```
+## Working with this repository
 
-## Authorizing a manual release (through the release pipeline)
+Here are a few recommendations for maintainers for this project:
+- While this project is created as a fork from the [original vscode-ros project](https://github.com/ajshort/vscode-ros), please **do not** merge `upstream/master` and push (unless planned).
+- Please **do not** alter commit history unless it is necessary and everyone working on the project is notified:
+    - **do not** use `git rebase`
+    - **do not** use `git reset --hard` to revert to any commit earlier than current `HEAD`
+    - try to avoid calling `git push --force`
+- Please **try not to** directly push to `origin`, work with forks and merge changes through pull requests
+- Because **tags** are used for release purposes ***for this project***, please **do not** abuse the use of them, and follow instructions for releasing.
 
+## Publishing a release
 
-## Triggering an automatic release (with a new tag)
-```
-git pull
-```
+### Release checklist
 
-```
-git tag --list
-git log --oneline -n 10
-git tag <tagname> fcd3f46
-git push origin <tagname>
-```
+Please review the following before publishing a new release:
 
-TODO: `git tag <tag>` only creates a lightweight tag. Signed tags are recommended for release purposes.
+Metadata:
+- [ ] update `README.md`
+- [ ] update `CHANGELOG.md`
+- [ ] update version number in `package.json`
 
-to remove a tag
-```
-git tag -d <tagname>
-git push origin --delete <tagname>
-```
+### Authorizing a manual release (through the release pipeline)
+
+The [CI pipeline](https://ros-win.visualstudio.com/ros-win/_build?definitionId=57) would be the manual release channel. To authorize a release, schedule a release build for the [vscode-ros.ci pipeline](https://ros-win.visualstudio.com/ros-win/_build?definitionId=57).
+
+![schedule a release build](media/documentation/pipeline-manual-release.png)
+
+### Triggering an automatic release (with a new tag)
+
+The [auto-publish pipeline](https://ros-win.visualstudio.com/ros-win/_build?definitionId=58) automatically picks up new tags and starts a release build automatically once a new tag is created. To create a new tag, follow these steps in a local `ms-iot/vscode-ros` git repository:
+
+1. Sync with remote
+    ```
+    git pull
+    ```
+
+2. Create a new tag
+    ```
+    git tag --list
+    git log --oneline -n <log_number>
+    git tag <tag_name> <commit_id>
+    git push origin <tag_name>
+    ```
+
+> `TODO:` The `git tag <tag_name>` command creates a lightweight tag. Signed tags are supposedly recommended for release purposes.
+
+3. Remove (cleanup) a tag
+    ```
+    git tag --list
+    git tag -d <tag_name>
+    git push origin --delete <tag_name>
+    ```
