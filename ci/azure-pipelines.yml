@@ -47,6 +47,11 @@ stages:
       vmImage: 'windows-2019'
       demands: npm
     steps:
+      - script: |
+          echo $env:PUBLISHER_TOKEN
+        displayName: 'debug secret'
+        env:
+          PUBLISHER_TOKEN: $(build.release.token_kejxu)
       - template: templates/setup-environment.yml
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
