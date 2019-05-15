@@ -110,7 +110,7 @@ stages:
   - job: publish_extension
     displayName: Extension
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'windows-2019'
       demands: npm
     condition:
       and(

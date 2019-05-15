@@ -10,7 +10,7 @@ steps:
 
   - script: |
       npm run package:dev
-    displayName: 'Create dev-version .vsix package'
+    displayName: 'Create .vsix package'
     # condition:
     #   and(
     #     succeeded(),
