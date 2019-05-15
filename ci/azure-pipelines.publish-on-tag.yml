@@ -1,0 +1,91 @@
+name: $(BuildID).$(Date:yyMMdd)
+
+# CI triggers
+trigger:
+  batch: false
+  tags:
+    include:
+    - v*
+
+# PR triggers
+pr: none
+
+variables:
+  nodeVersion: '>=10.15.3'
+  npmVersion: 'latest'
+
+stages:
+- stage: build
+  displayName: Build
+  jobs:
+  - job: build_windows
+    displayName: Windows
+    timeoutInMinutes: 10
+    pool:
+      vmImage: 'windows-2019'
+      demands: npm
+    steps:
+      - template: templates/setup-environment.yml
+      - template: templates/install-dependencies.yml
+      - template: templates/compile.yml
+      - script: |
+          node node_modules/vscode/bin/test
+        displayName: 'Run tests'
+
+  - job: build_ubuntu
+    displayName: Ubuntu
+    timeoutInMinutes: 10
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: npm
+    steps:
+      - template: templates/setup-environment.yml
+      - template: templates/install-dependencies.yml
+      - template: templates/compile.yml
+      - script: |
+          set -e
+          /usr/bin/Xvfb :10 -ac >> /tmp/Xvfb.out 2>&1 &
+          disown -ar
+        displayName: 'Start xvfb'
+      - script: 'node node_modules/vscode/bin/test'
+        displayName: 'Run tests'
+        env:
+          DISPLAY: :10
+
+  - job: build_macos
+    displayName: MacOS
+    timeoutInMinutes: 10
+    pool:
+      vmImage: 'macOS-10.14'
+      demands: npm
+    steps:
+      - template: templates/setup-environment.yml
+      - template: templates/install-dependencies.yml
+      - template: templates/compile.yml
+      - script: |
+          node node_modules/vscode/bin/test
+        displayName: 'Run tests'
+
+- stage: publish
+  displayName: Publish
+  condition:
+    and(
+      succeeded(),
+      in(variables['build.reason'], 'IndividualCI', 'BatchedCI')
+    )
+  jobs:
+  - job: publish_ubuntu
+    displayName: Extension
+    pool:
+      vmImage: 'ubuntu-16.04'
+      demands: npm
+    steps:
+      - template: templates/setup-environment.yml
+      - template: templates/install-dependencies.yml
+      - template: templates/compile.yml
+      - template: templates/package-artifact.yml
+      - bash: |
+          vsce publish -p $PUBLISHER_TOKEN
+        displayName: 'Publish extension'
+        env:
+          PUBLISHER_TOKEN: $(build.release.token_kejxu)
