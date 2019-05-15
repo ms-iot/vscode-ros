@@ -47,11 +47,6 @@ stages:
       vmImage: 'windows-2019'
       demands: npm
     steps:
-      - script: |
-          echo $env:PUBLISHER_TOKEN
-        displayName: 'debug secret'
-        env:
-          PUBLISHER_TOKEN: $(build.release.token_kejxu)
       - template: templates/setup-environment.yml
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
@@ -111,8 +106,8 @@ stages:
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
       - template: templates/package-artifact.yml
-      - script: |
-          vsce publish -p $env:PUBLISHER_TOKEN
+      - bash: |
+          vsce publish -p $PUBLISHER_TOKEN
         displayName: 'Publish extension'
         env:
           PUBLISHER_TOKEN: $(build.release.token_kejxu)
