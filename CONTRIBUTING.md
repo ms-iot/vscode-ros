@@ -10,7 +10,7 @@ When working with team-managed projects (like this one), it is generally conside
 
 ### Creating a fork
 
-After creating a fork of a repository, make sure to [configure a remote](gitconfigureremote) first. For example, when working on a fork from this repository, do this first:
+After creating a fork of a repository, make sure to [configure a remote][git_configure_remote] first. For example, when working on a fork from this repository, do this first:
 
 ```
 git remote -v
@@ -21,7 +21,7 @@ git add upstream https://github.com/ms-iot/vscode-ros
 
 Forks do not automatically sync with the original repository, to keep forks up-to-date, here are a few ways to accomplish that:
 
-1. `fetch + merge` as described in GitHub's [syncing a fork guide](gitsyncfork)
+1. `fetch + merge` as described in GitHub's [syncing a fork guide][git_sync_fork]
     ```
     git fetch upstream
     git checkout <branch>
@@ -69,7 +69,7 @@ git push origin --tags
 
 ## Releasing a new version
 
-Please check [release instructions](releaseinstructions).
+Please check [release instructions][release_instructions].
 
 ## Microsoft Open Source Code of Conduct
 
@@ -80,8 +80,8 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 <!-- link to files -->
-[releaseinstructions]: RELEASE_INSTRUCTIONS.md
+[release_instructions]: RELEASE_INSTRUCTIONS.md
 
 <!-- link to external sites -->
-[gitconfigureremote]: https://help.github.com/en/articles/configuring-a-remote-for-a-fork
-[gitsyncfork]: https://help.github.com/en/articles/syncing-a-fork
+[git_configure_remote]: https://help.github.com/en/articles/configuring-a-remote-for-a-fork
+[git_sync_fork]: https://help.github.com/en/articles/syncing-a-fork

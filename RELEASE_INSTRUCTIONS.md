@@ -5,7 +5,7 @@ The following instructions are intended for developers responsible for maintaini
 ## Working with this repository
 
 Here are a few recommendations for maintainers for this project:
-- While this project is created as a fork from the [original vscode-ros project](ajshort_vscode-ros), please **do not** merge `upstream/master` and push (unless planned).
+- While this project is created as a fork from the [original vscode-ros project][ajshort_vscode-ros], please **do not** merge `upstream/master` and push (unless planned).
 - Please **do not** alter commit history unless it is necessary and everyone working on the project is notified:
     - **do not** use `git rebase`
     - **do not** use `git reset --hard` to revert to any commit earlier than current `HEAD`
@@ -26,13 +26,13 @@ Metadata:
 
 ### Authorizing a manual release (through the release pipeline)
 
-To authorize a release manually, schedule a release build with the [vscode-ros.ci pipeline](vscode-ros.ci).
+To authorize a release manually, schedule a release build with the [vscode-ros.ci pipeline][vscode-ros.ci].
 
 ![schedule a release build](media/documentation/pipeline-manual-release.png)
 
 ### Triggering an automatic release (with a new tag)
 
-The [auto-publish pipeline](vscode-ros.auto-publish) automatically picks up new tags and starts a release build automatically once a new tag is created. To create a new tag, follow these steps in a local `ms-iot/vscode-ros` git repository:
+The [auto-publish pipeline][vscode-ros.auto-publish] automatically picks up new tags and starts a release build automatically once a new tag is created. To create a new tag, follow these steps in a local `ms-iot/vscode-ros` git repository:
 
 1. Sync with remote
     ```
