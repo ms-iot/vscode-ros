@@ -1,13 +1,10 @@
-# ROS Extension for Visual Studio Code
+# Visual Studio Code Extension for ROS
 
 [![Build Status](https://dev.azure.com/ros-win/ros-win/_apis/build/status/vscode-ros.ci?branchName=master)](https://dev.azure.com/ros-win/ros-win/_build/latest?definitionId=57&branchName=master)
 
-
-The ROS Extension for [Visual Studio Code (VSCode)][vscode] provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
+The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
 
 ***This fork from https://github.com/ajshort/vscode-ros is currently experimental.***
-
-***This is still work in progress; it is still unstable and anything could be changed/removed.***
 
 ## Getting Started
 
@@ -59,7 +56,7 @@ Further information, including the [MSRC PGP](https://technet.microsoft.com/en-u
 
 <!-- ## Data and Telemetry
 
-The ROS Extension for Visual Studio Code collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](https://privacy.microsoft.com/en-us/privacystatement) to learn more.
+This extension collects usage data and sends it to Microsoft to help improve our products and services. Read our [privacy statement](https://privacy.microsoft.com/en-us/privacystatement) to learn more.
 
 This extension respects the `telemetry.enableTelemetry` setting, learn more about [this option](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting). -->
 
