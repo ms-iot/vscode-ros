@@ -4,13 +4,13 @@ Please follow general work flow while contributing to this repository.
 
 ## Working with a fork
 
-![a typical git fork](/media/documentation/git-fork.png)
+![a typical git fork](media/documentation/git-fork.png)
 
 When working with team-managed projects (like this one), it is generally considered better practice not to make changes directly (through `git push`). Instead, changes are better made through pull requests so that all changes could be reviewed, verified, and clearly recorded as commits.
 
 ### Creating a fork
 
-After creating a fork of a repository, make sure to [configure a remote](https://help.github.com/en/articles/configuring-a-remote-for-a-fork) first. For example, when working on a fork from this repository, do this first:
+After creating a fork of a repository, make sure to [configure a remote](git_configure_remote) first. For example, when working on a fork from this repository, do this first:
 
 ```
 git remote -v
@@ -21,7 +21,7 @@ git add upstream https://github.com/ms-iot/vscode-ros
 
 Forks do not automatically sync with the original repository, to keep forks up-to-date, here are a few ways to accomplish that:
 
-1. `fetch + merge` as described in GitHub's [syncing a fork guide](https://help.github.com/en/articles/syncing-a-fork)
+1. `fetch + merge` as described in GitHub's [syncing a fork guide](git_sync_fork)
     ```
     git fetch upstream
     git checkout <branch>
@@ -69,7 +69,7 @@ git push origin --tags
 
 ## Releasing a new version
 
-Please check [release instructions](RELEASE_INSTRUCTIONS.md).
+Please check [release instructions](release_instructions).
 
 ## Microsoft Open Source Code of Conduct
 
@@ -78,3 +78,10 @@ This project welcomes contributions and suggestions. Most contributions require 
 When you submit a pull request, a CLA-bot will automatically determine whether you need to provide a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions provided by the bot. You will only need to do this once across all repositories using our CLA.
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+<!-- link to files -->
+[release_instructions]: RELEASE_INSTRUCTIONS.md
+
+<!-- link to external sites -->
+[git_configure_remote]: https://help.github.com/en/articles/configuring-a-remote-for-a-fork
+[git_sync_fork]: https://help.github.com/en/articles/syncing-a-fork
