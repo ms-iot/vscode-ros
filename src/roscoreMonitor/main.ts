@@ -49,7 +49,7 @@ function generateTopicsTable(publishers, subscribers) {
     t.appendChild(th);
 
     let tb = document.createElement("tbody");
-    topics = Object.keys({
+    let topics = Object.keys({
         ...publishers,
         ...subscribers,
     });
@@ -158,4 +158,4 @@ function initializeMasterMonitor() {
     });
 };
 
-window.onload = initializeMasterMonitor();
+window.onload = () => initializeMasterMonitor();

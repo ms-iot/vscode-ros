@@ -49,10 +49,10 @@ export function launchMonitor(context: vscode.ExtensionContext) {
         }
     );
 
-    let stylesheet = vscode.Uri.file(path.join(context.extensionPath, "assets", "masterMonitorStyle.css")).with({
+    let stylesheet = vscode.Uri.file(path.join(context.extensionPath, "assets", "roscoreMonitorStyle.css")).with({
         scheme: "vscode-resource"
     });
-    let script = vscode.Uri.file(path.join(context.extensionPath, "assets", "masterMonitor.js")).with({
+    let script = vscode.Uri.file(path.join(context.extensionPath, "out", "src", "roscoreMonitor", "main.js")).with({
         scheme: "vscode-resource"
     });
 
