@@ -10,7 +10,7 @@
     },
     "displayName": "ROS",
     "description": "Develop Robot Operating System (ROS) with Visual Studio Code.",
-    "icon": "assets/icon.png",
+    "icon": "media/icon.png",
     "categories": [
         "Debuggers",
         "Other"
