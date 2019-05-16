@@ -10,10 +10,12 @@ trigger:
     exclude:
     - .vscode/*
     - .github/*
+    - media/*
     - CHANGELOG.md
     - CONTRIBUTING.md
     - LICENSE
     - README.md
+    - RELEASE_INSTRUCTIONS.md
     - THIRD_PARTY_NOTICE.md
 
 # PR triggers
@@ -26,10 +28,12 @@ pr:
     exclude:
     - .vscode/*
     - .github/*
+    - media/*
     - CHANGELOG.md
     - CONTRIBUTING.md
     - LICENSE
     - README.md
+    - RELEASE_INSTRUCTIONS.md
     - THIRD_PARTY_NOTICE.md
 
 variables:
