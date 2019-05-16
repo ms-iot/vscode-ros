@@ -28,7 +28,7 @@ Metadata:
 
 To authorize a release manually, schedule a release build with the [vscode-ros.ci pipeline][vscode-ros.ci].
 
-![schedule a release build](media/documentation/pipeline-manual-release.png)
+![schedule a release build][schedule_manual_release_build]
 
 ### Triggering an automatic release (with a new tag)
 
@@ -57,7 +57,7 @@ The [auto-publish pipeline][vscode-ros.auto-publish] automatically picks up new 
     ```
 
 <!-- link to files -->
-
+[schedule_manual_release_build]: /media/documentation/pipeline-manual-release.png
 
 <!-- link to external sites -->
 [ajshort_vscode-ros]: https://github.com/ajshort/vscode-ros

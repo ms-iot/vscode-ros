@@ -4,7 +4,7 @@ Please follow general work flow while contributing to this repository.
 
 ## Working with a fork
 
-![a typical git fork](media/documentation/git-fork.png)
+![a typical git fork][fork_repo]
 
 When working with team-managed projects (like this one), it is generally considered better practice not to make changes directly (through `git push`). Instead, changes are better made through pull requests so that all changes could be reviewed, verified, and clearly recorded as commits.
 
@@ -80,6 +80,7 @@ When you submit a pull request, a CLA-bot will automatically determine whether y
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 <!-- link to files -->
+[fork_repo]: /media/documentation/git-fork.png
 [release_instructions]: RELEASE_INSTRUCTIONS.md
 
 <!-- link to external sites -->
