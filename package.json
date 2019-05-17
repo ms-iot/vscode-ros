@@ -184,6 +184,25 @@
                 "extensions": [
                     "rviz"
                 ]
+            },
+            {
+                "id": "ros.msg",
+                "aliases": [
+                    "ROS Message"
+                ],
+                "extensions": [
+                    ".action",
+                    ".msg",
+                    ".srv"
+                ],
+                "configuration": "./languages/ros.msg.configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "ros.msg",
+                "scopeName": "source.ros.msg",
+                "path": "./languages/syntaxes/ros.msg.tmLanguage.json"
             }
         ],
         "menus": {
@@ -231,8 +250,5 @@
         "mocha": "^6.1.4",
         "typescript": "^3.4.3",
         "vscode": "^1.1.33"
-    },
-    "extensionDependencies": [
-        "ajshort.msg"
-    ]
+    }
 }

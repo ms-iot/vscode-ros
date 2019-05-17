@@ -1,0 +1,115 @@
+{
+    "name": "ros.msg",
+    "scopeName": "source.ros.msg",
+    "fileTypes": [
+        "action",
+        "msg",
+        "srv"
+    ],
+    "patterns": [
+        {
+            "name": "meta.field.msg",
+            "begin": "^\\s*(string)\\b",
+            "beginCaptures": {
+                "1": {
+                    "name": "storage.type.msg"
+                }
+            },
+            "end": "$",
+            "patterns": [
+                {
+                    "begin": "=",
+                    "end": "$",
+                    "contentName": "string.unquoted.msg"
+                },
+                {
+                    "include": "#field"
+                }
+            ]
+        },
+        {
+            "name": "meta.field.msg",
+            "begin": "^\\s*([/\\w]+)\\b",
+            "beginCaptures": {
+                "1": {
+                    "patterns": [
+                        {
+                            "include": "#types"
+                        }
+                    ]
+                }
+            },
+            "end": "$",
+            "patterns": [
+                {
+                    "include": "#field"
+                }
+            ]
+        },
+        {
+            "include": "#comments"
+        }
+    ],
+    "repository": {
+        "field": {
+            "patterns": [
+                {
+                    "include": "#comments"
+                },
+                {
+                    "include": "#identifier"
+                },
+                {
+                    "include": "#numeric-constant"
+                },
+                {
+                    "begin": "=",
+                    "end": "$",
+                    "patterns": [
+                        {
+                            "include": "#boolean-constant"
+                        },
+                        {
+                            "include": "#numeric-constant"
+                        },
+                        {
+                            "include": "#comments"
+                        }
+                    ]
+                }
+            ]
+        },
+        "comments": {
+            "match": "#.*",
+            "name": "comment.line.number-sign.msg"
+        },
+        "types": {
+            "patterns": [
+                {
+                    "match": "\\b(bool|u?int(8|16|32|64)|float(32|64)|string|time|duration)\\b",
+                    "name": "storage.type.msg"
+                },
+                {
+                    "match": "\\b(byte|char)\\b",
+                    "name": "invalid.deprecated.msg"
+                },
+                {
+                    "match": "\\b[a-zA-Z]\\w*(\\/[a-zA-Z]\\w*)?\\b",
+                    "name": "support.class"
+                }
+            ]
+        },
+        "identifier": {
+            "match": "\\b[a-zA-Z]\\w+\\b",
+            "name": "variable.parameter"
+        },
+        "boolean-constant": {
+            "match": "\\b(True|False)\\b",
+            "name": "constant.language.msg"
+        },
+        "numeric-constant": {
+            "match": "\\b[+-]?[0-9]*\\.?[0-9]+([eE][+-]?\\d+)?\\b",
+            "name": "constant.numeric.msg"
+        }
+    }
+}
