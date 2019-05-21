@@ -12,7 +12,6 @@ import * as debug from "./debug";
 import * as master from "./master";
 import * as pfs from "./promise-fs";
 import * as utils from "./utils";
-import * as platformHelper from "./platformHelper"
 
 /**
  * The catkin workspace base dir.
@@ -90,8 +89,6 @@ export async function activate(context: vscode.ExtensionContext) {
     }));
 
     sourceRosAndWorkspace();
-
-    // await platformHelper.setup();
 
     return {
         getBaseDir: () => baseDir,

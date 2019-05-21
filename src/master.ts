@@ -17,17 +17,7 @@ export function startCore() {
         windowsHide: false
     };
 
-    const masterProcess = child_process.spawn("roscore", [], newProcessOptions);
-
-    masterProcess.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-    masterProcess.stderr.on('data', (data) => {
-        console.log(`stderr: ${data}`);
-    });
-    masterProcess.on('close', (code) => {
-        console.log(`child process exited with code ${code}`);
-    });
+    child_process.spawn("roscore", [], newProcessOptions);
 }
 
 export function stopCore(api: XmlRpcApi) {
