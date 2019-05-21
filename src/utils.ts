@@ -83,17 +83,14 @@ export function getIncludeDirs(): Promise<string[]> {
     ));
 }
 
-export function findPackageFiles(packageName: string, filter:string, pattern: string): Promise<string[]> {
-    return new Promise((c, e) => child_process.exec(`catkin_find --without-underlays ${filter} ${packageName}`, 
-    { env: extension.env }, 
-    (err, out) =>
-    {
-        let findFilePromises = [];
-        let paths = out.trim().split(os.EOL);
-        paths.forEach(foundPath =>
-            {
+export function findPackageFiles(packageName: string, filter: string, pattern: string): Promise<string[]> {
+    return new Promise((c, _e) => child_process.exec(`catkin_find --without-underlays ${filter} ${packageName}`,
+        { env: extension.env }, (_err, out) => {
+            let findFilePromises = [];
+            let paths = out.trim().split(os.EOL);
+            paths.forEach(foundPath => {
                 let normalizedPath = path.win32.normalize(foundPath);
-                findFilePromises.push(new Promise((found) => child_process.exec(`where /r "${normalizedPath}" ` + pattern, 
+                findFilePromises.push(new Promise((found) => child_process.exec(`where /r "${normalizedPath}" ` + pattern,
                     { env: extension.env }, (err, out) => {
                         if (err) {
                             found(null);
@@ -104,8 +101,7 @@ export function findPackageFiles(packageName: string, filter:string, pattern: st
                 )));
             });
 
-        return Promise.all(findFilePromises).then(values =>
-            {
+            return Promise.all(findFilePromises).then(values => {
                 // remove null elements
                 values = values.filter(s => s != null) as string[];
 
@@ -113,8 +109,8 @@ export function findPackageFiles(packageName: string, filter:string, pattern: st
                 values = [].concat(...values);
                 c(values);
             });
-    }
-));
+        }
+    ));
 }
 
 /**
