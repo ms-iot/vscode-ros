@@ -49,7 +49,7 @@ export enum Commands {
     GetDebugSettings = "ros.getDebugSettings",
     Rosrun = "ros.rosrun",
     Roslaunch = "ros.roslaunch",
-    ShowMasterStatus = "ros.showMasterStatus",
+    ShowCoreStatus = "ros.showCoreStatus",
     StartRosCore = "ros.startCore",
     TerminateRosCore = "ros.stopCore",
     UpdateCppProperties = "ros.updateCppProperties",
@@ -141,11 +141,11 @@ function activateEnvironment(context: vscode.ExtensionContext) {
 
     // Set up the master.
     const masterApi = new master.XmlRpcApi(env.ROS_MASTER_URI);
-    const masterStatusItem = new master.StatusBarItem(masterApi);
+    const coreStatusItem = new master.StatusBarItem(masterApi);
 
-    masterStatusItem.activate();
+    coreStatusItem.activate();
 
-    subscriptions.push(masterStatusItem);
+    subscriptions.push(coreStatusItem);
     subscriptions.push(vscode.workspace.registerTaskProvider("catkin", new CatkinTaskProvider()));
     subscriptions.push(vscode.debug.registerDebugConfigurationProvider("ros", new debug.RosDebugConfigProvider()));
 
@@ -154,7 +154,7 @@ function activateEnvironment(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand(Commands.CreateCatkinPackage, catkin.createPackage),
         vscode.commands.registerCommand(Commands.CreateTerminal, utils.createTerminal),
         vscode.commands.registerCommand(Commands.GetDebugSettings, debug.getDebugSettings),
-        vscode.commands.registerCommand(Commands.ShowMasterStatus, () => { master.launchMonitor(context) }),
+        vscode.commands.registerCommand(Commands.ShowCoreStatus, () => { master.launchMonitor(context) }),
         vscode.commands.registerCommand(Commands.StartRosCore, master.startCore),
         vscode.commands.registerCommand(Commands.TerminateRosCore, () => { master.stopCore(masterApi) }),
         vscode.commands.registerCommand(Commands.UpdateCppProperties, build.updateCppProperties),

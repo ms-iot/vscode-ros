@@ -16,9 +16,9 @@ distro if this can't be done automatically.
 
 > You must build the catkin workspace at least once before the extension will recognise it.
 
-To start ROS master, use the "ROS: Start Core" command. The "ROS master" indicator in the bottom left will show if the
-master is currently running, and you can click on this to view parameters etc. If you hit F5 you can create a debug
-configuration to run a `rosrun` or `roslaunch` command (*not yet supported on Windows*).
+To start ROS core, use the "ROS: Start Core" command.
+The "ROS Core" indicator in the bottom left will show if the core is currently running, and you can click on this to view parameters etc.
+If you hit F5 you can create a debug configuration to run a `rosrun` or `roslaunch` command (*not yet supported on Windows*).
 
 The first time you open the workspace the extension will automatically create build and test tasks and update the
 C++ and Python paths. You can re-run this process later using the appropriate commands.
@@ -26,7 +26,7 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 ## Features
 
 * Automatic ROS environment configuration.
-* Allows starting, stopping and viewing the ROS master status.
+* Allows starting, stopping and viewing the ROS core status.
 * Automatically discover `catkin_make` or `catkin build` build tasks.
 * Create catkin packages using `catkin_create_pkg` script or `catkin create pkg`.
 * Run `rosrun` or `roslaunch` (breakpoints currently not supported).
@@ -36,15 +36,15 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 
 ## Commands
 
-| Name | Command | Description | Supported on Windows? |
-|:---:|:---:|:---|:---:|
-| Create Catkin Package | `ros.createCatkinPackage` | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. | |
-| Create Terminal | `ros.createTerminal` | Create a terminal with ROS sourced. | &check; |
-| Show Master Status | `ros.showMasterStatus` | Open a detail view showing details about the ROS master. | &check; |
-| Start Core | `ros.startCore` | Spawn a ROS core | &check; |
-| Stop Core | `ros.stopCore` | Terminate the ROS core | &check; |
-| Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. | |
-| Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. | |
+| Name | Command | Description |
+|:---:|:---:|:---|
+| Create Catkin Package | `ros.createCatkinPackage` | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. |
+| Create Terminal | `ros.createTerminal` | Create a terminal with ROS sourced. |
+| Show Core Status | `ros.showCoreStatus` | Open a detail view showing ROS core runtime status. |
+| Start Core | `ros.startCore` | Spawn a ROS core |
+| Stop Core | `ros.stopCore` | Terminate the ROS core |
+| Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. |
+| Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. |
 
 <!-- ## Roadmap -->
 

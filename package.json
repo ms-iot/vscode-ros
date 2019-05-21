@@ -56,8 +56,8 @@
                 "category": "ROS"
             },
             {
-                "command": "ros.showMasterStatus",
-                "title": "Show Master Status",
+                "command": "ros.showCoreStatus",
+                "title": "Show Core Status",
                 "category": "ROS"
             },
             {

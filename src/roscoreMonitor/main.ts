@@ -115,13 +115,13 @@ function generateServicesTable(services) {
     return t;
 }
 
-function initializeMasterMonitor() {
+function initializeCoreMonitor() {
     // handle message passed from extension to webview
     window.addEventListener("message", (event) => {
         const message = event.data;
         console.debug(message);
 
-        const masterStatus = document.getElementById("master-status");
+        const coreStatus = document.getElementById("ros-status");
         const parametersElement = document.getElementById("parameters");
         const topicsElement = document.getElementById("topics");
         const servicesElement = document.getElementById("services");
@@ -131,8 +131,8 @@ function initializeMasterMonitor() {
         removeAllChildElements(servicesElement);
 
         if (message.status) {
-            console.log("ROS master online");
-            masterStatus.textContent = "online";
+            console.log("ROS online");
+            coreStatus.textContent = "online";
 
             let parameters = JSON.parse(message.parameters);
             let systemState = JSON.parse(message.systemState);
@@ -152,10 +152,10 @@ function initializeMasterMonitor() {
             servicesElement.appendChild(generateServicesTable(systemState.services));
         }
         else {
-            console.log("ROS master offline");
-            masterStatus.textContent = "offline";
+            console.log("ROS offline");
+            coreStatus.textContent = "offline";
         }
     });
 };
 
-window.onload = () => initializeMasterMonitor();
+window.onload = () => initializeCoreMonitor();

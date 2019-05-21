@@ -41,8 +41,8 @@ export function stopCore(api: XmlRpcApi) {
 
 export function launchMonitor(context: vscode.ExtensionContext) {
     const panel = vscode.window.createWebviewPanel(
-        "rosMasterStatus",
-        "ROS Master Status",
+        "rosCoreStatus",
+        "ROS Core Status",
         vscode.ViewColumn.Two,
         {
             enableScripts: true,
@@ -56,7 +56,7 @@ export function launchMonitor(context: vscode.ExtensionContext) {
         scheme: "vscode-resource"
     });
 
-    panel.webview.html = getMasterStatusWebviewContent(stylesheet, script);
+    panel.webview.html = getCoreStatusWebviewContent(stylesheet, script);
 
     setInterval(() => {
         const masterApi = new XmlRpcApi(extension.env.ROS_MASTER_URI);
@@ -85,7 +85,7 @@ export function launchMonitor(context: vscode.ExtensionContext) {
     }, 100);
 }
 
-function getMasterStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Uri): string {
+function getCoreStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Uri): string {
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -97,8 +97,8 @@ function getMasterStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Ur
 </head>
 
 <body>
-    <h1>ROS Master Status</h1>
-    <h2 id="master-status">-</h2>
+    <h1>ROS Core Status</h1>
+    <h2 id="ros-status">-</h2>
 
     <div id="parameters"></div>
     <div id="topics"></div>
@@ -170,7 +170,7 @@ interface ISystemState {
 }
 
 /**
- * Shows the ROS master status in the status bar.
+ * Shows the ROS core status in the status bar.
  */
 export class StatusBarItem {
     private item: vscode.StatusBarItem;
@@ -179,8 +179,8 @@ export class StatusBarItem {
 
     public constructor(private api: XmlRpcApi) {
         this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
-        this.item.text = "$(question) ROS master";
-        this.item.command = extension.Commands.ShowMasterStatus;
+        this.item.text = "$(question) ROS core";
+        this.item.command = extension.Commands.ShowCoreStatus;
     }
 
     public activate() {
@@ -199,7 +199,7 @@ export class StatusBarItem {
             return;
         }
 
-        this.item.text = (status ? "$(check)" : "$(x)") + " ROS master";
+        this.item.text = (status ? "$(check)" : "$(x)") + " ROS core";
         this.status = status;
     }
 }
