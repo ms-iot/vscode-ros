@@ -15,7 +15,7 @@ trigger:
     - CONTRIBUTING.md
     - LICENSE
     - README.md
-    - RELEASE_INSTRUCTIONS.md
+    - MAINTAINERS_GUIDELINES.md
     - THIRD_PARTY_NOTICE.md
 
 # PR triggers
@@ -33,7 +33,7 @@ pr:
     - CONTRIBUTING.md
     - LICENSE
     - README.md
-    - RELEASE_INSTRUCTIONS.md
+    - MAINTAINERS_GUIDELINES.md
     - THIRD_PARTY_NOTICE.md
 
 variables:

@@ -69,7 +69,7 @@ git push origin --tags
 
 ## Releasing a new version
 
-Please check [release instructions][release_instructions].
+Please check [release instructions][maintainers_guidelines].
 
 ## Microsoft Open Source Code of Conduct
 
@@ -81,7 +81,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 <!-- link to files -->
 [fork_repo]: /media/documentation/git-fork.png
-[release_instructions]: RELEASE_INSTRUCTIONS.md
+[maintainers_guidelines]: MAINTAINERS_GUIDELINES.md
 
 <!-- link to external sites -->
 [git_configure_remote]: https://help.github.com/en/articles/configuring-a-remote-for-a-fork
