@@ -91,13 +91,8 @@ export function findPackageFiles(packageName: string, filter: string, pattern: s
             paths.forEach(foundPath => {
                 let normalizedPath = path.win32.normalize(foundPath);
                 findFilePromises.push(new Promise((found) => child_process.exec(`where /r "${normalizedPath}" ` + pattern,
-                    { env: extension.env }, (err, out) => {
-                        if (err) {
-                            found(null);
-                        } else {
-                            found(out.trim().split(os.EOL))
-                        }
-                    }
+                    { env: extension.env }, (err, out) =>
+                        err ? found(null) : found(out.trim().split(os.EOL))
                 )));
             });
 
