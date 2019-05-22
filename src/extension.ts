@@ -267,7 +267,6 @@ async function sourceRosAndWorkspace(): Promise<void> {
     if (!await pfs.exists(workspaceDevelPath)) {
         workspaceDevelPath = path.join(`${baseDir}`, "devel");
     }
-
     let wsSetupScript: string = path.format({
         dir: workspaceDevelPath,
         name: "setup",
