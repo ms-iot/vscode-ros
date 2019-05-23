@@ -4,8 +4,6 @@
 
 The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
 
-***This fork from https://github.com/ajshort/vscode-ros is currently experimental.***
-
 ## Getting Started
 
 The extension will automatically start when you open a catkin workspace.
