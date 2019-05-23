@@ -83,25 +83,46 @@ export function getIncludeDirs(): Promise<string[]> {
     ));
 }
 
+export function findPackageFiles(packageName: string, filter: string, pattern: string): Promise<string[]> {
+    return new Promise((c, _e) => child_process.exec(`catkin_find --without-underlays ${filter} ${packageName}`,
+        { env: extension.env }, (_err, out) => {
+            let findFilePromises = [];
+            let paths = out.trim().split(os.EOL);
+            paths.forEach(foundPath => {
+                let normalizedPath = path.win32.normalize(foundPath);
+                findFilePromises.push(new Promise((found) => child_process.exec(`where /r "${normalizedPath}" ` + pattern,
+                    { env: extension.env }, (err, out) =>
+                        err ? found(null) : found(out.trim().split(os.EOL))
+                )));
+            });
+
+            return Promise.all(findFilePromises).then(values => {
+                // remove null elements
+                values = values.filter(s => s != null) as string[];
+
+                // flatten
+                values = [].concat(...values);
+                c(values);
+            });
+        }
+    ));
+}
+
 /**
  * list full paths to all executables inside a package
  */
 export function findPackageExecutables(packageName: string): Promise<string[]> {
     let command: string;
     if (process.platform === "win32") {
-        const commandFindPackagePaths = `catkin_find --without-underlays --libexec ${packageName}`;
-        let paths = child_process.execSync(commandFindPackagePaths, { env: extension.env }).toString();
-        let normalizedPath = path.win32.normalize(paths.trim().split(os.EOL)[0]);
-        command = `where /r "${normalizedPath}" *.exe`;
-    }
-    else {
+        return findPackageFiles(packageName, `--libexec`, `*.exe`);
+    } else {
         const dirs = `catkin_find --without-underlays --libexec --share '${packageName}'`;
         command = `find $(${dirs}) -type f -executable`;
+        return new Promise((c, e) => child_process.exec(command, { env: extension.env }, (err, out) =>
+            err ? e(err) : c(out.trim().split(os.EOL))
+        ));
     }
 
-    return new Promise((c, e) => child_process.exec(command, { env: extension.env }, (err, out) =>
-        err ? e(err) : c(out.trim().split(os.EOL))
-    ));
 }
 
 /**
@@ -110,10 +131,7 @@ export function findPackageExecutables(packageName: string): Promise<string[]> {
 export function findPackageLaunchFiles(packageName: string): Promise<string[]> {
     let command: string;
     if (process.platform === "win32") {
-        const commandFindPackagePaths = `catkin_find --without-underlays --share ${packageName}`;
-        let paths = child_process.execSync(commandFindPackagePaths, { env: extension.env }).toString();
-        let normalizedPath = path.win32.normalize(paths.trim().split(os.EOL)[0]);
-        command = `where /r "${normalizedPath}" *.launch`;
+        return findPackageFiles(packageName, `--share`, `*.launch`);
     }
     else {
         const dirs = `catkin_find --without-underlays --share '${packageName}'`;

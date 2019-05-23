@@ -224,16 +224,28 @@ async function sourceRosAndWorkspace(): Promise<void> {
 
     const config = utils.getConfig();
     const distro = config.get("distro", "");
+    let setupScriptExt: string;
+    if (process.platform === "win32") {
+        setupScriptExt = ".bat";
+    }
+    else {
+        setupScriptExt = ".bash";
+    }
 
     if (distro) {
         try {
-            let setupScript: string;
+            let globalInstallPath: string;
             if (process.platform === "win32") {
-                setupScript = `C:\\opt\\ros\\${distro}\\x64\\setup.bat`;
+                globalInstallPath = path.join("C:", "opt", "ros", `${distro}`, "x64");
             }
             else {
-                setupScript = `/opt/ros/${distro}/setup.bash`;
+                globalInstallPath = path.join("/", "opt", "ros", `${distro}`);
             }
+            let setupScript: string = path.format({
+                dir: globalInstallPath,
+                name: "setup",
+                ext: setupScriptExt,
+            });
             env = await utils.sourceSetupFile(setupScript, {});
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
@@ -250,13 +262,16 @@ async function sourceRosAndWorkspace(): Promise<void> {
     }
 
     // Source the workspace setup over the top.
-    let wsSetupScript: string;
-    if (process.platform === "win32") {
-        wsSetupScript = `${baseDir}\\devel_isolated\\setup.bat`;
+    let workspaceDevelPath: string;
+    workspaceDevelPath = path.join(`${baseDir}`, "devel_isolated");
+    if (!await pfs.exists(workspaceDevelPath)) {
+        workspaceDevelPath = path.join(`${baseDir}`, "devel");
     }
-    else {
-        wsSetupScript = `${baseDir}/devel/setup.bash`;
-    }
+    let wsSetupScript: string = path.format({
+        dir: workspaceDevelPath,
+        name: "setup",
+        ext: setupScriptExt,
+    });
 
     if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(wsSetupScript)) {
         try {
