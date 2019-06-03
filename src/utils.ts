@@ -30,11 +30,9 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
             exportEnvCommand = `bash -c "source '${filename}' && env"`;
         }
 
-        let processOptions = {
+        let processOptions: child_process.ExecOptions = {
             cwd: extension.baseDir,
             env: env,
-            shell: "cmd",
-            windowsHide: false,
         };
         child_process.exec(exportEnvCommand, processOptions, (error, stdout, _stderr) => {
             if (!error) {
