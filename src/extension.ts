@@ -273,8 +273,8 @@ async function sourceRosAndWorkspace(): Promise<void> {
     if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(wsSetupScript)) {
         try {
             env = await utils.sourceSetupFile(wsSetupScript, env);
-        } catch (err) {
-            vscode.window.showWarningMessage("Could not source the workspace setup file.");
+        } catch (_err) {
+            vscode.window.showErrorMessage("Failed to source the workspace setup file.");
         }
     }
 

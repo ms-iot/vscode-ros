@@ -10,14 +10,16 @@ import * as path from "path";
 import * as extension from "./extension";
 
 export function startCore() {
-    let newProcessOptions = {
+    let launchCoreCommand: string = "roscore";
+    let processOptions: child_process.SpawnOptions = {
         cwd: extension.baseDir,
         env: extension.env,
-        shell: "cmd",
-        windowsHide: false
     };
 
-    child_process.spawn("roscore", [], newProcessOptions);
+    const roscoreProcess = child_process.spawn(launchCoreCommand, processOptions);
+    roscoreProcess.on('error', (_err) => {
+        vscode.window.showErrorMessage("Failed to launch ROS core.");
+    });
 }
 
 export function stopCore(api: XmlRpcApi) {
