@@ -3,6 +3,7 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
+import * as vscode_telemetry from "vscode-extension-telemetry";
 
 import * as build from "./build";
 import * as catkin from "./catkin";
