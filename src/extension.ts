@@ -11,11 +11,11 @@ import CppFormatter from "./cpp-formatter";
 import * as debug from "./debug";
 import * as master from "./master";
 import * as pfs from "./promise-fs";
+import * as telemetry from "./telemetry-helper";
 import * as utils from "./utils";
-import * as telemetry from "./telemetry";
 
-import * as rosrun from "./ros/rosrun";
 import * as roslaunch from "./ros/roslaunch";
+import * as rosrun from "./ros/rosrun";
 
 /**
  * The catkin workspace base dir.
@@ -60,7 +60,7 @@ export enum Commands {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    const logger: telemetry.ILogger = telemetry.getLogger(context);
+    const reporter = telemetry.getReporter(context);
 
     // Activate if we're in a catkin workspace.
     await determineBuildSystem(vscode.workspace.rootPath);
@@ -68,9 +68,6 @@ export async function activate(context: vscode.ExtensionContext) {
     if (buildSystem == BuildSystem.None) {
         return;
     }
-
-    console.log(`Activating ROS extension in "${baseDir}"`);
-    logger.logActivate();
 
     // Activate components when the ROS env is changed.
     context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
@@ -97,6 +94,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     sourceRosAndWorkspace();
 
+    reporter.sendTelemetryActivate();
     return {
         getBaseDir: () => baseDir,
         getEnv: () => env,
@@ -134,8 +132,6 @@ async function determineBuildSystem(dir: string): Promise<void> {
  * Activates components which require a ROS env.
  */
 function activateEnvironment(context: vscode.ExtensionContext) {
-    const logger: telemetry.ILogger = telemetry.getLogger(context);
-
     // Clear existing disposables.
     while (subscriptions.length > 0) {
         subscriptions.pop().dispose();
@@ -158,34 +154,34 @@ function activateEnvironment(context: vscode.ExtensionContext) {
     // register plugin commands
     subscriptions.push(
         vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
-            catkin.createPackage(logger);
+            catkin.createPackage(context);
         }),
         vscode.commands.registerCommand(Commands.CreateTerminal, () => {
-            utils.createTerminal(logger);
+            utils.createTerminal(context);
         }),
         vscode.commands.registerCommand(Commands.GetDebugSettings, () => {
-            debug.getDebugSettings(logger);
+            debug.getDebugSettings(context);
         }),
         vscode.commands.registerCommand(Commands.ShowCoreStatus, () => {
-            master.launchMonitor(context, logger);
+            master.launchMonitor(context);
         }),
         vscode.commands.registerCommand(Commands.StartRosCore, () => {
-            master.startCore(logger);
+            master.startCore(context);
         }),
         vscode.commands.registerCommand(Commands.TerminateRosCore, () => {
-            master.stopCore(masterApi, logger);
+            master.stopCore(context, masterApi);
         }),
         vscode.commands.registerCommand(Commands.UpdateCppProperties, () => {
-            build.updateCppProperties(logger);
+            build.updateCppProperties(context);
         }),
         vscode.commands.registerCommand(Commands.UpdatePythonPath, () => {
-            build.updatePythonPath(logger);
+            build.updatePythonPath(context);
         }),
         vscode.commands.registerCommand(Commands.Rosrun, () => {
-            rosrun.setup(logger);
+            rosrun.setup(context);
         }),
         vscode.commands.registerCommand(Commands.Roslaunch, () => {
-            roslaunch.setup(logger);
+            roslaunch.setup(context);
         }),
     );
 

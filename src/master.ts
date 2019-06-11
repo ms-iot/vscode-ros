@@ -2,18 +2,17 @@
 // Licensed under the MIT License.
 
 import * as child_process from "child_process";
+import * as path from "path";
 import * as _ from "underscore";
 import * as vscode from "vscode";
 import * as xmlrpc from "xmlrpc";
-import * as path from "path";
 
 import * as extension from "./extension";
-import * as telemetry from "./telemetry";
+import * as telemetry from "./telemetry-helper";
 
-export function startCore(logger?: telemetry.ILogger) {
-    if (logger) {
-        logger.logCommand(extension.Commands.StartRosCore);
-    }
+export function startCore(context: vscode.ExtensionContext) {
+    const reporter = telemetry.getReporter(context);
+    reporter.sendTelemetryCommand(extension.Commands.StartRosCore);
 
     let launchCoreCommand: string = "roscore";
     let processOptions: child_process.SpawnOptions = {
@@ -27,10 +26,9 @@ export function startCore(logger?: telemetry.ILogger) {
     });
 }
 
-export function stopCore(api: XmlRpcApi, logger?: telemetry.ILogger) {
-    if (logger) {
-        logger.logCommand(extension.Commands.TerminateRosCore);
-    }
+export function stopCore(context: vscode.ExtensionContext, api: XmlRpcApi) {
+    const reporter = telemetry.getReporter(context);
+    reporter.sendTelemetryCommand(extension.Commands.TerminateRosCore);
 
     if (process.platform === "win32") {
         api.getPid().then(pid => child_process.exec(`taskkill /pid ${pid} /f`));
@@ -40,10 +38,9 @@ export function stopCore(api: XmlRpcApi, logger?: telemetry.ILogger) {
     }
 }
 
-export function launchMonitor(context: vscode.ExtensionContext, logger?: telemetry.ILogger) {
-    if (logger) {
-        logger.logCommand(extension.Commands.ShowCoreStatus);
-    }
+export function launchMonitor(context: vscode.ExtensionContext) {
+    const reporter = telemetry.getReporter(context);
+    reporter.sendTelemetryCommand(extension.Commands.ShowCoreStatus);
 
     const panel = vscode.window.createWebviewPanel(
         "rosCoreStatus",

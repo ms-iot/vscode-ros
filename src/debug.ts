@@ -5,16 +5,15 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import * as extension from "./extension";
-import * as telemetry from "./telemetry";
+import * as telemetry from "./telemetry-helper";
 import * as utils from "./utils";
 
 /**
  * Gets stringified settings to pass to the debug server.
  */
-export async function getDebugSettings(logger?: telemetry.ILogger) {
-    if (logger) {
-        logger.logCommand(extension.Commands.GetDebugSettings);
-    }
+export async function getDebugSettings(context: vscode.ExtensionContext) {
+    const reporter = telemetry.getReporter(context);
+    reporter.sendTelemetryCommand(extension.Commands.GetDebugSettings);
 
     return JSON.stringify({ env: extension.env });
 }
