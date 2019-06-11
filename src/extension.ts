@@ -12,7 +12,7 @@ import * as debug from "./debug";
 import * as master from "./master";
 import * as pfs from "./promise-fs";
 import * as utils from "./utils";
-import * as telemetry from "./telemetry"
+import * as telemetry from "./telemetry";
 
 /**
  * The catkin workspace base dir.

@@ -4,7 +4,7 @@
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
-import * as vscodeUtils from "./vscode-utils"
+import * as vscodeUtils from "./vscode-utils";
 
 interface ITelemetryReporter {
     sendTelemetryEvent(
