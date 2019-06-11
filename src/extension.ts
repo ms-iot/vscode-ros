@@ -57,7 +57,7 @@ export enum Commands {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    const logger = telemetry.getLogger(context);
+    const logger: telemetry.ILogger = telemetry.getLogger(context);
 
     // Activate if we're in a catkin workspace.
     await determineBuildSystem(vscode.workspace.rootPath);
@@ -132,7 +132,7 @@ async function determineBuildSystem(dir: string): Promise<void> {
  * Activates components which require a ROS env.
  */
 function activateEnvironment(context: vscode.ExtensionContext) {
-    const logger = telemetry.getLogger(context);
+    const logger: telemetry.ILogger = telemetry.getLogger(context);
 
     // Clear existing disposables.
     while (subscriptions.length > 0) {

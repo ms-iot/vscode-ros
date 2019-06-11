@@ -35,7 +35,7 @@ enum TelemetryEvent {
     command = "command",
 }
 
-interface ILogger {
+export interface ILogger {
     logCommand(commandName: string): void;
     logActivate(result: string): void;
 }
