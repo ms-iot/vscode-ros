@@ -12,7 +12,7 @@ import * as debug from "./debug";
 import * as master from "./master";
 import * as pfs from "./promise-fs";
 import * as utils from "./utils";
-import * as telemetry from "./telemetry-reporter"
+import * as telemetry from "./telemetry"
 
 /**
  * The catkin workspace base dir.
@@ -57,22 +57,18 @@ export enum Commands {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const logger = telemetry.getLogger(context);
 
     // Activate if we're in a catkin workspace.
     await determineBuildSystem(vscode.workspace.rootPath);
 
     if (buildSystem == BuildSystem.None) {
-        reporter.sendTelemetryEvent(telemetry.EventName.Activate, {
-            result: "skipped",
-        });
+        logger.logActivate("skipped");
         return;
     }
 
     console.log(`Activating ROS extension in "${baseDir}"`);
-    reporter.sendTelemetryEvent(telemetry.EventName.Activate, {
-        result: "found_catkin",
-    });
+    logger.logActivate("found_catkin");
 
     // Activate components when the ROS env is changed.
     context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
@@ -136,7 +132,7 @@ async function determineBuildSystem(dir: string): Promise<void> {
  * Activates components which require a ROS env.
  */
 function activateEnvironment(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const logger = telemetry.getLogger(context);
 
     // Clear existing disposables.
     while (subscriptions.length > 0) {
@@ -160,63 +156,43 @@ function activateEnvironment(context: vscode.ExtensionContext) {
     // register plugin commands
     subscriptions.push(
         vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                name: Commands.CreateCatkinPackage,
-            });
+            logger.logCommand(Commands.CreateCatkinPackage);
             catkin.createPackage();
         }),
         vscode.commands.registerCommand(Commands.CreateTerminal, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.CreateTerminal,
-            });
+            logger.logCommand(Commands.CreateTerminal);
             utils.createTerminal();
         }),
         vscode.commands.registerCommand(Commands.GetDebugSettings, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.GetDebugSettings,
-            });
+            logger.logCommand(Commands.GetDebugSettings);
             debug.getDebugSettings();
         }),
         vscode.commands.registerCommand(Commands.ShowCoreStatus, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.ShowCoreStatus,
-            });
+            logger.logCommand(Commands.ShowCoreStatus);
             master.launchMonitor(context);
         }),
         vscode.commands.registerCommand(Commands.StartRosCore, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.StartRosCore,
-            });
+            logger.logCommand(Commands.StartRosCore);
             master.startCore();
         }),
         vscode.commands.registerCommand(Commands.TerminateRosCore, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.TerminateRosCore,
-            });
+            logger.logCommand(Commands.TerminateRosCore);
             master.stopCore(masterApi);
         }),
         vscode.commands.registerCommand(Commands.UpdateCppProperties, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.UpdateCppProperties,
-            });
+            logger.logCommand(Commands.UpdateCppProperties);
             build.updateCppProperties();
         }),
         vscode.commands.registerCommand(Commands.UpdatePythonPath, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.UpdatePythonPath,
-            });
+            logger.logCommand(Commands.UpdatePythonPath);
             build.updatePythonPath();
         }),
         vscode.commands.registerCommand(Commands.Rosrun, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.Rosrun,
-            });
+            logger.logCommand(Commands.Rosrun);
             rosrundelegate();
         }),
         vscode.commands.registerCommand(Commands.Roslaunch, () => {
-            reporter.sendTelemetryEvent(telemetry.EventName.Command, {
-                "name": Commands.Roslaunch,
-            });
+            logger.logCommand(Commands.Roslaunch);
             roslaunchdelegate();
         }),
     );
