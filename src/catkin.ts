@@ -1,14 +1,20 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import * as extension from "./extension";
 import * as cp from "child_process";
 import * as vscode from "vscode";
+
+import * as extension from "./extension";
+import * as telemetry from "./telemetry";
 
 /**
  * Interacts with the user to run a `catkin_create_pkg` command.
  */
-export async function createPackage(uri?: vscode.Uri) {
+export async function createPackage(logger?: telemetry.ILogger, uri?: vscode.Uri) {
+    if (logger) {
+        logger.logCommand(extension.Commands.CreateCatkinPackage);
+    }
+
     const name = await vscode.window.showInputBox({
         prompt: "Package name",
         validateInput: val => val.match(/^\w+$/) ? "" : "Invalid name",

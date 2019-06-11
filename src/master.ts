@@ -8,8 +8,13 @@ import * as xmlrpc from "xmlrpc";
 import * as path from "path";
 
 import * as extension from "./extension";
+import * as telemetry from "./telemetry";
 
-export function startCore() {
+export function startCore(logger?: telemetry.ILogger) {
+    if (logger) {
+        logger.logCommand(extension.Commands.StartRosCore);
+    }
+
     let launchCoreCommand: string = "roscore";
     let processOptions: child_process.SpawnOptions = {
         cwd: extension.baseDir,
@@ -22,7 +27,11 @@ export function startCore() {
     });
 }
 
-export function stopCore(api: XmlRpcApi) {
+export function stopCore(api: XmlRpcApi, logger?: telemetry.ILogger) {
+    if (logger) {
+        logger.logCommand(extension.Commands.TerminateRosCore);
+    }
+
     if (process.platform === "win32") {
         api.getPid().then(pid => child_process.exec(`taskkill /pid ${pid} /f`));
     }
@@ -31,7 +40,11 @@ export function stopCore(api: XmlRpcApi) {
     }
 }
 
-export function launchMonitor(context: vscode.ExtensionContext) {
+export function launchMonitor(context: vscode.ExtensionContext, logger?: telemetry.ILogger) {
+    if (logger) {
+        logger.logCommand(extension.Commands.ShowCoreStatus);
+    }
+
     const panel = vscode.window.createWebviewPanel(
         "rosCoreStatus",
         "ROS Core Status",

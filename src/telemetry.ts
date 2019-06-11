@@ -36,8 +36,8 @@ enum TelemetryEvent {
 }
 
 export interface ILogger {
+    logActivate(): void;
     logCommand(commandName: string): void;
-    logActivate(result: string): void;
 }
 
 class Logger {
@@ -47,15 +47,13 @@ class Logger {
         this.telemetryReporter = getTelemetryReporter(context);
     }
 
+    public logActivate(): void {
+        this.telemetryReporter.sendTelemetryEvent(TelemetryEvent.activate);
+    }
+
     public logCommand(commandName: string): void {
         this.telemetryReporter.sendTelemetryEvent(TelemetryEvent.command, {
             name: commandName,
-        });
-    }
-
-    public logActivate(result: string): void {
-        this.telemetryReporter.sendTelemetryEvent(TelemetryEvent.activate, {
-            result,
         });
     }
 }
