@@ -7,16 +7,9 @@ import * as path from "path";
 import * as _ from "underscore";
 import * as vscode from "vscode";
 
-import * as extension from "./extension";
-import * as pfs from "./promise-fs";
-import * as telemetry from "./telemetry-helper";
-
-/**
- * Gets the ROS config section.
- */
-export function getConfig(): vscode.WorkspaceConfiguration {
-    return vscode.workspace.getConfiguration("ros");
-}
+import * as extension from "../extension";
+import * as pfs from "../promise-fs";
+import * as telemetry from "../telemetry-helper";
 
 /**
  * Executes a setup file and returns the resulting env.

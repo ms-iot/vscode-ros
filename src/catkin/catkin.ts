@@ -1,11 +1,12 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import * as cp from "child_process";
+import * as child_process from "child_process";
 import * as vscode from "vscode";
 
-import * as extension from "./extension";
-import * as telemetry from "./telemetry-helper";
+import * as extension from "../extension";
+import * as telemetry from "../telemetry-helper";
+import * as catkin_task_provider from "./catkin-task-provider";
 
 /**
  * Interacts with the user to run a `catkin_create_pkg` command.
@@ -43,7 +44,7 @@ export async function createPackage(context: vscode.ExtensionContext, uri?: vsco
         createPkgCommand = `catkin create pkg --catkin-deps ${dependencies} -- ${name}`;
     }
 
-    cp.exec(createPkgCommand, opts, (err, stdout, stderr) => {
+    child_process.exec(createPkgCommand, opts, (err, stdout, stderr) => {
         if (!err) {
             vscode.workspace.openTextDocument(`${cwd}/${name}/package.xml`).then(vscode.window.showTextDocument);
         } else {
@@ -57,4 +58,8 @@ export async function createPackage(context: vscode.ExtensionContext, uri?: vsco
             vscode.window.showErrorMessage(message);
         }
     });
+}
+
+export function getCatkinTaskProvider(): catkin_task_provider.CatkinTaskProvider {
+    return new catkin_task_provider.CatkinTaskProvider();
 }

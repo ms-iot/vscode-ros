@@ -1,7 +1,8 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import RosDebugSession from "./debug-session";
-import { DebugSession } from "vscode-debugadapter";
+import * as adapter from "vscode-debugadapter";
 
-DebugSession.run(RosDebugSession);
+import * as session from "./debug-session";
+
+adapter.DebugSession.run(session.RosDebugSession);

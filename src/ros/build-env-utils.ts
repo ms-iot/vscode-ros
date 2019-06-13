@@ -5,9 +5,9 @@ import * as path from "path";
 import * as _ from "underscore";
 import * as vscode from "vscode";
 
-import * as extension from "./extension";
-import * as pfs from "./promise-fs";
-import * as telemetry from "./telemetry-helper";
+import * as extension from "../extension";
+import * as pfs from "../promise-fs";
+import * as telemetry from "../telemetry-helper";
 import * as utils from "./utils";
 
 const PYTHON_AUTOCOMPLETE_PATHS = "python.autoComplete.extraPaths";

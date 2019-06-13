@@ -1,13 +1,14 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import * as extension from "./extension";
 import * as vscode from "vscode";
+
+import * as extension from "../extension";
 
 /**
  * Provides catkin build and test tasks.
  */
-export default class CatkinTaskProvider implements vscode.TaskProvider {
+export class CatkinTaskProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
         let buildCommand: string;
         let testCommand: string;

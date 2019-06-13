@@ -4,24 +4,12 @@
 import * as path from "path";
 import * as vscode from "vscode";
 
-import * as extension from "./extension";
-import * as telemetry from "./telemetry-helper";
-import * as utils from "./utils";
-
-/**
- * Gets stringified settings to pass to the debug server.
- */
-export async function getDebugSettings(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
-    reporter.sendTelemetryCommand(extension.Commands.GetDebugSettings);
-
-    return JSON.stringify({ env: extension.env });
-}
+import * as utils from "../../../ros/utils";
 
 /**
  * Interacts with the user to create a `roslaunch` or `rosrun` configuration.
  */
-export class RosDebugConfigProvider implements vscode.DebugConfigurationProvider {
+export class RosDebugConfigurationProvider implements vscode.DebugConfigurationProvider {
     public provideDebugConfigurations(folder: vscode.WorkspaceFolder | undefined, token?: vscode.CancellationToken) {
         return [];
     }

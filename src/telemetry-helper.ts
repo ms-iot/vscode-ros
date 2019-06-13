@@ -4,7 +4,7 @@
 import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
-import * as vscodeUtils from "./vscode-utils";
+import * as vscode_utils from "./vscode-utils";
 
 let reporterSingleton: TelemetryReporter;
 
@@ -13,7 +13,7 @@ function getTelemetryReporter(context: vscode.ExtensionContext): TelemetryReport
         return reporterSingleton;
     }
 
-    const packageInfo = vscodeUtils.getPackageInfo(context);
+    const packageInfo = vscode_utils.getPackageInfo(context);
     if (packageInfo) {
         reporterSingleton = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey);
         context.subscriptions.push(reporterSingleton);

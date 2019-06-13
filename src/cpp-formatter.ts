@@ -1,7 +1,7 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import * as cp from "child_process";
+import * as child_process from "child_process";
 import * as vscode from "vscode";
 
 /**
@@ -58,7 +58,7 @@ const CLANG_FORMAT_STYLE = {
 /**
  * Formats C++ source using clang-format.
  */
-export default class CppFormatter implements vscode.DocumentFormattingEditProvider {
+export class CppFormatter implements vscode.DocumentFormattingEditProvider {
     public provideDocumentFormattingEdits(document: vscode.TextDocument,
         options: vscode.FormattingOptions,
         token: vscode.CancellationToken): Thenable<vscode.TextEdit[]> {
@@ -67,7 +67,7 @@ export default class CppFormatter implements vscode.DocumentFormattingEditProvid
         const style = JSON.stringify(Object.assign(CLANG_FORMAT_STYLE, custom));
 
         return new Promise((resolve, reject) => {
-            const process = cp.exec(`clang-format -style='${style}'`, (err, out) => {
+            const process = child_process.exec(`clang-format -style='${style}'`, (err, out) => {
                 if (!err) {
                     const lastLine = document.lineCount - 1;
                     const lastChar = document.lineAt(lastLine).text.length;

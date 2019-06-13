@@ -7,8 +7,8 @@ import * as _ from "underscore";
 import * as vscode from "vscode";
 import * as xmlrpc from "xmlrpc";
 
-import * as extension from "./extension";
-import * as telemetry from "./telemetry-helper";
+import * as extension from "../extension";
+import * as telemetry from "../telemetry-helper";
 
 export function startCore(context: vscode.ExtensionContext) {
     const reporter = telemetry.getReporter(context);
@@ -51,10 +51,10 @@ export function launchMonitor(context: vscode.ExtensionContext) {
         }
     );
 
-    let stylesheet = vscode.Uri.file(path.join(context.extensionPath, "assets", "roscoreMonitorStyle.css")).with({
+    let stylesheet = vscode.Uri.file(path.join(context.extensionPath, "assets", "ros", "core-monitor", "style.css")).with({
         scheme: "vscode-resource"
     });
-    let script = vscode.Uri.file(path.join(context.extensionPath, "out", "src", "roscoreMonitor", "main.js")).with({
+    let script = vscode.Uri.file(path.join(context.extensionPath, "out", "src", "ros", "core-monitor", "main.js")).with({
         scheme: "vscode-resource"
     });
 
