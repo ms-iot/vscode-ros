@@ -4,7 +4,6 @@
 import * as child_process from "child_process";
 import * as os from "os";
 import * as path from "path";
-import * as _ from "underscore";
 import * as vscode from "vscode";
 
 import * as extension from "../extension";
@@ -59,7 +58,21 @@ export function getDistros(): Promise<string[]> {
 export function getPackages(): Promise<{ [name: string]: string }> {
     return new Promise((resolve, reject) => child_process.exec("rospack list", { env: extension.env }, (err, out) => {
         if (!err) {
-            resolve(_.object(out.trim().split(os.EOL).map(line => line.split(" ", 2))));
+            const lines = out.trim().split(os.EOL).map(((line) => {
+                const info: string[] = line.split(" ");
+                if (info.length === 2) {
+                    // each line should contain exactly 2 strings separated by 1 space
+                    return info;
+                }
+            }));
+
+            const packageInfoReducer = (acc: object, cur: string[]) => {
+                const k: string = cur[0] as string;
+                const v: string = cur[1] as string;
+                acc[k] = v;
+                return acc;
+            };
+            resolve(lines.reduce(packageInfoReducer, {}));
         } else {
             reject(err);
         }

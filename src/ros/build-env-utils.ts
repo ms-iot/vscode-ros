@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import * as path from "path";
-import * as _ from "underscore";
 import * as vscode from "vscode";
 
 import * as extension from "../extension";
@@ -51,13 +50,14 @@ async function updateCppPropertiesInternal(): Promise<void> {
     const includes = await utils.getIncludeDirs();
     const filename = vscode.workspace.rootPath + "/.vscode/c_cpp_properties.json";
 
-    // Get all packages within the workspace, and check if they have an include
-    // directory. If so, add them to the list.
-    const packages = await utils.getPackages().then(
-        pkgs => _.values(pkgs).filter(pkg => pkg.startsWith(extension.baseDir))
-    );
+    // Get all packages within the workspace that have an include directory
+    const filteredPackages = await utils.getPackages().then((packages: { [name: string]: string }) => {
+        return Object.values(packages).filter((packagePath: string) => {
+            return packagePath.startsWith(extension.baseDir);
+        });
+    });
 
-    await Promise.all(packages.map(pkg => {
+    await Promise.all(filteredPackages.map(pkg => {
         const include = path.join(pkg, "include");
 
         return pfs.exists(include).then(exists => {
