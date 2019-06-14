@@ -152,7 +152,6 @@ export class XmlRpcApi {
                 services: res[2].reduce(responseReducer, {}),
                 subscribers: res[1].reduce(responseReducer, {}),
             };
-
             return systemState;
         });
     }
