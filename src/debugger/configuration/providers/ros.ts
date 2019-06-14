@@ -14,14 +14,13 @@ export class RosDebugConfigurationProvider implements vscode.DebugConfigurationP
         return [];
     }
 
-    public async resolveDebugConfiguration(
-        folder: vscode.WorkspaceFolder | undefined,
-        config: vscode.DebugConfiguration,
-        token?: vscode.CancellationToken) {
-        const packages = utils.getPackages();
-
+    public async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken) {
         const command = await vscode.window.showQuickPick(["roslaunch", "rosrun"], { placeHolder: "Launch command" });
-        const packageName = await vscode.window.showQuickPick(packages.then(Object.keys), { placeHolder: "Package" });
+
+        const getPackages = utils.getPackages();
+        const packageName = await vscode.window.showQuickPick(getPackages.then((packages: { [name: string]: string }) => {
+            return Object.keys(packages);
+        }), { placeHolder: "Package" });
 
         let target: string;
 

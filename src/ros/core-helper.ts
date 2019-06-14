@@ -3,7 +3,6 @@
 
 import * as child_process from "child_process";
 import * as path from "path";
-import * as _ from "underscore";
 import * as vscode from "vscode";
 import * as xmlrpc from "xmlrpc";
 
@@ -111,6 +110,12 @@ function getCoreStatusWebviewContent(stylesheet: vscode.Uri, script: vscode.Uri)
 `;
 }
 
+interface ISystemState {
+    publishers: { [topic: string]: string[] };
+    subscribers: { [topic: string]: string[] };
+    services: { [service: string]: string[] };
+}
+
 const CALLER_ID = "vscode-ros";
 
 /**
@@ -135,10 +140,19 @@ export class XmlRpcApi {
     }
 
     public getSystemState(): Promise<ISystemState> {
-        return this.methodCall("getSystemState").then(res => <ISystemState>{
-            publishers: _.object(res[0]),
-            services: _.object(res[2]),
-            subscribers: _.object(res[1]),
+        const responseReducer = (acc: object, cur: any[]) => {
+            const k: string = cur[0] as string;
+            const v: string[] = cur[1] as string[];
+            acc[k] = v;
+            return acc;
+        };
+        return this.methodCall("getSystemState").then((res) => {
+            const systemState: ISystemState = {
+                publishers: res[0].reduce(responseReducer, {}),
+                services: res[2].reduce(responseReducer, {}),
+                subscribers: res[1].reduce(responseReducer, {}),
+            };
+            return systemState;
         });
     }
 
@@ -163,12 +177,6 @@ export class XmlRpcApi {
             });
         });
     }
-}
-
-interface ISystemState {
-    publishers: { [topic: string]: string[] };
-    subscribers: { [topic: string]: string[] };
-    services: { [service: string]: string[] };
 }
 
 /**
