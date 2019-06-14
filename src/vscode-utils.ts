@@ -12,14 +12,12 @@ export interface IPackageInfo {
 
 export function getPackageInfo(context: vscode.ExtensionContext): IPackageInfo {
     const metadataFile: string = "package.json";
-    const extensionMetadata = require(path.join(context.extensionPath, metadataFile));
-    if ("name" in extensionMetadata &&
-        "version" in extensionMetadata &&
-        "aiKey" in extensionMetadata) {
+    const metadata = require(path.join(context.extensionPath, metadataFile));
+    if (metadata && ("name" in metadata) && ("version" in metadata) && ("aiKey" in metadata)) {
         return {
-            name: extensionMetadata.name,
-            version: extensionMetadata.version,
-            aiKey: extensionMetadata.aiKey,
+            name: metadata.name,
+            version: metadata.version,
+            aiKey: metadata.aiKey,
         };
     }
     return undefined;
