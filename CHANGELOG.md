@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.4
+## 0.4.5
 
 * Require `vscode` 1.26
 * Enable launching and terminating `roscore` on Windows
