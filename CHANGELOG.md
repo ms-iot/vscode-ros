@@ -4,9 +4,9 @@
 
 * Require `vscode` 1.26
 * Enable launching and terminating `roscore` on Windows
-* Update ROS core monitor with webview API
+* Update ROS core monitor implementation with webview API
 * Fix `sourceRosAndWorkspace()` for workspaces built with `catkin_make_isolated`
-* Fix `findPackageFiles()` on Windows
+* Fix `findPackageFiles()` for Windows
 * Replace all `ROS master` instances with `ROS core`
 
 ## 0.3.0
