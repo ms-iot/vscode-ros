@@ -6,19 +6,6 @@ trigger:
   branches:
     include:
     - master
-    - dev
-  # add back path exclusion after verification
-  # paths:
-  #   exclude:
-  #   - .vscode/*
-  #   - .github/*
-  #   - media/*
-  #   - CHANGELOG.md
-  #   - CONTRIBUTING.md
-  #   - LICENSE
-  #   - README.md
-  #   - MAINTAINERS_GUIDELINES.md
-  #   - THIRD_PARTY_NOTICE.md
 
 # PR triggers
 pr:
@@ -26,7 +13,6 @@ pr:
   branches:
     include:
     - master
-    - dev
 
 variables:
   nodeVersion: '>=10.15.3'
