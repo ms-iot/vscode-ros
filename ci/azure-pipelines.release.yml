@@ -3,12 +3,16 @@ name: $(BuildID).$(Date:yyMMdd)
 # CI triggers
 trigger:
   batch: false
-  tags:
+  branches:
     include:
-    - v*
+    - release/*
 
 # PR triggers
-pr: none
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - release/*
 
 variables:
   nodeVersion: '>=10.15.3'
@@ -71,7 +75,7 @@ stages:
   condition:
     and(
       succeeded(),
-      in(variables['build.reason'], 'IndividualCI', 'BatchedCI')
+      in(variables['build.reason'], 'Manual', 'IndividualCI', 'BatchedCI')
     )
   jobs:
   - job: publish_ubuntu
@@ -89,3 +93,9 @@ stages:
         displayName: 'Publish extension'
         env:
           PUBLISHER_TOKEN: $(build.release.token_kejxu)
+        condition:
+          and(
+            succeeded(),
+            in(variables['build.reason'], 'Manual'),
+            eq(variables['build.release'], 'true')
+          )
