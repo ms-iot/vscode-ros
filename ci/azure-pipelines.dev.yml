@@ -3,12 +3,32 @@ name: $(BuildID).$(Date:yyMMdd)
 # CI triggers
 trigger:
   batch: false
-  tags:
+  branches:
     include:
-    - v*
+    - '*'
+    exclude:
+    - master
+  # add back path exclusion after verification
+  # paths:
+  #   exclude:
+  #   - .vscode/*
+  #   - .github/*
+  #   - media/*
+  #   - CHANGELOG.md
+  #   - CONTRIBUTING.md
+  #   - LICENSE
+  #   - README.md
+  #   - MAINTAINERS_GUIDELINES.md
+  #   - THIRD_PARTY_NOTICE.md
 
 # PR triggers
-pr: none
+pr:
+  autoCancel: true
+  branches:
+    include:
+    - '*'
+    exclude:
+    - master
 
 variables:
   nodeVersion: '>=10.15.3'
@@ -71,7 +91,7 @@ stages:
   condition:
     and(
       succeeded(),
-      in(variables['build.reason'], 'IndividualCI', 'BatchedCI')
+      in(variables['build.reason'], 'Manual', 'IndividualCI', 'BatchedCI')
     )
   jobs:
   - job: publish_ubuntu
@@ -84,8 +104,3 @@ stages:
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
       - template: templates/package-artifact.yml
-      - bash: |
-          vsce publish -p $PUBLISHER_TOKEN
-        displayName: 'Publish extension'
-        env:
-          PUBLISHER_TOKEN: $(build.release.token_kejxu)
