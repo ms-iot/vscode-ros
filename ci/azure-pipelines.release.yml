@@ -5,30 +5,14 @@ trigger:
   batch: false
   branches:
     include:
-    - '*'
-    exclude:
-    - master
-  # add back path exclusion after verification
-  # paths:
-  #   exclude:
-  #   - .vscode/*
-  #   - .github/*
-  #   - media/*
-  #   - CHANGELOG.md
-  #   - CONTRIBUTING.md
-  #   - LICENSE
-  #   - README.md
-  #   - MAINTAINERS_GUIDELINES.md
-  #   - THIRD_PARTY_NOTICE.md
+    - release/*
 
 # PR triggers
 pr:
   autoCancel: true
   branches:
     include:
-    - '*'
-    exclude:
-    - master
+    - release/*
 
 variables:
   nodeVersion: '>=10.15.3'
@@ -104,3 +88,14 @@ stages:
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
       - template: templates/package-artifact.yml
+      - bash: |
+          vsce publish -p $PUBLISHER_TOKEN
+        displayName: 'Publish extension'
+        env:
+          PUBLISHER_TOKEN: $(build.release.token_kejxu)
+        condition:
+          and(
+            succeeded(),
+            in(variables['build.reason'], 'Manual'),
+            eq(variables['build.release'], 'true')
+          )
