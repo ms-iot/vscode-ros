@@ -80,26 +80,26 @@ Please review the following before publishing a new release:
 
 Metadata:
 
-- [ ] update `README.md`
-- [ ] update `CHANGELOG.md`
-- [ ] update version number in `package.json`
+- update `README.md`
+- update `CHANGELOG.md`
+- update version number in `package.json`
 
 Release testing:
 
-- [ ] Starting, terminating, and monitoring ROS core
+- Start, terminate, and monitor ROS core
     1. launch ROS core monitor with `ros.showMasterStatus`
     2. start a new ROS core process in background with `ros.startCore`
     3. check if ROS core monitor shows parameters and nodes correctly
     4. termintate the ROS core process with `ros.stopCore`
     5. check if ROS core monitor shows "offline"
-- [ ] Creating a terminal with ROS environment sourced
+- Create a terminal with ROS environment sourced
     1. start a new ROS terminal with `ros.createTerminal`
     2. check if ROS environment variables are properly configured
-- [ ] Execute a ROS executable
+- Execute a ROS executable
     1. start a ROS core process (in another terminal or with `ros.startCore`)
     2. execute `ros.rosrun` and choose an executable
     3. check if the executable gets launched
-- [ ] Execute a ROS launch file
+- Execute a ROS launch file
     1. execute `ros.roslaunch` and choose a launch file
     2. check if the launch file gets launched
 
