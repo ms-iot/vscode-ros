@@ -60,17 +60,17 @@ Versioning of this extension follows the [SemVer guidelines][semver_guidelines].
 This project is not expected to have an insider's channel, so there are just some very simple guidelines to follow in practice:
 
 1. when any change is introduced into the `master` branch after the existing release (at this point, the version number in the `master` branch should be `<current_version>`), update the version number in the `master` branch to `<new_version>-dev`
-2. after branching off to a release branch (`release/*`), update the version number in the release branch to `<new_version>-rc` (release candidate)
+2. after branching off to a release branch (`release/*`), the version number in the release branch stays the same as `<new_version>-dev`
     - if any change comes into the `master` branch (instead of the release branch) at this point, the version number in the `master` branch should be updated to `<even_newer_version>-dev`
-3. after the release branch has been reviewed and is ready to be released, update the version number to `<new_version>`
-    - ***note: this should be the final commit before the release, files in this specific commit should be the exact same files that get published***
+3. after the release branch has been reviewed and is ready to be released, update the version number to `<new_version>` and release
+    - a newer version of the extension should be published as soon as the version number becomes `<new_version>`
 
 Reasoning:
 
 1. VS Code extension marketplace hosts only the latest version; when there is no insider's channel, there is only 1 public version (the latest version)
 2. extensions can only be published with numeric SemVer versions, so no pre-release fields for final releases
-3. in order for packages installed from `.vsix` published from the [vscode-ros.ci pipeline][vscode-ros.ci] to receive updates to the final release on the VS Code extension marketplace, the version number shipped in the `.vsix` package must be smaller. Therefore, the version numbers need to have pre-release fields (`-dev` or `-rc`)
-4. since there is no insider's channel, which means pre-release builds installed from `.vsix` will not receive auto-update to another pre-release build, there is no further versioning for the pre-release fields
+3. in order for packages installed from `.vsix` published from the [vscode-ros.ci pipeline][vscode-ros.ci] to receive updates to the final release on the VS Code extension marketplace, the version number shipped in the `.vsix` package must be smaller. Therefore, the version numbers need to have the pre-release field (`-dev`)
+4. since there is no insider's channel, which means pre-release builds installed from `.vsix` will not receive auto-update to another pre-release build, there is no further versioning for the pre-release fields (no `-alpha`, `-beta`, `-rc1`, `-rc2`, etc.)
 
 ### Publishing a release
 
