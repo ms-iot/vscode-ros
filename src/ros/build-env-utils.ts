@@ -1,7 +1,6 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
@@ -84,7 +83,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
                     databaseFilename: "",
                     limitSymbolsToIncludedHeaders: true,
                 },
-                includePath: [...includes],
+                includePath: includes,
                 name: "ROS",
             },
         ],
