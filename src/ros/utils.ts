@@ -2,6 +2,7 @@
 // Licensed under the MIT License.
 
 import * as child_process from "child_process";
+import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -79,13 +80,26 @@ export function getPackages(): Promise<{ [name: string]: string }> {
     }));
 }
 
-/**
- * Gets include dirs using `catkin_find`.
- */
-export function getIncludeDirs(): Promise<string[]> {
-    return new Promise((c, e) => child_process.exec("catkin_find --include", { env: extension.env }, (err, out) =>
-        err ? e(err) : c(out.trim().split("\n"))
-    ));
+export async function getIncludeDirs(): Promise<string[]> {
+    const cmakePrefixPaths: string[] = [];
+    if (extension.env.hasOwnProperty("CMAKE_PREFIX_PATH")) {
+        cmakePrefixPaths.push(...extension.env.CMAKE_PREFIX_PATH.split(path.delimiter));
+    }
+
+    const includeDirs: string[] = [];
+    const fsPromises = cmakePrefixPaths.map((dir: string) => {
+        const include = path.join(dir, "include");
+        return fs.promises.access(include, fs.constants.F_OK)
+            .then(() => {
+                includeDirs.push(include);
+            })
+            .catch(() => {
+                // suppress exception if include folder does not exist
+            });
+    });
+    return Promise.all(fsPromises).then(() => {
+        return includeDirs;
+    });
 }
 
 export function findPackageFiles(packageName: string, filter: string, pattern: string): Promise<string[]> {

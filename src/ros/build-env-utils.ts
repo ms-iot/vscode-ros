@@ -48,8 +48,7 @@ export async function updateCppProperties(context: vscode.ExtensionContext): Pro
  * Updates the `c_cpp_properties.json` file with ROS include paths.
  */
 async function updateCppPropertiesInternal(): Promise<void> {
-    const includes = await utils.getIncludeDirs();
-    const filename = vscode.workspace.rootPath + "/.vscode/c_cpp_properties.json";
+    let includes = await utils.getIncludeDirs();
 
     // Get all packages within the workspace that have an include directory
     const filteredPackages = await utils.getPackages().then((packages: { [name: string]: string }) => {
@@ -68,23 +67,31 @@ async function updateCppPropertiesInternal(): Promise<void> {
         });
     }));
 
-    let platform: string = os.platform();
-    let c_cpp_properties: any = {
+    if (process.platform !== "win32") {
+        includes.push(path.join("/", "usr", "include"));
+    }
+
+    // append ** so the IntelliSense engine will do a recursive search for hearder files starting from that directory
+    includes = includes.map((include: string) => {
+        return path.join(include, "**");
+    });
+
+    // https://github.com/Microsoft/vscode-cpptools/blob/master/Documentation/LanguageServer/c_cpp_properties.json.md
+    const cppProperties: any = {
         configurations: [
             {
-                browse: { databaseFilename: "", limitSymbolsToIncludedHeaders: true },
+                browse: {
+                    databaseFilename: "",
+                    limitSymbolsToIncludedHeaders: true,
+                },
                 includePath: [...includes],
-                name: "Windows",
+                name: "ROS",
             },
         ],
     };
 
-    if (platform != "win32") {
-        c_cpp_properties.configurations[0].name = "Linux"
-        c_cpp_properties.configurations[0].includePath.push("/usr/include");
-    }
-
-    await pfs.writeFile(filename, JSON.stringify(c_cpp_properties, undefined, 2));
+    const filename = path.join(vscode.workspace.rootPath, ".vscode", "c_cpp_properties.json");
+    await pfs.writeFile(filename, JSON.stringify(cppProperties, undefined, 2));
 }
 
 export function updatePythonPath(context: vscode.ExtensionContext) {
