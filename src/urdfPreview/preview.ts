@@ -35,10 +35,10 @@ export default class URDFPreview
                 enableScripts: true,
                 retainContextWhenHidden: true
             }
-        ); 
+        );
 
         return new URDFPreview(editor, context, resource);
-    }
+    } 
 
     private constructor(
         webview: vscode.WebviewPanel,
@@ -164,7 +164,7 @@ export default class URDFPreview
 
     public reveal() {
         this._webview.reveal(vscode.ViewColumn.Two);
-    }
+    }    
 
     private isPreviewOf(resource: vscode.Uri): boolean {
         return this._resource.fsPath === resource.fsPath;
@@ -189,9 +189,9 @@ export default class URDFPreview
     public dispose() {
         this._disposable.dispose();
         this._onDisposeEmitter.fire();
-        this._onDisposeEmitter.dispose();    
+        this._onDisposeEmitter.dispose();
 
         this._onDidChangeViewStateEmitter.dispose();
-        this._webview.dispose();
+        this._webview.dispose();    
     }
 }
