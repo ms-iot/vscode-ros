@@ -6,7 +6,7 @@ import * as path from 'path';
 import { xacro, getPackages } from '../ros/utils'; 
 import { Disposable, window } from 'vscode';
 
-export default class URDFPreview
+export default class URDFPreview 
 {
     private _resource: vscode.Uri;
     private _processing: boolean;
@@ -35,7 +35,7 @@ export default class URDFPreview
                 enableScripts: true,
                 retainContextWhenHidden: true
             }
-        );
+        ); 
 
         return new URDFPreview(editor, context, resource);
     }
@@ -77,7 +77,7 @@ export default class URDFPreview
 
         this._webview.onDidDispose(() => {
             this.dispose();
-        }, null, subscriptions);
+        }, null, subscriptions);        
 
         this._disposable = Disposable.from(...subscriptions);
     }
@@ -110,7 +110,7 @@ export default class URDFPreview
         }
 
         var packageMap = await getPackages();
-
+            
         // replace package://(x) with fully resolved paths
         var pattern =  /package:\/\/(.*?)\//g;
         var match;
@@ -185,11 +185,11 @@ export default class URDFPreview
         // Schedule update if none is pending
         this.refresh();
     }
-
+    
     public dispose() {
         this._disposable.dispose();
         this._onDisposeEmitter.fire();
-        this._onDisposeEmitter.dispose();
+        this._onDisposeEmitter.dispose();    
 
         this._onDidChangeViewStateEmitter.dispose();
         this._webview.dispose();
