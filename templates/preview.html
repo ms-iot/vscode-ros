@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <style>
-    html, body 
+    html, body
     {
         background-color: var(--vscode-editor-background);
         padding: 0;
@@ -31,7 +31,7 @@
 <script src="http://static.robotwebtools.org/ros3djs/current/ros3d.js"></script>
 
 <script>
-    
+
 function TFFakeClient() {
 
 }
@@ -65,7 +65,7 @@ function applyURDF(urdfText) {
       tfClient : tfClient,
       loader : ROS3D.COLLADA_LOADER_2
     });
-    
+
     window.viewer.scene.add(urdfScene);
 
     for(var jointName in window.urdfModel.joints) {
@@ -100,8 +100,8 @@ function applyURDF(urdfText) {
             vscode.setState({previewFile: message.previewFile});
             break;
         }
-      });    
-      
+      });
+
       // Create the main viewer.
       window.viewer = new ROS3D.Viewer({
         divID : 'urdf',
@@ -118,7 +118,7 @@ function applyURDF(urdfText) {
   function resize() {
     if (window.viewer) {
         window.viewer.resize(urdf.clientWidth, urdf.clientHeight);
-    }      
+    }
   }
 </script>
 </head>

@@ -59,7 +59,7 @@ export enum Commands {
     TerminateRosCore = "ros.stopCore",
     UpdateCppProperties = "ros.updateCppProperties",
     UpdatePythonPath = "ros.updatePythonPath",
-    URDFPreview = "ros.urdfPreview",
+    PreviewURDF = "ros.previewUrdf",
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -193,9 +193,9 @@ function activateEnvironment(context: vscode.ExtensionContext) {
             ros_cli.roslaunch(context);
         }),
 
-        vscode.commands.registerCommand(Commands.URDFPreview, () => {
-            URDFPreviewManager.INSTANCE.preview(vscode.window.activeTextEditor.document.uri)
-        })
+        vscode.commands.registerCommand(Commands.PreviewURDF, () => {
+            URDFPreviewManager.INSTANCE.preview(vscode.window.activeTextEditor.document.uri);
+        }),
     );
 
     // Generate config files if they don't already exist.

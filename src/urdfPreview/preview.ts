@@ -1,9 +1,12 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { xacro, getPackages } from '../ros/utils'; 
 import { Disposable, window } from 'vscode';
 
-export default class URDFPreview 
+export default class URDFPreview
 {
     private _resource: vscode.Uri;
     private _processing: boolean;
@@ -35,7 +38,7 @@ export default class URDFPreview
         );
 
         return new URDFPreview(editor, context, resource);
-    } 
+    }
 
     private constructor(
         webview: vscode.WebviewPanel,
@@ -74,7 +77,7 @@ export default class URDFPreview
 
         this._webview.onDidDispose(() => {
             this.dispose();
-        }, null, subscriptions);        
+        }, null, subscriptions);
 
         this._disposable = Disposable.from(...subscriptions);
     }
@@ -107,7 +110,7 @@ export default class URDFPreview
         }
 
         var packageMap = await getPackages();
-            
+
         // replace package://(x) with fully resolved paths
         var pattern =  /package:\/\/(.*?)\//g;
         var match;
@@ -161,7 +164,7 @@ export default class URDFPreview
 
     public reveal() {
         this._webview.reveal(vscode.ViewColumn.Two);
-    }    
+    }
 
     private isPreviewOf(resource: vscode.Uri): boolean {
         return this._resource.fsPath === resource.fsPath;
@@ -182,14 +185,13 @@ export default class URDFPreview
         // Schedule update if none is pending
         this.refresh();
     }
-    
+
     public dispose() {
         this._disposable.dispose();
         this._onDisposeEmitter.fire();
         this._onDisposeEmitter.dispose();
 
         this._onDidChangeViewStateEmitter.dispose();
-        this._webview.dispose();    
+        this._webview.dispose();
     }
 }
-  
