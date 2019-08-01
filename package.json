@@ -144,31 +144,60 @@
                                 "default": "${command:debugSettings}"
                             }
                         }
+                    },
+                    "attach": {
+                        "properties": {
+                            "runtime": {
+                                "type": "string",
+                                "description": "Runtime type of the node (currently supports Python and C++). Use \"${action:pick}\" to choose interactively.\nThis is only for local processes that were launched directly. Advanced attaching (e.g. attaching to a running ptvsd server, attaching to a remote process, etc.) should use language-specific debugger extension.",
+                                "enum": [
+                                    "${action:pick}",
+                                    "C++",
+                                    "Python"
+                                ],
+                                "default": "${action:pick}"
+                            },
+                            "processId": {
+                                "anyOf": [
+                                    {
+                                        "type": "string",
+                                        "description": "Optional process id to attach the debugger to. Use \"${action:pick}\" to get a list of local running processes to attach to. Note that some platforms require administrator privileges in order to attach to a process.",
+                                        "enum": [
+                                            "${action:pick}"
+                                        ],
+                                        "default": "${action:pick}"
+                                    },
+                                    {
+                                        "type": "integer",
+                                        "description": "Optional process id to attach the debugger to. Use \"${action:pick}\" to get a list of local running processes to attach to. Note that some platforms require administrator privileges in order to attach to a process.",
+                                        "default": 0
+                                    }
+                                ]
+                            }
+                        }
                     }
                 },
                 "configurationSnippets": [
                     {
-                        "label": "ROS: roslaunch",
-                        "description": "Runs a launch file using roslaunch",
+                        "label": "ROS: Launch",
+                        "description": "Debug ROS node(s) at launch.",
                         "body": {
+                            "name": "ROS: Launch",
                             "type": "ros",
+                            "request": "launch",
                             "command": "roslaunch",
-                            "name": "",
                             "package": "",
                             "target": ".launch",
                             "debugSettings": "${command:debugSettings}"
                         }
                     },
                     {
-                        "label": "ROS: rosrun",
-                        "description": "Runs an executable using rosrun",
+                        "label": "ROS: Attach",
+                        "description": "Debug a ROS node by attaching to it.",
                         "body": {
+                            "name": "ROS: Attach",
                             "type": "ros",
-                            "command": "rosrun",
-                            "name": "",
-                            "package": "",
-                            "target": "",
-                            "debugSettings": "${command:debugSettings}"
+                            "request": "attach"
                         }
                     }
                 ]
@@ -246,6 +275,7 @@
         "vscode-debugadapter": "^1.15.0",
         "vscode-debugprotocol": "^1.15.0",
         "vscode-extension-telemetry": "^0.1.1",
+        "portfinder": "1.0.21",
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {

@@ -5,6 +5,8 @@ import * as child_process from "child_process";
 import * as adapter from "vscode-debugadapter";
 import * as protocol from "vscode-debugprotocol";
 
+import * as requests from "./requests";
+
 interface ILaunchRequestArguments extends protocol.DebugProtocol.LaunchRequestArguments {
     command: "roslaunch" | "rosrun";
     package: string;
@@ -24,7 +26,7 @@ export class RosDebugSession extends adapter.DebugSession {
         super.shutdown();
     }
 
-    protected launchRequest(response: protocol.DebugProtocol.LaunchResponse, request: ILaunchRequestArguments) {
+    protected launchRequest(response: protocol.DebugProtocol.LaunchResponse, request: ILaunchRequestArguments): void {
         if (request.command !== "roslaunch" && request.command !== "rosrun") {
             this.sendErrorResponse(response, 0, "Invalid command");
             return;
@@ -51,5 +53,11 @@ export class RosDebugSession extends adapter.DebugSession {
         this.process.on("exit", () => this.sendEvent(new adapter.TerminatedEvent()));
 
         this.sendResponse(response);
+    }
+
+    protected attachRequest(response: protocol.DebugProtocol.AttachResponse, request: requests.IAttachRequest): void {
+        // attach requests are propagated to runtime-specific debugger extensions,
+        // this is only a proxy session, self-terminate immediately
+        this.shutdown();
     }
 }

@@ -7,10 +7,14 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
+      "args": [
+        "--extensionDevelopmentPath=${workspaceRoot}"
+      ],
       "stopOnEntry": false,
       "sourceMaps": true,
-      "outFiles": ["${workspaceRoot}/out/src/**/*.js"],
+      "outFiles": [
+        "${workspaceRoot}/out/src/**/*.js"
+      ],
       "preLaunchTask": "npm"
     },
     {
@@ -19,10 +23,14 @@
       "request": "launch",
       "cwd": "${workspaceRoot}",
       "program": "${workspaceRoot}/out/src/debugger/main.js",
-      "args": ["--server=4711"],
+      "args": [
+        "--server=4711"
+      ],
       "stopOnEntry": false,
       "sourceMaps": true,
-      "outFiles": ["${workspaceRoot}/out/src/**/*.js"],
+      "outFiles": [
+        "${workspaceRoot}/out/src/**/*.js"
+      ],
       "preLaunchTask": "npm"
     },
     {
@@ -30,17 +38,25 @@
       "type": "extensionHost",
       "request": "launch",
       "runtimeExecutable": "${execPath}",
-      "args": ["--extensionDevelopmentPath=${workspaceRoot}", "--extensionTestsPath=${workspaceRoot}/out/test"],
+      "args": [
+        "--extensionDevelopmentPath=${workspaceRoot}",
+        "--extensionTestsPath=${workspaceRoot}/out/test"
+      ],
       "stopOnEntry": false,
       "sourceMaps": true,
-      "outFiles": ["${workspaceRoot}/out/test"],
+      "outFiles": [
+        "${workspaceRoot}/out/test"
+      ],
       "preLaunchTask": "npm"
     }
   ],
   "compounds": [
     {
       "name": "Extension and Debugger",
-      "configurations": ["Extension", "Debugger"]
+      "configurations": [
+        "Extension",
+        "Debugger"
+      ]
     }
   ]
 }

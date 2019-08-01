@@ -5,8 +5,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import * as cpp_formatter from "./cpp-formatter";
-import * as debug_provider from "./debugger/configuration/provider";
-import * as debug_utils from "./debugger/utils";
 import * as pfs from "./promise-fs";
 import * as telemetry from "./telemetry-helper";
 import * as vscode_utils from "./vscode-utils";
@@ -18,6 +16,9 @@ import * as ros_cli from "./ros/cli";
 import * as ros_core from "./ros/core-helper";
 import * as ros_utils from "./ros/utils";
 import URDFPreviewManager from "./urdfPreview/previewManager"
+
+import * as debug_manager from "./debugger/manager";
+import * as debug_utils from "./debugger/utils";
 
 /**
  * The catkin workspace base dir.
@@ -32,6 +33,9 @@ export function setBaseDir(dir: string) {
  * The sourced ROS environment.
  */
 export let env: any;
+
+export let extPath: string;
+export let outputChannel: vscode.OutputChannel;
 
 let onEnvChanged = new vscode.EventEmitter<void>();
 
@@ -61,6 +65,10 @@ export enum Commands {
 
 export async function activate(context: vscode.ExtensionContext) {
     const reporter = telemetry.getReporter(context);
+
+    extPath = context.extensionPath;
+    outputChannel = vscode_utils.createOutputChannel();
+    context.subscriptions.push(outputChannel);
 
     // Activate if we're in a catkin workspace.
     let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
@@ -132,7 +140,8 @@ function activateEnvironment(context: vscode.ExtensionContext) {
 
     subscriptions.push(coreStatusItem);
     subscriptions.push(buildtool.BuildTool.registerTaskProvider());
-    subscriptions.push(vscode.debug.registerDebugConfigurationProvider("ros", debug_provider.getRosDebugConfigurationProvider()));
+
+    debug_manager.registerRosDebugManager(context);
 
     // register plugin commands
     subscriptions.push(

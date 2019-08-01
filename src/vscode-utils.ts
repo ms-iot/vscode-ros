@@ -28,3 +28,6 @@ export function getExtensionConfiguration(): vscode.WorkspaceConfiguration {
     return vscode.workspace.getConfiguration(rosConfigurationName);
 }
 
+export function createOutputChannel(): vscode.OutputChannel {
+    return vscode.window.createOutputChannel("ROS");
+}
