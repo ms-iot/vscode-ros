@@ -48,8 +48,8 @@ TFFakeClient.prototype.unsubscribe = function(frameID, callback) {
 
 
 function applyURDF(urdfText) {
-    if (window.urdfModel) {
-        window.viewer.scene.remove(window.urdfModel); 
+    if (window.urdfScene) {
+        window.viewer.scene.remove(window.urdfScene); 
     }
 
     window.urdfModel = new ROSLIB.UrdfModel({
@@ -59,14 +59,14 @@ function applyURDF(urdfText) {
 
     var tfClient = new TFFakeClient();
 
-    var urdfScene = new ROS3D.Urdf({
+    window.urdfScene = new ROS3D.Urdf({
       urdfModel : window.urdfModel,
       path : "vscode-resource:",
       tfClient : tfClient,
       loader : ROS3D.COLLADA_LOADER_2
     });
     
-    window.viewer.scene.add(urdfScene);
+    window.viewer.scene.add(window.urdfScene);
 
     for(var jointName in window.urdfModel.joints) {
             var joint = window.urdfModel.joints[jointName];
