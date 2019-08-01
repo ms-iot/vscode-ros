@@ -33,24 +33,24 @@
 <script>
     
 function TFFakeClient() {
-
+  this.callbacks = new Map();
 }
 
 TFFakeClient.prototype.subscribe = function(frameID, callback) {
-    // ROS 3D requires a TF Client refresh in order
-    // to apply the transforms; fake it here. 
-    var tf = new ROSLIB.Transform();
-    callback(tf);
+    this.callbacks.set(frameID, callback);
 }
 
 TFFakeClient.prototype.unsubscribe = function(frameID, callback) {
+    this.callbacks.delete(frameID);
 }
 
 
 function applyURDF(urdfText) {
-    if (window.urdfModel) {
-        window.viewer.scene.remove(window.urdfModel); 
+    if (window.urdfScene) {
+        window.viewer.scene.remove(window.urdfScene); 
     }
+
+    window.tfCallback = new Map();
 
     window.urdfModel = new ROSLIB.UrdfModel({
         string : urdfText,
@@ -59,33 +59,48 @@ function applyURDF(urdfText) {
 
     var tfClient = new TFFakeClient();
 
-    var urdfScene = new ROS3D.Urdf({
+    window.urdfScene = new ROS3D.Urdf({
       urdfModel : window.urdfModel,
       path : "vscode-resource:",
       tfClient : tfClient,
       loader : ROS3D.COLLADA_LOADER_2
     });
     
-    window.viewer.scene.add(urdfScene);
+    window.viewer.scene.add(window.urdfScene);
 
-    for(var jointName in window.urdfModel.joints) {
-            var joint = window.urdfModel.joints[jointName];
-            var childFrameID = joint.child;
+    let joints = new Map();
+    for(let jointName in window.urdfModel.joints) {
+      let joint = window.urdfModel.joints[jointName];
+      joints.set(joint.child, { 
+        parent: joint.parent,
+        origin: joint.origin
+      });
+    }
 
-            for (var nodes = urdfScene.children, i = 0; i < nodes.length; i++) {
-                var seekingFrameID = nodes[i].frameID;
-                if (seekingFrameID[0] === '/') {
-                    seekingFrameID = seekingFrameID.substring(1);
-                }
-                if (seekingFrameID == childFrameID) {
-                    var poseTransformed = new ROSLIB.Pose(nodes[i].pose);
-                    var tf = new ROSLIB.Transform({translation : joint.origin.position, rotation : joint.origin.orientation});
-                    poseTransformed.applyTransform(tf);
-                    nodes[i].updatePose(poseTransformed);
-                    break;
-                }
-            }
+    // update tfClient callbacks to inject joint transform data
+    for (let entry of tfClient.callbacks) {
+      let frameID = entry[0];
+      if (frameID[0] === '/') {
+        frameID = frameID.substring(1);
+      }
+
+      if (joints.has(frameID)) {
+        // callback expects a transform wrt the world.
+        let initialPose = new ROSLIB.Pose();
+        let tempFrameID = frameID;
+        while (joints.has(tempFrameID)) {
+          let origin = joints.get(tempFrameID).origin;
+          let tf = new ROSLIB.Transform({translation : origin.position, rotation : origin.orientation});
+          initialPose.applyTransform(tf);
+          tempFrameID = joints.get(tempFrameID).parent;
         }
+        let tf = new ROSLIB.Transform({translation : initialPose.position, rotation : initialPose.orientation});
+        entry[1](tf);
+      } else {
+        let tf = new ROSLIB.Transform();
+        entry[1](tf);
+      }
+    }
   }
   function init() {
     const vscode = acquireVsCodeApi();
