@@ -82,9 +82,9 @@
                 "category": "ROS"
             },
             {
-                "category": "ROS",
                 "command": "ros.previewUrdf",
-                "title": "Preview URDF"
+                "title": "Preview URDF",
+                "category": "ROS"
             }
         ],
         "configuration": {
