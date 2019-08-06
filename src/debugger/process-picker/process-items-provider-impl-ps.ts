@@ -1,3 +1,8 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+// copied from https://github.com/microsoft/vscode-cpptools
+
 /* tslint:disable */
 
 import * as os from "os";

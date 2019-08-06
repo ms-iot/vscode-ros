@@ -11,7 +11,7 @@ import * as port_finder from "portfinder";
 import * as extension from "../../../extension";
 
 import * as process_picker from "../../process-picker/process-picker";
-import * as picker_items_provider_factory from "../../process-picker/process-quick-pick-items-provider-factory";
+import * as picker_items_provider_factory from "../../process-picker/process-items-provider";
 import * as requests from "../../requests";
 
 export class AttachResolver implements vscode.DebugConfigurationProvider {
@@ -97,7 +97,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
             return;
         }
 
-        let processItemsProvider = picker_items_provider_factory.NativeAttachItemsProviderFactory.Get();
+        let processItemsProvider = picker_items_provider_factory.LocalProcessItemsProviderFactory.Get();
         let processPicker = new process_picker.LocalProcessPicker(processItemsProvider);
         config.processId = await processPicker.pick();
     }

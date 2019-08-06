@@ -1,7 +1,7 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All Rights Reserved.
- * See 'LICENSE' in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+// copied from https://github.com/microsoft/vscode-cpptools
 
 /* tslint:disable */
 
@@ -18,8 +18,8 @@ export function getExtensionFilePath(extensionfile: string): string {
 
 class RefreshButton implements vscode.QuickInputButton {
     get iconPath(): { dark: vscode.Uri; light: vscode.Uri } {
-        const refreshImagePathDark: string = getExtensionFilePath("assets/Refresh_inverse.svg");
-        const refreshImagePathLight: string = getExtensionFilePath("assets/Refresh.svg");
+        const refreshImagePathDark: string = getExtensionFilePath(path.join("assets", "process-picker", "refresh_inverse.svg"));
+        const refreshImagePathLight: string = getExtensionFilePath(path.join("assets", "process-picker", "refresh.svg"));
 
         return {
             dark: vscode.Uri.file(refreshImagePathDark),

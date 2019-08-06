@@ -1,7 +1,12 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+// copied from https://github.com/microsoft/vscode-cpptools
+
 /* tslint:disable */
 
 import * as process_item from "./process-entry";
-import * as attach_items_provider from "./process-quick-pick-items-provider-factory";
+import * as attach_items_provider from "./process-items-provider";
 
 export abstract class LocalProcessQuickPickItemsProvider implements attach_items_provider.IProcessQuickPickItemsProvider {
     public getItems(): Promise<process_item.IProcessQuickPickItem[]> {
