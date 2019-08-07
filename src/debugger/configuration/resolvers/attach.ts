@@ -11,6 +11,7 @@ import * as extension from "../../../extension";
 import * as process_picker from "../../process-picker/process-picker";
 import * as picker_items_provider_factory from "../../process-picker/process-items-provider";
 import * as requests from "../../requests";
+import * as utils from "../../utils";
 
 export class AttachResolver implements vscode.DebugConfigurationProvider {
     private readonly supportedRuntimeTypes = [
@@ -36,7 +37,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
 
         if (config.runtime === "C++") {
             if (os.platform() === "win32") {
-                let cppattachdebugconfiguration: vscode.DebugConfiguration = {
+                const cppattachdebugconfiguration: vscode.DebugConfiguration = {
                     name: `C++: ${config.processId}`,
                     type: "cppvsdbg",
                     request: "attach",
@@ -44,12 +45,13 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                 };
                 vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
             }
-        }
-        else if (config.runtime === "Python") {
+        } else if (config.runtime === "Python") {
             const host = "localhost";
             const port = await port_finder.getPortPromise();
-            let injectPtvsdCmd = `python -m ptvsd --host ${host} --port ${port} --pid ${config.processId}`;
-            let processOptions: child_process.ExecOptions = {
+            const ptvsd = await utils.getPtvsdFromPythonExtension();
+
+            const injectPtvsdCmd = `python ${ptvsd} --host ${host} --port ${port} --pid ${config.processId}`;
+            const processOptions: child_process.ExecOptions = {
                 cwd: extension.baseDir,
                 env: extension.env,
             };
@@ -61,7 +63,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                     extension.outputChannel.show(true);
                     vscode.window.showInformationMessage(statusMsg);
 
-                    let pythonattachdebugconfiguration: vscode.DebugConfiguration = {
+                    const pythonattachdebugconfiguration: vscode.DebugConfiguration = {
                         name: `Python: ${config.processId}`,
                         type: "python",
                         request: "attach",
