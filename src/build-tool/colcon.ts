@@ -1,21 +1,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as vscode from "vscode"
 import * as child_process from "child_process";
+import * as vscode from "vscode";
 
-import * as extension from "../extension"
+import * as extension from "../extension";
 
 /**
  * Provides colcon build and test tasks.
  */
 export class ColconProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        let buildCommand: string;
-        let testCommand: string;
-
-        buildCommand = 'colcon build';
-        testCommand = 'colcon test';
+        const buildCommand = "colcon build";
+        const testCommand = "colcon test";
 
         const build = new vscode.Task(
             { type: "colcon" },
@@ -23,7 +20,7 @@ export class ColconProvider implements vscode.TaskProvider {
             "build",
             "colcon",
             new vscode.ShellExecution(buildCommand, {
-                env: extension.env
+                env: extension.env,
             }),
             []);
         build.group = vscode.TaskGroup.Build;
@@ -34,7 +31,7 @@ export class ColconProvider implements vscode.TaskProvider {
             "test",
             "colcon",
             new vscode.ShellExecution(testCommand, {
-                env: extension.env
+                env: extension.env,
             }),
             []);
         test.group = vscode.TaskGroup.Test;
@@ -49,9 +46,8 @@ export class ColconProvider implements vscode.TaskProvider {
 
 export async function isApplicable(dir: string): Promise<boolean> {
     const opts = { dir, env: extension.env };
-    const { stdout, stderr } = await child_process.exec('colcon -h', opts);
-    for await (const line of stderr)
-    {
+    const { stdout, stderr } = await child_process.exec("colcon -h", opts);
+    for await (const line of stderr) {
         return false;
     }
     return true;

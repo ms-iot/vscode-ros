@@ -3,20 +3,21 @@
 
 import * as path from "path";
 import * as vscode from "vscode";
-import * as pfs from "../promise-fs";
+
 import * as extension from "../extension";
+import * as pfs from "../promise-fs";
 import * as telemetry from "../telemetry-helper";
 import * as catkin_make from "./catkin-make";
 import * as catkin_tools from "./catkin-tools";
 import * as colcon from "./colcon";
 
 export abstract class BuildTool {
-    static current: BuildTool;
-    static registerTaskProvider(): vscode.Disposable {
+    public static current: BuildTool;
+    public static registerTaskProvider(): vscode.Disposable {
         return this.current._registerTaskProvider();
     }
 
-    static async createPackage(context: vscode.ExtensionContext) {
+    public static async createPackage(context: vscode.ExtensionContext) {
         const reporter = telemetry.getReporter(context);
         reporter.sendTelemetryCommand(extension.Commands.CreateCatkinPackage);
         return this.current._createPackage();
@@ -26,6 +27,7 @@ export abstract class BuildTool {
     protected abstract async _createPackage(): Promise<void>;
 }
 
+// tslint:disable-next-line: max-classes-per-file
 class NotImplementedBuildTool extends BuildTool {
     protected _registerTaskProvider(): vscode.Disposable {
         return null;
@@ -36,7 +38,12 @@ class NotImplementedBuildTool extends BuildTool {
     }
 }
 
+// tslint:disable-next-line: max-classes-per-file
 class CatkinCmakeBuildTool extends BuildTool {
+    public static async isApplicable(dir: string): Promise<boolean> {
+        return pfs.exists(`${dir}/.catkin_workspace`);
+    }
+
     protected _registerTaskProvider(): vscode.Disposable {
         return vscode.workspace.registerTaskProvider("catkin_cmake", new catkin_make.CatkinMakeProvider());
     }
@@ -44,13 +51,14 @@ class CatkinCmakeBuildTool extends BuildTool {
     protected async _createPackage(): Promise<void> {
         return catkin_make.createPackage();
     }
-
-    static async isApplicable(dir: string): Promise<boolean> {
-        return (await pfs.exists(`${dir}/.catkin_workspace`));
-    }
 }
 
+// tslint:disable-next-line: max-classes-per-file
 class CatkinToolsBuildTool extends BuildTool {
+    public static async isApplicable(dir: string): Promise<boolean> {
+        return pfs.exists(`${dir}/.catkin_tools`);
+    }
+
     protected _registerTaskProvider(): vscode.Disposable {
         return vscode.workspace.registerTaskProvider("catkin_tools", new catkin_tools.CatkinToolsProvider());
     }
@@ -58,13 +66,14 @@ class CatkinToolsBuildTool extends BuildTool {
     protected async _createPackage(): Promise<void> {
         return catkin_tools.createPackage();
     }
-
-    static async isApplicable(dir: string): Promise<boolean> {
-        return (await pfs.exists(`${dir}/.catkin_tools`));
-    }
 }
 
+// tslint:disable-next-line: max-classes-per-file
 class ColconBuildTool extends BuildTool {
+    public static async isApplicable(dir: string): Promise<boolean> {
+        return colcon.isApplicable(dir);
+    }
+
     protected _registerTaskProvider(): vscode.Disposable {
         return vscode.workspace.registerTaskProvider("colcon", new colcon.ColconProvider());
     }
@@ -72,10 +81,6 @@ class ColconBuildTool extends BuildTool {
     protected async _createPackage(): Promise<void> {
         // Do nothing.
         return;
-    }
-
-    static async isApplicable(dir: string): Promise<boolean> {
-        return (await colcon.isApplicable(dir));
     }
 }
 
