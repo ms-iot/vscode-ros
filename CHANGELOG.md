@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.0
+
+* Enable previewing URDF and Xacro files
+* Fix bugs in ROS core monitor
+
 ## 0.4.5
 
 * Require `vscode` 1.26

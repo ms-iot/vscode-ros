@@ -44,13 +44,14 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 | Stop Core | `ros.stopCore` | Terminate the ROS core |
 | Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. |
 | Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. |
-| URDF Preview | `ros.previewUrdf` | Preview URDF and Xacro files. Updates after changes are saved. |
+| Preview URDF | `ros.previewUrdf` | Preview URDF and Xacro files. Updates after changes are saved. |
 
 ## Roadmap
 Project roadmap and workitems are located on the [vscode-ros github projects page](https://github.com/ms-iot/vscode-ros/projects).
 Future projects include:
-* ROS2
-* Debugging C++ & Python from Roslaunch
+
+* Support for ROS2 build tool and CLI commands
+* Support for debugging C++ & Python from `roslaunch`
 
 ## Reporting Security Issues
 
