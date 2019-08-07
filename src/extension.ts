@@ -120,7 +120,7 @@ function activateEnvironment(context: vscode.ExtensionContext) {
         subscriptions.pop().dispose();
     }
 
-    if (typeof env.ROS_ROOT === "undefined") {
+    if (typeof env.ROS_DISTRO === "undefined") {
         return;
     }
 
@@ -210,7 +210,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
         }
-    } else if (typeof process.env.ROS_ROOT !== "undefined") {
+    } else if (typeof process.env.ROS_DISTRO !== "undefined") {
         env = process.env;
     } else {
         const message = "The ROS distro is not configured.";
@@ -233,7 +233,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         ext: setupScriptExt,
     });
 
-    if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(wsSetupScript)) {
+    if (env && typeof env.ROS_DISTRO !== "undefined" && await pfs.exists(wsSetupScript)) {
         try {
             env = await ros_utils.sourceSetupFile(wsSetupScript, env);
         } catch (_err) {
