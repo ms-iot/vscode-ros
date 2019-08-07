@@ -8,6 +8,7 @@ import * as extension from "../extension";
 import * as telemetry from "../telemetry-helper";
 import * as catkin_make from "./catkin-make";
 import * as catkin_tools from "./catkin-tools";
+import * as colcon from "./colcon";
 
 export abstract class BuildTool {
     static current: BuildTool;
@@ -37,21 +38,44 @@ class NotImplementedBuildTool extends BuildTool {
 
 class CatkinCmakeBuildTool extends BuildTool {
     protected _registerTaskProvider(): vscode.Disposable {
-        return vscode.workspace.registerTaskProvider("catkin", new catkin_make.CatkinMakeProvider());
+        return vscode.workspace.registerTaskProvider("catkin_cmake", new catkin_make.CatkinMakeProvider());
     }
 
     protected async _createPackage(): Promise<void> {
         return catkin_make.createPackage();
     }
+
+    static async isApplicable(dir: string): Promise<boolean> {
+        return (await pfs.exists(`${dir}/.catkin_workspace`));
+    }
 }
 
 class CatkinToolsBuildTool extends BuildTool {
     protected _registerTaskProvider(): vscode.Disposable {
-        return vscode.workspace.registerTaskProvider("catkin", new catkin_tools.CatkinToolsProvider());
+        return vscode.workspace.registerTaskProvider("catkin_tools", new catkin_tools.CatkinToolsProvider());
     }
 
     protected async _createPackage(): Promise<void> {
         return catkin_tools.createPackage();
+    }
+
+    static async isApplicable(dir: string): Promise<boolean> {
+        return (await pfs.exists(`${dir}/.catkin_tools`));
+    }
+}
+
+class ColconBuildTool extends BuildTool {
+    protected _registerTaskProvider(): vscode.Disposable {
+        return vscode.workspace.registerTaskProvider("colcon", new colcon.ColconProvider());
+    }
+
+    protected async _createPackage(): Promise<void> {
+        // Do nothing.
+        return;
+    }
+
+    static async isApplicable(dir: string): Promise<boolean> {
+        return (await colcon.isApplicable(dir));
     }
 }
 
@@ -63,13 +87,17 @@ BuildTool.current = new NotImplementedBuildTool();
  */
 export async function determineBuildTool(dir: string): Promise<boolean> {
     while (dir && path.dirname(dir) !== dir) {
-        if (await pfs.exists(`${dir}/.catkin_workspace`)) {
+        if (await CatkinCmakeBuildTool.isApplicable(dir)) {
             extension.setBaseDir(dir);
             BuildTool.current = new CatkinCmakeBuildTool();
             return true;
-        } else if (await pfs.exists(`${dir}/.catkin_tools`)) {
+        } else if (await CatkinToolsBuildTool.isApplicable(dir)) {
             extension.setBaseDir(dir);
             BuildTool.current = new CatkinToolsBuildTool();
+            return true;
+        } else if (await ColconBuildTool.isApplicable(dir)) {
+            extension.setBaseDir(dir);
+            BuildTool.current = new ColconBuildTool();
             return true;
         }
 
