@@ -120,20 +120,17 @@ function activateEnvironment(context: vscode.ExtensionContext) {
         subscriptions.pop().dispose();
     }
 
-    if (typeof env.ROS_DISTRO === "undefined") {
+    if (typeof env.ROS_ROOT === "undefined") {
         return;
     }
 
-    if (typeof env.ROS_MASTER_URI !== "undefined") {
-        // Set up the master.
-        const roscoreApi = new ros_core.XmlRpcApi(env.ROS_MASTER_URI);
-        const coreStatusItem = new ros_core.StatusBarItem(roscoreApi);
+    // Set up the master.
+    const roscoreApi = new ros_core.XmlRpcApi(env.ROS_MASTER_URI);
+    const coreStatusItem = new ros_core.StatusBarItem(roscoreApi);
 
-        coreStatusItem.activate();
+    coreStatusItem.activate();
 
-        subscriptions.push(coreStatusItem);
-    }
-
+    subscriptions.push(coreStatusItem);
     subscriptions.push(buildtool.BuildTool.registerTaskProvider());
     subscriptions.push(vscode.debug.registerDebugConfigurationProvider("ros", debug_provider.getRosDebugConfigurationProvider()));
 
@@ -155,7 +152,7 @@ function activateEnvironment(context: vscode.ExtensionContext) {
             ros_core.startCore(context);
         }),
         vscode.commands.registerCommand(Commands.TerminateRosCore, () => {
-            //ros_core.stopCore(context, roscoreApi);
+            ros_core.stopCore(context, roscoreApi);
         }),
         vscode.commands.registerCommand(Commands.UpdateCppProperties, () => {
             ros_build_utils.updateCppProperties(context);
@@ -213,7 +210,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
         }
-    } else if (typeof process.env.ROS_DISTRO !== "undefined") {
+    } else if (typeof process.env.ROS_ROOT !== "undefined") {
         env = process.env;
     } else {
         const message = "The ROS distro is not configured.";
@@ -236,7 +233,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         ext: setupScriptExt,
     });
 
-    if (env && typeof env.ROS_DISTRO !== "undefined" && await pfs.exists(wsSetupScript)) {
+    if (env && typeof env.ROS_ROOT !== "undefined" && await pfs.exists(wsSetupScript)) {
         try {
             env = await ros_utils.sourceSetupFile(wsSetupScript, env);
         } catch (_err) {
