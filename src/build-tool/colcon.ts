@@ -5,8 +5,6 @@ import * as vscode from "vscode"
 import * as child_process from "child_process";
 
 import * as extension from "../extension"
-import * as common from "./common"
-import { appendFileSync } from "fs";
 
 /**
  * Provides colcon build and test tasks.
@@ -16,22 +14,32 @@ export class ColconProvider implements vscode.TaskProvider {
         let buildCommand: string;
         let testCommand: string;
 
-        buildCommand = `colcon build`;
-        testCommand = `colcon test`;
+        buildCommand = 'colcon build';
+        testCommand = 'colcon test';
 
-        const make = new vscode.Task({ type: "colcon" }, "build", "colcon");
-        make.execution = new vscode.ShellExecution(buildCommand, {
-            env: extension.env
-        });
-        make.group = vscode.TaskGroup.Build;
+        const build = new vscode.Task(
+            { type: "colcon" },
+            vscode.TaskScope.Workspace,
+            "build",
+            "colcon",
+            new vscode.ShellExecution(buildCommand, {
+                env: extension.env
+            }),
+            []);
+        build.group = vscode.TaskGroup.Build;
 
-        const test = new vscode.Task({ type: "colcon" }, "test", "colcon");
-        test.execution = new vscode.ShellExecution(testCommand, {
-            env: extension.env
-        });
+        const test = new vscode.Task(
+            { type: "colcon" },
+            vscode.TaskScope.Workspace,
+            "test",
+            "colcon",
+            new vscode.ShellExecution(testCommand, {
+                env: extension.env
+            }),
+            []);
         test.group = vscode.TaskGroup.Test;
 
-        return [make, test];
+        return [build, test];
     }
 
     public resolveTask(task: vscode.Task, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
