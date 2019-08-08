@@ -16,12 +16,11 @@ export async function getDebugSettings(context: vscode.ExtensionContext) {
     return JSON.stringify({ env: extension.env });
 }
 
-export async function getPtvsdFromPythonExtension(): Promise<string>
-{
+export async function getPtvsdInjectCommand(host: string, port: number, pid: number): Promise<string> {
     // instead of requiring presence of correctly versioned ptvsd from pip (https://github.com/Microsoft/ptvsd)
     // use ptvsd shipped with vscode-python to avoid potential version mismatch
 
-    const pyExtensionId: string = 'ms-python.python';
+    const pyExtensionId: string = "ms-python.python";
     const pyExtension: vscode.Extension<IPythonExtensionApi> = vscode.extensions.getExtension(pyExtensionId);
     if (pyExtension) {
         if (!pyExtension.isActive) {
@@ -30,19 +29,17 @@ export async function getPtvsdFromPythonExtension(): Promise<string>
 
         // tslint:disable-next-line:strict-boolean-expressions
         if (pyExtension.exports && pyExtension.exports.debug) {
-            const mockHost: string = "localhost";
-            const mockPort: number = 8888;
-            const mockWait: boolean = true;
+            // hack python extension's api to get command for injecting ptvsd
 
-            let ptvsdLaunchCommand = await pyExtension.exports.debug.getRemoteLauncherCommand(mockHost, mockPort, mockWait);
+            // pass false for waitForDebugger so the --wait flag won't be added
+            const waitForDebugger: boolean = false;
+            const ptvsdCommand = await pyExtension.exports.debug.getRemoteLauncherCommand(host, port, waitForDebugger);
 
-            // ptvsdLaunchCommand[0] is the absolute path to the ptvsd launcher script
-            let ptvsdModule: string = ptvsdLaunchCommand[0];
-
-            // ptvsd from vscode-python seems to require an extra --default flag (as in ptvsdLaunchCommand)
-            // manually add it here
-            ptvsdModule = [ptvsdModule, "--default"].join(" ");
-            return ptvsdModule;
+            // prepend python interpreter
+            ptvsdCommand.unshift("python");
+            // append the --pid flag
+            ptvsdCommand.push("--pid", pid.toString());
+            return ptvsdCommand.join(" ");
         } else {
             throw new Error(`Update extension [${pyExtensionId}] to debug Python projects.`);
         }

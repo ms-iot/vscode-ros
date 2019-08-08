@@ -26,11 +26,11 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         await this.resolveProcessIdIfNeeded(config);
 
         // propagate debug configuration to Python or C++ debugger depending on the chosen runtime type
-        this.launchAttachSession(config);
+        this.launchAttachSession(config as requests.IResolvedAttachRequest);
         return config;
     }
 
-    private async launchAttachSession(config: requests.IAttachRequest) {
+    private async launchAttachSession(config: requests.IResolvedAttachRequest) {
         if (!config.runtime || !config.processId) {
             return;
         }
@@ -41,22 +41,20 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                     name: `C++: ${config.processId}`,
                     type: "cppvsdbg",
                     request: "attach",
-                    processId: config.processId
+                    processId: config.processId,
                 };
                 vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
             }
         } else if (config.runtime === "Python") {
             const host = "localhost";
             const port = await port_finder.getPortPromise();
-            const ptvsd = await utils.getPtvsdFromPythonExtension();
+            const ptvsdInjectCommand = await utils.getPtvsdInjectCommand(host, port, config.processId);
 
-            const injectPtvsdCmd = `python ${ptvsd} --host ${host} --port ${port} --pid ${config.processId}`;
             const processOptions: child_process.ExecOptions = {
                 cwd: extension.baseDir,
                 env: extension.env,
             };
-
-            child_process.exec(injectPtvsdCmd, processOptions, (error, stdout, stderr) => {
+            child_process.exec(ptvsdInjectCommand, processOptions, (error, stdout, stderr) => {
                 if (!error) {
                     const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
                     extension.outputChannel.appendLine(statusMsg);
