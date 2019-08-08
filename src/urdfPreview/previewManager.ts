@@ -3,6 +3,9 @@
 
 import * as vscode from 'vscode';
 import * as path from "path";
+
+import * as extension from "../extension";
+import * as telemetry from "../telemetry-helper";
 import URDFPreview from './preview'
 
 export default class URDFPreviewManager implements vscode.WebviewPanelSerializer {
@@ -26,6 +29,8 @@ export default class URDFPreviewManager implements vscode.WebviewPanelSerializer
     public preview(
         resource: vscode.Uri
     ): void {
+        const reporter = telemetry.getReporter(this._context);
+        reporter.sendTelemetryCommand(extension.Commands.PreviewURDF);
         if (URDFPreviewManager.handlesUri(resource)) {
             let preview = this.getExistingPreview(resource);
             if (preview) {
