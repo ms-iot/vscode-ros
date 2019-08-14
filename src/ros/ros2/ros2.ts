@@ -29,29 +29,20 @@ export class ROS2 implements ros.ROSApi {
         }));
     }
 
-    public getPackages(): Promise<{ [name: string]: () => string }> {
-        return new Promise((resolve, reject) => child_process.exec("ros2 pkg list", { env: this._env }, (err, out) => {
-            if (!err) {
-                const lines = out.trim().split(os.EOL).map(((line) => {
-                    return line;
-                }));
-
-                const packageInfoReducer = (acc: object, cur: string) => {
-                    const k: string = cur;
-                    acc[k] = async () => {
-                        const { stdout } = await child_process.exec(`ros2 pkg prefix --share ${k}`, { env: this._env });
-                        for await (const line of stdout) {
-                            return line.trim();
-                        }
-                        return "";
-                    };
-                    return acc;
-                };
-                resolve(lines.reduce(packageInfoReducer, {}));
-            } else {
-                reject(err);
-            }
-        }));
+    public async getPackages(): Promise<{ [name: string]: () => Promise<string> }> {
+        let packages: { [name: string]: () => Promise<string> } = {};
+        const {stdout} = child_process.exec("ros2 pkg list", { env: this._env });
+        for await (const line of stdout) {
+            const packageName:string = line.trim();
+            packages[packageName] = async (): Promise<string> => {
+                const { stdout } = await child_process.exec(`ros2 pkg prefix --share ${packageName}`, { env: this._env });
+                for await (const line of stdout) {
+                    return line.trim();
+                }
+                return "";
+            };
+        }
+        return packages;
     }
 
     public getIncludeDirs(): Promise<string[]> {

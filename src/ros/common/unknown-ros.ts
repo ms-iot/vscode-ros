@@ -17,7 +17,7 @@ export class UnknownROS implements ros.ROSApi {
         return;
     }
 
-    public getPackages(): Promise<{ [name: string]: () => string }> {
+    public getPackages(): Promise<{ [name: string]: () => Promise<string> }> {
         console.error("Unknown ROS distro.");
         return;
     }
