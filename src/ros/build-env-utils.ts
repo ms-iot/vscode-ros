@@ -51,13 +51,15 @@ async function updateCppPropertiesInternal(): Promise<void> {
 
     // Get all packages within the workspace that have an include directory
     const filteredPackages = await rosApi.getPackages().then((packages: { [name: string]: () => string }) => {
-        return Object.values(packages).filter((packagePath: () => string) => {
-            return packagePath().startsWith(extension.baseDir);
+        return Object.values(packages).filter(async (packagePath: () => string) => {
+            const packageBasePath = await packagePath();
+            return packageBasePath.startsWith(extension.baseDir);
         });
     });
 
-    await Promise.all(filteredPackages.map(pkg => {
-        const include = path.join(pkg(), "include");
+    await Promise.all(filteredPackages.map(async pkg => {
+        const packageBasePath = await pkg();
+        const include = path.join(packageBasePath, "include");
 
         return pfs.exists(include).then(exists => {
             if (exists) {
