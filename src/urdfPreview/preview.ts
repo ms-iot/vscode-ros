@@ -116,7 +116,7 @@ export default class URDFPreview
         var pattern =  /package:\/\/(.*?)\//g;
         var match;
         while (match = pattern.exec(urdfText)) {
-            var packagePath = packageMap[match[1]];
+            var packagePath = await packageMap[match[1]]();
             if (packagePath.charAt(0)  === '/') {
                 // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
                 // base path has a /, if not it adds it.

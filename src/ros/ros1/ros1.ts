@@ -21,12 +21,12 @@ export class ROS1 implements ros.ROSApi {
     }
 
     public getPackageNames(): Promise<string[]> {
-        return this.getPackages().then((packages: { [name: string]: string }) => {
+        return this.getPackages().then((packages: { [name: string]: () => string }) => {
             return Object.keys(packages);
         });
     }
 
-    public getPackages(): Promise<{ [name: string]: string }> {
+    public getPackages(): Promise<{ [name: string]: () => string }> {
         return new Promise((resolve, reject) => child_process.exec("rospack list", { env: this._env }, (err, out) => {
             if (!err) {
                 const lines = out.trim().split(os.EOL).map(((line) => {
@@ -40,7 +40,9 @@ export class ROS1 implements ros.ROSApi {
                 const packageInfoReducer = (acc: object, cur: string[]) => {
                     const k: string = cur[0] as string;
                     const v: string = cur[1] as string;
-                    acc[k] = v;
+                    acc[k] = async () => {
+                        return `${v}`;
+                    };
                     return acc;
                 };
                 resolve(lines.reduce(packageInfoReducer, {}));

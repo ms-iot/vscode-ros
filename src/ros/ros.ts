@@ -21,7 +21,7 @@ export interface ROSApi {
     /**
      * Gets a map of package names to paths.
      */
-    getPackages: () => Promise<{ [name: string]: string }>;
+    getPackages: () => Promise<{ [name: string]: () => string }>;
 
     /**
      * Gets a list of CMake include paths.
