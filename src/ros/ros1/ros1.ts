@@ -11,13 +11,13 @@ import * as ros from "../ros";
 import * as ros_core from "./core-helper";
 
 export class ROS1 implements ros.ROSApi {
-    private _context: vscode.ExtensionContext;
-    private _env: any;
-    private _xmlRpcApi: ros_core.XmlRpcApi = null;
+    private context: vscode.ExtensionContext;
+    private env: any;
+    private xmlRpcApi: ros_core.XmlRpcApi = null;
 
     public setContext(context: vscode.ExtensionContext, env: any) {
-        this._context = context;
-        this._env = env;
+        this.context = context;
+        this.env = env;
     }
 
     public getPackageNames(): Promise<string[]> {
@@ -27,7 +27,7 @@ export class ROS1 implements ros.ROSApi {
     }
 
     public getPackages(): Promise<{ [name: string]: () => Promise<string> }> {
-        return new Promise((resolve, reject) => child_process.exec("rospack list", { env: this._env }, (err, out) => {
+        return new Promise((resolve, reject) => child_process.exec("rospack list", { env: this.env }, (err, out) => {
             if (!err) {
                 const lines = out.trim().split(os.EOL).map(((line) => {
                     const info: string[] = line.split(" ");
@@ -36,12 +36,12 @@ export class ROS1 implements ros.ROSApi {
                         return info;
                     }
                 }));
-    
+
                 const packageInfoReducer = (acc: object, cur: string[]) => {
                     const k: string = cur[0] as string;
                     const v: string = cur[1] as string;
                     acc[k] = async () => {
-                        return `${v}`;
+                        return v;
                     };
                     return acc;
                 };
@@ -54,8 +54,8 @@ export class ROS1 implements ros.ROSApi {
 
     public getIncludeDirs(): Promise<string[]> {
         const cmakePrefixPaths: string[] = [];
-        if (this._env.hasOwnProperty("CMAKE_PREFIX_PATH")) {
-            cmakePrefixPaths.push(...this._env.CMAKE_PREFIX_PATH.split(path.delimiter));
+        if (this.env.hasOwnProperty("CMAKE_PREFIX_PATH")) {
+            cmakePrefixPaths.push(...this.env.CMAKE_PREFIX_PATH.split(path.delimiter));
         }
 
         const includeDirs: string[] = [];
@@ -81,8 +81,8 @@ export class ROS1 implements ros.ROSApi {
         } else {
             const dirs = `catkin_find --without-underlays --libexec --share '${packageName}'`;
             command = `find $(${dirs}) -type f -executable`;
-            return new Promise((c, e) => child_process.exec(command, { env: this._env }, (err, out) =>
-                err ? e(err) : c(out.trim().split(os.EOL))
+            return new Promise((c, e) => child_process.exec(command, { env: this.env }, (err, out) =>
+                err ? e(err) : c(out.trim().split(os.EOL)),
             ));
         }
     }
@@ -91,34 +91,33 @@ export class ROS1 implements ros.ROSApi {
         let command: string;
         if (process.platform === "win32") {
             return this._findPackageFiles(packageName, `--share`, `*.launch`);
-        }
-        else {
+        } else {
             const dirs = `catkin_find --without-underlays --share '${packageName}'`;
             command = `find $(${dirs}) -type f -name *.launch`;
         }
 
-        return new Promise((c, e) => child_process.exec(command, { env: this._env }, (err, out) => {
+        return new Promise((c, e) => child_process.exec(command, { env: this.env }, (err, out) => {
             err ? e(err) : c(out.trim().split(os.EOL));
         }));
     }
 
     public startCore() {
-        if (typeof this._env.ROS_MASTER_URI === "undefined") {
-            return; 
+        if (typeof this.env.ROS_MASTER_URI === "undefined") {
+            return;
         }
-        ros_core.startCore(this._context);
+        ros_core.startCore(this.context);
     }
 
     public stopCore() {
-        if (typeof this._env.ROS_MASTER_URI === "undefined") {
-            return; 
+        if (typeof this.env.ROS_MASTER_URI === "undefined") {
+            return;
         }
-        ros_core.stopCore(this._context, this._getXmlRpcApi());
+        ros_core.stopCore(this.context, this._getXmlRpcApi());
     }
 
     public activateCoreMonitor(): vscode.Disposable {
-        if (typeof this._env.ROS_MASTER_URI === "undefined") {
-            return null; 
+        if (typeof this.env.ROS_MASTER_URI === "undefined") {
+            return null;
         }
         const coreStatusItem = new ros_core.StatusBarItem(this._getXmlRpcApi());
         coreStatusItem.activate();
@@ -126,12 +125,12 @@ export class ROS1 implements ros.ROSApi {
     }
 
     public showCoreMonitor() {
-        ros_core.launchMonitor(this._context);
+        ros_core.launchMonitor(this.context);
     }
 
-    public activateRosrun(packageName: string, executableName:string, argument: string): vscode.Terminal {
-        let terminal = vscode.window.createTerminal({
-            env: this._env,
+    public activateRosrun(packageName: string, executableName: string, argument: string): vscode.Terminal {
+        const terminal = vscode.window.createTerminal({
+            env: this.env,
             name: "rosrun",
         });
         terminal.sendText(`rosrun ${packageName} ${executableName} ${argument}`);
@@ -139,8 +138,8 @@ export class ROS1 implements ros.ROSApi {
     }
 
     public activateRoslaunch(launchFilepath: string, argument: string): vscode.Terminal {
-        let terminal = vscode.window.createTerminal({
-            env: this._env,
+        const terminal = vscode.window.createTerminal({
+            env: this.env,
             name: "roslaunch",
         });
         terminal.sendText(`roslaunch ${launchFilepath} ${argument}`);
@@ -148,34 +147,34 @@ export class ROS1 implements ros.ROSApi {
     }
 
     private _findPackageFiles(packageName: string, filter: string, pattern: string): Promise<string[]> {
-        return new Promise((c, _e) => child_process.exec(`catkin_find --without-underlays ${filter} ${packageName}`,
-            { env: this._env }, (_err, out) => {
-                let findFilePromises = [];
-                let paths = out.trim().split(os.EOL);
-                paths.forEach(foundPath => {
-                    let normalizedPath = path.win32.normalize(foundPath);
-                    findFilePromises.push(new Promise((found) => child_process.exec(`where /r "${normalizedPath}" ` + pattern,
-                        { env: this._env }, (err, out) =>
-                            err ? found(null) : found(out.trim().split(os.EOL))
+        return new Promise((c, e) => child_process.exec(`catkin_find --without-underlays ${filter} ${packageName}`,
+            { env: this.env }, (err, out) => {
+                const findFilePromises = [];
+                const paths = out.trim().split(os.EOL);
+                paths.forEach((foundPath) => {
+                    const normalizedPath = path.win32.normalize(foundPath);
+                    findFilePromises.push(new Promise((found) => child_process.exec(
+                        `where /r "${normalizedPath}" ` + pattern, { env: this.env }, (innerErr, innerOut) =>
+                            innerErr ? found(null) : found(innerOut.trim().split(os.EOL)),
                     )));
                 });
 
-                return Promise.all(findFilePromises).then(values => {
+                return Promise.all(findFilePromises).then((values) => {
                     // remove null elements
-                    values = values.filter(s => s != null) as string[];
+                    values = values.filter((s) => s != null) as string[];
 
                     // flatten
                     values = [].concat(...values);
                     c(values);
                 });
-            }
+            },
         ));
     }
 
     private _getXmlRpcApi(): ros_core.XmlRpcApi {
-        if (this._xmlRpcApi === null) {
-            this._xmlRpcApi = new ros_core.XmlRpcApi(this._env.ROS_MASTER_URI);
+        if (this.xmlRpcApi === null) {
+            this.xmlRpcApi = new ros_core.XmlRpcApi(this.env.ROS_MASTER_URI);
         }
-        return this._xmlRpcApi;
+        return this.xmlRpcApi;
     }
 }
