@@ -32,16 +32,23 @@ export class ROS2 implements ros.ROSApi {
     public async getPackages(): Promise<{ [name: string]: () => Promise<string> }> {
         let packages: { [name: string]: () => Promise<string> } = {};
         const {stdout} = child_process.exec("ros2 pkg list", { env: this._env });
-        for await (const line of stdout) {
+        let chucks = "";
+        for await (const chuck of stdout) {
+            chucks += chuck;
+        }
+
+        chucks.split(os.EOL).map(((line) => {
             const packageName:string = line.trim();
             packages[packageName] = async (): Promise<string> => {
                 const { stdout } = await child_process.exec(`ros2 pkg prefix --share ${packageName}`, { env: this._env });
-                for await (const line of stdout) {
-                    return line.trim();
+                let chucks = "";
+                for await (const chuck of stdout) {
+                    chucks += chuck;
                 }
-                return "";
+                return chucks.trim();
             };
-        }
+        }));
+
         return packages;
     }
 
