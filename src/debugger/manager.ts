@@ -27,7 +27,7 @@ class RosDebugManager implements vscode.DebugConfigurationProvider {
         if (config.request === "attach") {
             return this.attachResolver.resolveDebugConfiguration(folder, config as requests.IAttachRequest, token);
         } else if (config.request === "launch") {
-            return this.launchResolver.resolveDebugConfiguration(folder, config, token);
+            return this.launchResolver.resolveDebugConfiguration(folder, config as requests.ILaunchRequest, token);
         }
     }
 }

@@ -5,20 +5,12 @@ import * as vscode from "vscode";
 import * as debug_protocol from "vscode-debugprotocol";
 
 // tslint:disable-next-line: max-line-length
-export interface IAttachRequest extends debug_protocol.DebugProtocol.AttachRequestArguments, vscode.DebugConfiguration {
+export interface IAttachRequest extends vscode.DebugConfiguration, debug_protocol.DebugProtocol.AttachRequestArguments {
     runtime?: string;
     processId?: number | string;
 }
 
 // tslint:disable-next-line: max-line-length
-export interface IResolvedAttachRequest extends IAttachRequest {
-    runtime: string;
-    processId: number;
-}
-
-// tslint:disable-next-line: max-line-length
-export interface ILaunchRequest extends debug_protocol.DebugProtocol.AttachRequestArguments, vscode.DebugConfiguration {
-    command?: string;
-    package?: string;
-    target?: string;
+export interface ILaunchRequest extends vscode.DebugConfiguration, debug_protocol.DebugProtocol.LaunchRequestArguments {
+    target: string;
 }
