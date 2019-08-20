@@ -15,6 +15,8 @@ import * as vscode from "vscode";
 import * as extension from "../../../extension";
 import * as requests from "../../requests";
 
+const promisifiedExec = util.promisify(child_process.exec);
+
 interface IRoslaunchRequest {
     executable: string;
     arguments: string[];
@@ -33,8 +35,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             env: extension.env,
         };
 
-        const execPromisified = util.promisify(child_process.exec);
-        let result = await execPromisified(`roslaunch --dump-params ${config.target}`, rosExecOptions);
+        let result = await promisifiedExec(`roslaunch --dump-params ${config.target}`, rosExecOptions);
         const parameters = Object.keys(yaml.load(result.stdout));
         if (parameters && parameters.length) {
             // only call into rosparam when necessary
@@ -43,15 +44,15 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 if (error) {
                     throw error;
                 }
-                await execPromisified(`rosparam load ${tmpFile.name}`, rosExecOptions);
+                await promisifiedExec(`rosparam load ${tmpFile.name}`, rosExecOptions);
                 tmpFile.removeCallback();
             });
         }
 
-        result = await execPromisified(`roslaunch --nodes ${config.target}`, rosExecOptions);
+        result = await promisifiedExec(`roslaunch --nodes ${config.target}`, rosExecOptions);
         const nodes = result.stdout.trim().split(os.EOL);
         await Promise.all(nodes.map((node: string) => {
-            return execPromisified(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
+            return promisifiedExec(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
             for (const command of commands) {
                 const roslaunchRequest = this.parseRoslaunchCommand(command.stdout);
