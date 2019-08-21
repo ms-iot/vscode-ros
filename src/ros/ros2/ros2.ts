@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 
 import * as ros from "../ros";
 import * as daemon from "./daemon";
+import * as ros2_monitor from "./ros2-monitor";
 
 export class ROS2 implements ros.ROSApi {
     private context: vscode.ExtensionContext;
@@ -110,9 +111,8 @@ export class ROS2 implements ros.ROSApi {
         return coreStatusItem;
     }
 
-    public showCoreMonitor() {
-        // not yet implemented.
-        return;
+    public async showCoreMonitor() {
+        return ros2_monitor.launchMonitor(this.context);
     }
 
     public activateRosrun(packageName: string, executableName: string, argument: string): vscode.Terminal {

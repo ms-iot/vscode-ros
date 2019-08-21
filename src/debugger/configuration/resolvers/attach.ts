@@ -13,6 +13,12 @@ import * as picker_items_provider_factory from "../../process-picker/process-ite
 import * as requests from "../../requests";
 import * as utils from "../../utils";
 
+// tslint:disable-next-line: max-line-length
+export interface IResolvedAttachRequest extends requests.IAttachRequest {
+    runtime: string;
+    processId: number;
+}
+
 export class AttachResolver implements vscode.DebugConfigurationProvider {
     private readonly supportedRuntimeTypes = [
         "C++",
@@ -26,11 +32,11 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         await this.resolveProcessIdIfNeeded(config);
 
         // propagate debug configuration to Python or C++ debugger depending on the chosen runtime type
-        this.launchAttachSession(config as requests.IResolvedAttachRequest);
+        this.launchAttachSession(config as IResolvedAttachRequest);
         return config;
     }
 
-    private async launchAttachSession(config: requests.IResolvedAttachRequest) {
+    private async launchAttachSession(config: IResolvedAttachRequest) {
         if (!config.runtime || !config.processId) {
             return;
         }

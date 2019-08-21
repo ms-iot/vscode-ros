@@ -103,45 +103,21 @@
                 "label": "ROS",
                 "program": "./out/src/debugger/main.js",
                 "runtime": "node",
-                "variables": {
-                    "debugSettings": "ros.getDebugSettings"
-                },
                 "configurationAttributes": {
                     "launch": {
                         "required": [
-                            "command",
-                            "package",
                             "target"
                         ],
                         "properties": {
-                            "command": {
-                                "type": "string",
-                                "description": "Whether to run a launch file or executable",
-                                "enum": [
-                                    "roslaunch",
-                                    "rosrun"
-                                ],
-                                "default": "roslaunch"
-                            },
-                            "package": {
-                                "type": "string",
-                                "description": "The package name",
-                                "default": ""
-                            },
                             "target": {
                                 "type": "string",
-                                "description": "The launch file or executable name",
+                                "description": "Absolute path to launch file",
                                 "default": ""
                             },
                             "args": {
                                 "type": "array",
-                                "description": "Arguments to pass to the launch or run command",
+                                "description": "Arguments for the roslaunch command",
                                 "default": []
-                            },
-                            "debugSettings": {
-                                "type": "string",
-                                "description": "The stringified debug settings",
-                                "default": "${command:debugSettings}"
                             }
                         }
                     },
@@ -185,10 +161,7 @@
                             "name": "ROS: Launch",
                             "type": "ros",
                             "request": "launch",
-                            "command": "roslaunch",
-                            "package": "",
-                            "target": ".launch",
-                            "debugSettings": "${command:debugSettings}"
+                            "target": "absolute path to launch file"
                         }
                     },
                     {
@@ -272,15 +245,21 @@
         "vscode:prepublish": "tsc -p ./"
     },
     "dependencies": {
+        "js-yaml": "^3.12.1",
+        "portfinder": "^1.0.21",
+        "shell-quote": "^1.6.0",
+        "tmp": "^0.1.0",
         "vscode-debugadapter": "^1.15.0",
         "vscode-debugprotocol": "^1.15.0",
         "vscode-extension-telemetry": "^0.1.1",
-        "portfinder": "1.0.21",
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {
+        "@types/js-yaml": "^3.12.1",
         "@types/mocha": "^2.2.32",
         "@types/node": "^11.13.4",
+        "@types/shell-quote": "^1.6.0",
+        "@types/tmp": "^0.1.0",
         "@types/xmlrpc": "^1.3.2",
         "mocha": "^6.1.4",
         "typescript": "^3.4.3",

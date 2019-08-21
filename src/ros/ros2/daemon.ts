@@ -6,6 +6,7 @@ import * as util from "util";
 import * as vscode from "vscode";
 
 import * as extension from "../../extension";
+import * as ros2_monitor from "./ros2-monitor"
 
 /**
  * start the ROS2 daemon.
@@ -31,11 +32,13 @@ export async function stopDaemon() {
 export class StatusBarItem {
     private item: vscode.StatusBarItem;
     private timeout: NodeJS.Timeout;
+    private ros2cli: ros2_monitor.XmlRpcApi;
 
     public constructor() {
         this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
         this.item.text = "$(question) ROS2 Daemon";
         this.item.command = extension.Commands.ShowCoreStatus;
+        this.ros2cli = new ros2_monitor.XmlRpcApi();
     }
 
     public activate() {
@@ -49,12 +52,15 @@ export class StatusBarItem {
     }
 
     private async update() {
-        const command: string = "ros2 daemon status";
-        const exec = util.promisify(child_process.exec);
-        const { stdout } = await exec(command, { env: extension.env });
-        const status: boolean = stdout.includes("The daemon is running");
-        this.item.text = (status ? "$(check)" : "$(x)") + " ROS2 Daemon";
-        this.timeout = setTimeout(() => this.update(), 200);
-        return;
+        let status: boolean = false;
+        try {
+            const result = await this.ros2cli.getNodeNamesAndNamespaces();
+            status = true;
+        } catch (error) {
+            // do nothing.
+        } finally {
+            this.item.text = (status ? "$(check)" : "$(x)") + " ROS2 Daemon";
+            this.timeout = setTimeout(() => this.update(), 200);
+        }
     }
 }
