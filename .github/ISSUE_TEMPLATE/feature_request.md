@@ -1,17 +1,14 @@
 ---
 name: Feature request
-about: Suggest an idea for this project <3
-title: "[feature] this could work!"
+about: Suggest an idea for this project
+title: "[feature] "
 labels: feature request
 assignees: ''
 
 ---
 
-**Is this feature request related to a problem?**
-Does the lack of this feature cause any problem? Please help us understand more about this request by sharing your experience =)
+**what is needed**
+\<what should be added or updated\>
 
-**What kind of solution would be helpful?**
-What do you think is necessary to be added/updated?
-
-**Additional information**
-Any additional information could go here =) Suggestions, comments, anything!
+**why is it needed**
+\<brief introduction for better understanding\>
