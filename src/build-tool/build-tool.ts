@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 import * as extension from "../extension";
 import * as pfs from "../promise-fs";
 import * as telemetry from "../telemetry-helper";
-import * as catkin_make from "./catkin-make";
+import * as catkin from "./catkin";
 import * as catkin_tools from "./catkin-tools";
 import * as colcon from "./colcon";
 
@@ -45,11 +45,11 @@ class CatkinCmakeBuildTool extends BuildTool {
     }
 
     protected _registerTaskProvider(): vscode.Disposable {
-        return vscode.workspace.registerTaskProvider("catkin_cmake", new catkin_make.CatkinMakeProvider());
+        return vscode.workspace.registerTaskProvider("catkin_cmake", new catkin.CatkinProvider());
     }
 
     protected async _createPackage(): Promise<void> {
-        return catkin_make.createPackage();
+        return catkin.createPackage();
     }
 }
 
