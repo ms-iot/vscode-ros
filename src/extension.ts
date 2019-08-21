@@ -220,7 +220,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
         }
-    } else if (process.env.ROS_DISTRO && process.env.ROS_DISTRO.trim().length) {
+    } else if (process.env.ROS_DISTRO) {
         env = process.env;
     } else {
         const installedDistros = await ros_utils.getDistros();
