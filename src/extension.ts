@@ -199,8 +199,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
     let setupScriptExt: string;
     if (process.platform === "win32") {
         setupScriptExt = ".bat";
-    }
-    else {
+    } else {
         setupScriptExt = ".bash";
     }
 
@@ -209,8 +208,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
             let globalInstallPath: string;
             if (process.platform === "win32") {
                 globalInstallPath = path.join("C:", "opt", "ros", `${distro}`, "x64");
-            }
-            else {
+            } else {
                 globalInstallPath = path.join("/", "opt", "ros", `${distro}`);
             }
             let setupScript: string = path.format({
@@ -222,14 +220,22 @@ async function sourceRosAndWorkspace(): Promise<void> {
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
         }
-    } else if (typeof process.env.ROS_DISTRO !== "undefined") {
+    } else if (process.env.ROS_DISTRO) {
         env = process.env;
     } else {
-        const message = "The ROS distro is not configured.";
-        const configure = "Configure";
+        const installedDistros = await ros_utils.getDistros();
+        if (!installedDistros.length) {
+            throw new Error("No ROS distro found!");
+        } else if (installedDistros.length === 1) {
+            // if there is only one distro installed, directly choose it
+            config.update("distro", installedDistros[0]);
+        } else {
+            const message = "The ROS distro is not configured.";
+            const configure = "Configure";
 
-        if (await vscode.window.showErrorMessage(message, configure) === configure) {
-            config.update("distro", await vscode.window.showQuickPick(ros_utils.getDistros()));
+            if (await vscode.window.showErrorMessage(message, configure) === configure) {
+                config.update("distro", await vscode.window.showQuickPick(installedDistros));
+            }
         }
     }
 
