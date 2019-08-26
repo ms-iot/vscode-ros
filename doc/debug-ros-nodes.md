@@ -84,7 +84,7 @@ Therefore, for normal Python processes in ROS, the workflow would be:
 2. inject `ptvsd` using API exposed by `vscode-python` (this avoids potential `ptvsd` version mismatch)
 3. start an Python-attach debug session with `vscode-python`
 
-### Example in `launch.json`
+### Example for `attach`
 
 ```json
 {
@@ -104,7 +104,7 @@ Therefore, for normal Python processes in ROS, the workflow would be:
 }
 ```
 
-### Note
+### Note on attach-debug
 
 Microsoft's VS Code extensions for [C++][ms-vscode.cpptools] and [Python][ms-python.python] provide flexible mechanisims of attaching into a [C++][vscode_cpp_debug] or [Python][vscode_python_debug] process.
 This extension only aims to enable a basic and generic attach-debug flow.
@@ -113,43 +113,68 @@ Please use language-specific extensions for any specific debugging requirements 
 * specifying `symbolSearchPath` or `miDebuggerPath` for C++ debugging
 * attaching to and debugging a remote process
 
-<!-- ## Launch
+## Launch
 
-Our goal for launch-debug is to provide a native-like debugging experience for ROS nodes launched from roslaunch, which means enabling debugging multiple ROS nodes at the same time. Just like debugging a C++ program or a Python script with a single debug session in VS Code, we want to enable the user to start multiple debug sessions when a launch-type debug configuration is executed.
+Our goal for launch-debug is to mimic the experience of debugging a single program in VS Code.
+When a `.launch` file is launched in debug mode, we want to launch all the ROS nodes defined in it in debug mode at the same time.
+Similar to attach-debug, we want to utilize all the language-specific debugging functionalities provided by `vscode-python` and `vscode-cpptools`.
 
-Very similar to attach-debug, we want to utilize all the language-specific debugging functionalities provided by vscode-python and vscode-cpptools. In this configuration, we are also going to provide a “stopOnEntry” flag that controls both the “stopOnEntry” flag for Python debugging and “stopAtEntry” flag for C++ debugging. If “stopOnEntry” is set to False, all processes will execute till a breakpoint is hit.
-The roslaunch executable needs to be updated to support a “--fake” or “--debug” flag, which specifies the launcher not to actually start any of the ROS nodes, but only print out their launch requests (executable, arguments, work directory, environment variables). The VS Code extension would execute the roslaunch command with the new “--debug” flag ,parse the launch requests in the output, and start debug sessions based on the type of the ROS node.
-For the same reason mentioned above, a stub debug adapter that self-terminates immediately is still needed. The entire workflow would look like this:
+![launch_debug][launch_debug]
 
-Why not use roslaunch’s non-launch options ?
-A couple of reasons:
-1.	roslaunch’s non-launch command does not output the exact same command that’s used to launch the node. For example, for a node defined like this:
-<node pkg="pubsub" type="talker" name="talker_py_1" args="$(arg foo)" />
-Calling roslaunch to get its launch command would give us:
-PS C:\ros\catkin_ws\dev_ros_comm> roslaunch --nodes C:\ros\catkin_ws\dev_ros_comm\src\beginner_tutorials\launch\minimal.win.launch
-/talker_py_1
-PS C:\ros\catkin_ws\dev_ros_comm> roslaunch --args /talker_py_1 C:\ros\catkin_ws\dev_ros_comm\src\beginner_tutorials\launch\minimal.win.launch
-python C:\ros\catkin_ws\dev_ros_comm\src\pubsub\scripts\talker.py foo __name:=talker_py_1
+*TODO: support language-specific configurations in debug configuration.*
 
-However, during runtime, roslaunch appends another argument "__log:=C:\Users\kejxu\.ros\log\a786f84f-bd4e-11e9-965e-480fcf49b453\talker_py_1-1.log"
+From another perspective, we aim to translate launch configurations in a `.launch` file into debug configurations for VS Code that will be executed all at the same time.
+To do this, we use [the command line functionality of `roslaunch`][roslaunch_commandline] to extract launch requests from a `.launch` file:
 
-2. roslaunch is needed for <param> tags
-since <param> tags are only loaded onto the parameter server, the launch file still needs to be executed so that all parameters are set correctly.
+1. get parameters defined in the `.launch` file with `roslaunch --dump-params <launch-file>`
+2. load parameters with [`rosparam load`][rosparam]
+3. get the nodes defined in the `.launch` files with `roslaunch --nodes <launch-file>`
+4. get launch requests for each node with `roslaunch --args <node> <launch-file>`
 
-3. `<env>` tags
-When using the “--args” flag, environment variable configurations would show up as Linux-style env-set commands (someenv=somevalue), which would not work on Windows
+### Limitations
 
-Limitations
+* when using the `--args` flag to get launch requests from the `.launch` file, environment configurations would be expressed as inline env-set commands:
 
-Potentially, when too many debug sessions are launched at the same time, it would be painful to terminate them one by one.
-The launch-debug configuration provided by vscode-python reuses the same port number, when multiple Python processes are launched, only one of those would eventually connect. However, we would still want to use launch-debug configuration since this is the only way we could terminate the process at the same time we terminate the debug session. This requires an update from the vscode-python side.
-Adding a debug=True attribute to the roslaunch/node xml specification?
-Launch file in ROS could contain from 1 single node to many nodes. Launching debug sessions for all of those could be seriously resource draining and in turn easily cause performance issues. Potentially it could be helpful if the user could add a debug=True attribute to the node(s) to debug specific node(s).
-However, since this means changing the ROS launch file XML specification, it potentially requires all launchers (including roslaunch) to be able to understand and consume this flag. The cost of adding this support to roslaunch is unknown and could potentially mean a much larger effort.
-The work-around for this is to use multiple launch files, and only one of those is specifically for debugging purpose.
-A Node.js-based ROS launcher specifically for VS Code?
-Since VS Code runs in a Node.js context, another possible solution would be to implement a new ROS launcher (to replace roslaunch for debugging) in JavaScript/TypeScript.
-Very similar implementation but in C++ has been attempted at https://wiki.ros.org/rosmon. Good thing about this approach is that we will not need to go through the upstreaming process, since we are creating new code; yet that is also the bad thing, any new code we publish creates maintenance burden on a already limited bandwidth. Not to mention the engineering cost of porting any potential change/update that roslaunch might get from the community in the future. -->
+    ```bash
+    someenv=somevalue node arg:=value
+    ```
+
+    which would require extra (reverse) parsing of the command line.
+    This could be avoided if `roslaunch` gets [updated](#what-about-an-updated-roslaunch).
+
+* with the current implementation, all nodes in a `.launch` file, instead of [only some specified ones](#what-about-adding-a-debug-attribute-to-the-node-element-in-roslaunch), will be launched in debug mode.
+    Potentially, when too many debug sessions are launched at the same time, it would be painful to terminate them one by one.
+    To work around this, use more than 1 `.launch` files and use one of them specifically for a limited number of nodes that need to be debugged.
+
+* currently, when attempting to start multiple Python-launch debug sessions at once, only 1 of them could be connected.
+    For this reason, it is limited to have only 1 Python node in the launch file for now.
+
+### Example for `launch`
+
+```json
+{
+    "configurations": [
+        {
+            "name": "ROS: Launch",
+            "type": "ros",
+            "request": "launch",
+            "target": "C:\\ros\\project_ws\\src\\project\\launch\\sample.launch"
+        },
+        {
+            "name": "ROS: Launch",
+            "type": "ros",
+            "request": "launch",
+            "target": "C:\\ros\\project_ws\\src\\project\\launch\\sample.launch",
+            "stopOnEntry": true
+        }
+    ]
+}
+```
+
+### ROS2 support
+
+This extension currently does not support [the launch tool for ROS2][ros2_launch].
+Support for `ros2/launch` will be added once the launcher becomes stabilized.
 
 ## Appendix
 
@@ -202,11 +227,28 @@ These debug requests are generated from the `ros`-type debug configurations.
 When debug configurations are executed, they are resolved into debug requests and then sent to corresponding debug adapters.
 It would lead to errors generated in VS Code if no debug adapter is there to handle the debug requests.
 
+### What about adding a `debug` attribute to the `node` element in `roslaunch`
+
+Potentially, it could be helpful if the user could add a `debug=True` attribute (just like `launch-prefix`) in the `.launch` file to debug specific node(s).
+However, since this means changing XML specification for ROS launch files, it would require all launchers (including `roslaunch`) to understand and consume this flag.
+
+This is not preferred since `roslaunch` does not support launching nodes in debug mode.
+
+### What about an updated `roslaunch`
+
+Ideally, `roslaunch` could be updated to support a `--debug` flag.
+When this flag is added, `roslaunch` will not start any of the ROS nodes, but instead print out the launch requests in an easy-to-parse format (e.g. JSON):
+
+* parameters to be set for the launch request
+* environment configurations for each node
+* launch commands for each node
+
 <!-- link to files -->
 [architecture]: ../media/documentation/debug-ros-nodes/architecture.png
 [execute_a_debug_configuration]: ../media/documentation/debug-ros-nodes/execute-a-debug-configuration.png
 [debug_flow]: ../media/documentation/debug-ros-nodes/debug-flow.png
 [attach_debug]: ../media/documentation/debug-ros-nodes/attach-debug.png
+[launch_debug]: ../media/documentation/debug-ros-nodes/launch-debug.png
 
 <!-- external links -->
 [ros_wiki_debug]: http://wiki.ros.org/roslaunch/Tutorials/Roslaunch%20Nodes%20in%20Valgrind%20or%20GDB
@@ -220,3 +262,6 @@ It would lead to errors generated in VS Code if no debug adapter is there to han
 [pdb]: https://docs.python.org/2/library/pdb.html
 [ptvsd]: https://github.com/microsoft/ptvsd
 [setuptools_console_scripts]: https://packaging.python.org/specifications/entry-points/
+[roslaunch_commandline]: http://wiki.ros.org/roslaunch/Commandline%20Tools
+[rosparam]: http://wiki.ros.org/rosparam
+[ros2_launch]: https://github.com/ros2/launch
