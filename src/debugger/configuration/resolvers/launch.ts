@@ -6,7 +6,6 @@ import * as fs from "fs";
 import * as yaml from "js-yaml";
 import * as os from "os";
 import * as path from "path";
-import * as port_finder from "portfinder";
 import * as shell_quote from "shell-quote";
 import * as tmp from "tmp";
 import * as util from "util";
@@ -98,7 +97,6 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 args: request.arguments,
                 env: request.env,
                 stopOnEntry: true,
-                port: await port_finder.getPortPromise(),
             };
             const launched = await vscode.debug.startDebugging(undefined, pythonlaunchdebugconfiguration);
             if (!launched) {
