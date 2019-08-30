@@ -4,6 +4,7 @@
 import * as vscode from "vscode";
 import * as child_process from "child_process";
 import * as os from "os";
+import * as path from "path";
 import * as port_finder from "portfinder";
 import * as shell_quote from "shell-quote";
 import * as sudo from "sudo-prompt";
@@ -54,7 +55,12 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                 };
                 vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
             } else {
-                const pathToProgram = shell_quote.parse(config.commandLine)[0];
+                let pathToProgram: string = "";
+                const commandLineArgs = shell_quote.parse(config.commandLine);
+                if (commandLineArgs && commandLineArgs.length) {
+                    const rootPath = vscode.workspace.rootPath;
+                    pathToProgram = path.resolve(rootPath, commandLineArgs[0] as string);
+                }
                 const cppattachdebugconfiguration: vscode.DebugConfiguration = {
                     name: `C++: ${config.processId}`,
                     type: "cppdbg",
