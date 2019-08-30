@@ -165,7 +165,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
             // contains a space
             const searchTerm = "-> ";
             const indexOfFirst = result.stdout.indexOf(searchTerm);
-            config.commandLine = result.stdout.substring(indexOfFirst + searchTerm.length);
+            config.commandLine = result.stdout.substring(indexOfFirst + searchTerm.length).trim();
         } catch (error) {
             throw (new Error(`Failed to resolve command line for process [${config.processId}]!`));
         }
