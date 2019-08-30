@@ -244,11 +244,11 @@ When this flag is added, `roslaunch` will not start any of the ROS nodes, but in
 * launch commands for each node
 
 <!-- link to files -->
-[architecture]: ../media/documentation/debug-ros-nodes/architecture.png
-[execute_a_debug_configuration]: ../media/documentation/debug-ros-nodes/execute-a-debug-configuration.png
-[debug_flow]: ../media/documentation/debug-ros-nodes/debug-flow.png
-[attach_debug]: ../media/documentation/debug-ros-nodes/attach-debug.png
-[launch_debug]: ../media/documentation/debug-ros-nodes/launch-debug.png
+[architecture]: ../../media/documentation/spec/debug-ros-nodes/architecture.png
+[execute_a_debug_configuration]: ../../media/documentation/spec/debug-ros-nodes/execute-a-debug-configuration.png
+[debug_flow]: ../../media/documentation/spec/debug-ros-nodes/debug-flow.png
+[attach_debug]: ../../media/documentation/spec/debug-ros-nodes/attach-debug.png
+[launch_debug]: ../../media/documentation/spec/debug-ros-nodes/launch-debug.png
 
 <!-- external links -->
 [ros_wiki_debug]: http://wiki.ros.org/roslaunch/Tutorials/Roslaunch%20Nodes%20in%20Valgrind%20or%20GDB
