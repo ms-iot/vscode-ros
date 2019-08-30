@@ -8,6 +8,7 @@ import * as path from "path";
 import * as port_finder from "portfinder";
 import * as shell_quote from "shell-quote";
 import * as sudo from "sudo-prompt";
+import * as util from "util";
 
 import * as extension from "../../../extension";
 
@@ -16,7 +17,9 @@ import * as picker_items_provider_factory from "../../process-picker/process-ite
 import * as requests from "../../requests";
 import * as utils from "../../utils";
 
-// tslint:disable-next-line: max-line-length
+const promisifiedExec = util.promisify(child_process.exec);
+const promisifiedSudoExec = util.promisify(sudo.exec);
+
 export interface IResolvedAttachRequest extends requests.IAttachRequest {
     runtime: string;
     processId: number;
@@ -45,15 +48,16 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
             return;
         }
 
+        let debugConfig: ICppvsdbgAttachConfiguration | ICppdbgAttachConfiguration | IPythonAttachConfiguration;
         if (config.runtime === "C++") {
             if (os.platform() === "win32") {
-                const cppattachdebugconfiguration: vscode.DebugConfiguration = {
+                const cppvsdbgAttachConfig: ICppvsdbgAttachConfiguration = {
                     name: `C++: ${config.processId}`,
                     type: "cppvsdbg",
                     request: "attach",
                     processId: config.processId,
                 };
-                vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
+                debugConfig = cppvsdbgAttachConfig;
             } else {
                 let pathToProgram: string = "";
                 const commandLineArgs = shell_quote.parse(config.commandLine);
@@ -61,62 +65,68 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                     const rootPath = vscode.workspace.rootPath;
                     pathToProgram = path.resolve(rootPath, commandLineArgs[0] as string);
                 }
-                const cppattachdebugconfiguration: vscode.DebugConfiguration = {
+                const cppdbgAttachConfig: ICppdbgAttachConfiguration = {
                     name: `C++: ${config.processId}`,
                     type: "cppdbg",
                     request: "attach",
                     program: pathToProgram,
                     processId: config.processId,
                 };
-                vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
+                debugConfig = cppdbgAttachConfig;
             }
+
         } else if (config.runtime === "Python") {
             const host = "localhost";
             const port = await port_finder.getPortPromise();
             const ptvsdInjectCommand = await utils.getPtvsdInjectCommand(host, port, config.processId);
+            try {
+                if (os.platform() === "win32") {
+                    const processOptions: child_process.ExecOptions = {
+                        cwd: extension.baseDir,
+                        env: extension.env,
+                    };
 
-            const pythonattachdebugconfiguration: vscode.DebugConfiguration = {
+                    // "ptvsd --pid" works with child_process.exec() on Windows
+                    const result = await promisifiedExec(ptvsdInjectCommand, processOptions);
+                } else {
+                    const processOptions = {
+                        name: "ptvsd",
+                    };
+
+                    // "ptvsd --pid" requires elevated permission on Ubuntu
+                    const result = await promisifiedSudoExec(ptvsdInjectCommand, processOptions);
+                }
+
+            } catch (error) {
+                const errorMsg = `Command [${ptvsdInjectCommand}] failed!`;
+                throw (new Error(errorMsg));
+            }
+
+            let statusMsg = `New ptvsd instance running on ${host}:${port} `;
+            statusMsg += `injected into process [${config.processId}].` + os.EOL;
+            statusMsg += `To re-attach to process [${config.processId}], `;
+            statusMsg += `please create a separate Python remote attach debug configuration `;
+            statusMsg += `that uses the host and port listed above.`;
+            extension.outputChannel.appendLine(statusMsg);
+            extension.outputChannel.show(true);
+            vscode.window.showInformationMessage(statusMsg);
+
+            const pythonattachdebugconfiguration: IPythonAttachConfiguration = {
                 name: `Python: ${config.processId}`,
                 type: "python",
                 request: "attach",
                 port: port,
                 host: host,
             };
+            debugConfig = pythonattachdebugconfiguration;
+        }
 
-            if (os.platform() === "win32") {
-                // ptvsd --pid works with child_process.exec() on Windows
-                const processOptions: child_process.ExecOptions = {
-                    cwd: extension.baseDir,
-                    env: extension.env,
-                };
-                child_process.exec(ptvsdInjectCommand, processOptions, (error, stdout, stderr) => {
-                    if (!error) {
-                        // @todo: add instructions for re-attaching to a Python process with ptvsd running
-                        const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
-                        extension.outputChannel.appendLine(statusMsg);
-                        extension.outputChannel.show(true);
-                        vscode.window.showInformationMessage(statusMsg);
-
-                        vscode.debug.startDebugging(undefined, pythonattachdebugconfiguration);
-                    }
-                });
-            } else {
-                // ptvsd --pid requires elevated permission on Ubuntu
-                const processOptions = {
-                    name: "ptvsd",
-                };
-                sudo.exec(ptvsdInjectCommand, processOptions, (error: string, stdout: string, stderr: string) => {
-                    if (!error) {
-                        // @todo: add instructions for re-attaching to a Python process with ptvsd running
-                        const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
-                        extension.outputChannel.appendLine(statusMsg);
-                        extension.outputChannel.show(true);
-                        vscode.window.showInformationMessage(statusMsg);
-
-                        vscode.debug.startDebugging(undefined, pythonattachdebugconfiguration);
-                    }
-                });
-            }
+        if (!debugConfig) {
+            return;
+        }
+        const launched = await vscode.debug.startDebugging(undefined, debugConfig);
+        if (!launched) {
+            throw (new Error(`Failed to start debug session!`));
         }
     }
 
