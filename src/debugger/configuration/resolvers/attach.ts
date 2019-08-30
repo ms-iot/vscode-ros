@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import * as child_process from "child_process";
 import * as os from "os";
 import * as port_finder from "portfinder";
+import * as shell_quote from "shell-quote";
 import * as sudo from "sudo-prompt";
 
 import * as extension from "../../../extension";
@@ -18,7 +19,7 @@ import * as utils from "../../utils";
 export interface IResolvedAttachRequest extends requests.IAttachRequest {
     runtime: string;
     processId: number;
-    programName: string;
+    commandLine: string;
 }
 
 export class AttachResolver implements vscode.DebugConfigurationProvider {
@@ -53,11 +54,12 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                 };
                 vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
             } else {
+                const pathToProgram = shell_quote.parse(config.commandLine)[0];
                 const cppattachdebugconfiguration: vscode.DebugConfiguration = {
                     name: `C++: ${config.processId}`,
                     type: "cppdbg",
                     request: "attach",
-                    program: config.programName,
+                    program: pathToProgram,
                     processId: config.processId,
                 };
                 vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
@@ -137,6 +139,6 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         const processPicker = new process_picker.LocalProcessPicker(processItemsProvider);
         const process = await processPicker.pick();
         config.processId = process.pid;
-        config.programName = process.name;
+        config.commandLine = process.commandLine;
     }
 }

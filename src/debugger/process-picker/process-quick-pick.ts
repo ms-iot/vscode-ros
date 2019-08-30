@@ -56,7 +56,7 @@ export async function showQuickPick(getAttachItems: () => Promise<process_entry.
                 }
 
                 let selected: process_entry.IProcessEntry = {
-                    name: quickPick.selectedItems[0].label,
+                    commandLine: quickPick.selectedItems[0].detail,
                     pid: quickPick.selectedItems[0].pid,
                 }
 
