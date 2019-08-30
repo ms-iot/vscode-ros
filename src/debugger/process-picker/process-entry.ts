@@ -7,7 +7,12 @@
 
 import * as vscode from "vscode";
 
-export class ProcessEntry {
+export interface IProcessEntry {
+    name: string;
+    pid: string;
+}
+
+export class ProcessEntry implements IProcessEntry {
     // constructor(readonly name: string, readonly pid: string, readonly commandLine: string) {}
     constructor(public name: string, public pid: string, public commandLine: string) {}
 }

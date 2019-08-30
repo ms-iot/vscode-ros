@@ -18,6 +18,7 @@ import * as utils from "../../utils";
 export interface IResolvedAttachRequest extends requests.IAttachRequest {
     runtime: string;
     processId: number;
+    programName: string;
 }
 
 export class AttachResolver implements vscode.DebugConfigurationProvider {
@@ -48,6 +49,15 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                     name: `C++: ${config.processId}`,
                     type: "cppvsdbg",
                     request: "attach",
+                    processId: config.processId,
+                };
+                vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
+            } else {
+                const cppattachdebugconfiguration: vscode.DebugConfiguration = {
+                    name: `C++: ${config.processId}`,
+                    type: "cppdbg",
+                    request: "attach",
+                    program: config.programName,
                     processId: config.processId,
                 };
                 vscode.debug.startDebugging(undefined, cppattachdebugconfiguration);
@@ -123,8 +133,10 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
             return;
         }
 
-        let processItemsProvider = picker_items_provider_factory.LocalProcessItemsProviderFactory.Get();
-        let processPicker = new process_picker.LocalProcessPicker(processItemsProvider);
-        config.processId = await processPicker.pick();
+        const processItemsProvider = picker_items_provider_factory.LocalProcessItemsProviderFactory.Get();
+        const processPicker = new process_picker.LocalProcessPicker(processItemsProvider);
+        const process = await processPicker.pick();
+        config.processId = process.pid;
+        config.programName = process.name;
     }
 }

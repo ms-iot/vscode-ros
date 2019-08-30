@@ -10,7 +10,7 @@ import * as vscode from 'vscode';
 
 import * as extension from "../../extension";
 
-import * as process_item from "./process-entry";
+import * as process_entry from "./process-entry";
 
 export function getExtensionFilePath(extensionfile: string): string {
     return path.resolve(extension.extPath, extensionfile);
@@ -32,10 +32,10 @@ class RefreshButton implements vscode.QuickInputButton {
     }
 }
 
-export function showQuickPick(getAttachItems: () => Promise<process_item.IProcessQuickPickItem[]>): Promise<string> {
+export async function showQuickPick(getAttachItems: () => Promise<process_entry.IProcessQuickPickItem[]>): Promise<process_entry.IProcessEntry> {
     return getAttachItems().then(processEntries => {
-        return new Promise<string>((resolve, reject) => {
-            let quickPick: vscode.QuickPick<process_item.IProcessQuickPickItem> = vscode.window.createQuickPick<process_item.IProcessQuickPickItem>();
+        return new Promise<process_entry.IProcessEntry>((resolve, reject) => {
+            let quickPick: vscode.QuickPick<process_entry.IProcessQuickPickItem> = vscode.window.createQuickPick<process_entry.IProcessQuickPickItem>();
             quickPick.title = "Attach to process";
             quickPick.canSelectMany = false;
             quickPick.matchOnDescription = true;
@@ -55,12 +55,15 @@ export function showQuickPick(getAttachItems: () => Promise<process_item.IProces
                     reject(new Error("Process not selected"));
                 }
 
-                let selectedId: string = quickPick.selectedItems[0].pid;
+                let selected: process_entry.IProcessEntry = {
+                    name: quickPick.selectedItems[0].label,
+                    pid: quickPick.selectedItems[0].pid,
+                }
 
                 disposables.forEach(item => item.dispose());
                 quickPick.dispose();
 
-                resolve(selectedId);
+                resolve(selected);
             }, undefined, disposables);
 
             quickPick.onDidHide(() => {
