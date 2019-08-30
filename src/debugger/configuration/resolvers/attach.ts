@@ -73,6 +73,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                 };
                 child_process.exec(ptvsdInjectCommand, processOptions, (error, stdout, stderr) => {
                     if (!error) {
+                        // @todo: add instructions for re-attaching to a Python process with ptvsd running
                         const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
                         extension.outputChannel.appendLine(statusMsg);
                         extension.outputChannel.show(true);
@@ -88,6 +89,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                 };
                 sudo.exec(ptvsdInjectCommand, processOptions, (error: string, stdout: string, stderr: string) => {
                     if (!error) {
+                        // @todo: add instructions for re-attaching to a Python process with ptvsd running
                         const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
                         extension.outputChannel.appendLine(statusMsg);
                         extension.outputChannel.show(true);
