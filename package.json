@@ -238,8 +238,8 @@
         ]
     },
     "scripts": {
-        "buildOnce": "tsc -p ./",
-        "compile": "tsc -watch -p ./",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
         "package:dev": "vsce package -o vscode-ros-dev.vsix",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "vscode:prepublish": "tsc -p ./"
@@ -248,6 +248,7 @@
         "js-yaml": "^3.12.1",
         "portfinder": "^1.0.21",
         "shell-quote": "^1.6.0",
+        "sudo-prompt": "^9.0.0",
         "tmp": "^0.1.0",
         "vscode-debugadapter": "^1.15.0",
         "vscode-debugprotocol": "^1.15.0",

@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import * as child_process from "child_process";
 import * as os from "os";
 import * as port_finder from "portfinder";
+import * as sudo from "sudo-prompt";
 
 import * as extension from "../../../extension";
 
@@ -56,27 +57,46 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
             const port = await port_finder.getPortPromise();
             const ptvsdInjectCommand = await utils.getPtvsdInjectCommand(host, port, config.processId);
 
-            const processOptions: child_process.ExecOptions = {
-                cwd: extension.baseDir,
-                env: extension.env,
+            const pythonattachdebugconfiguration: vscode.DebugConfiguration = {
+                name: `Python: ${config.processId}`,
+                type: "python",
+                request: "attach",
+                port: port,
+                host: host,
             };
-            child_process.exec(ptvsdInjectCommand, processOptions, (error, stdout, stderr) => {
-                if (!error) {
-                    const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
-                    extension.outputChannel.appendLine(statusMsg);
-                    extension.outputChannel.show(true);
-                    vscode.window.showInformationMessage(statusMsg);
 
-                    const pythonattachdebugconfiguration: vscode.DebugConfiguration = {
-                        name: `Python: ${config.processId}`,
-                        type: "python",
-                        request: "attach",
-                        port: port,
-                        host: host,
-                    };
-                    vscode.debug.startDebugging(undefined, pythonattachdebugconfiguration);
-                }
-            });
+            if (os.platform() === "win32") {
+                // ptvsd --pid works with child_process.exec() on Windows
+                const processOptions: child_process.ExecOptions = {
+                    cwd: extension.baseDir,
+                    env: extension.env,
+                };
+                child_process.exec(ptvsdInjectCommand, processOptions, (error, stdout, stderr) => {
+                    if (!error) {
+                        const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
+                        extension.outputChannel.appendLine(statusMsg);
+                        extension.outputChannel.show(true);
+                        vscode.window.showInformationMessage(statusMsg);
+
+                        vscode.debug.startDebugging(undefined, pythonattachdebugconfiguration);
+                    }
+                });
+            } else {
+                // ptvsd --pid requires elevated permission on Ubuntu
+                const processOptions = {
+                    name: "ptvsd",
+                };
+                sudo.exec(ptvsdInjectCommand, processOptions, (error: string, stdout: string, stderr: string) => {
+                    if (!error) {
+                        const statusMsg = `New ptvsd instance running on ${host}:${port} injected into process [${config.processId}].`;
+                        extension.outputChannel.appendLine(statusMsg);
+                        extension.outputChannel.show(true);
+                        vscode.window.showInformationMessage(statusMsg);
+
+                        vscode.debug.startDebugging(undefined, pythonattachdebugconfiguration);
+                    }
+                });
+            }
         }
     }
 

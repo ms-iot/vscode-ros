@@ -11,7 +11,7 @@
       "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": ["${workspaceRoot}/out/src/**/*.js"],
-      "preLaunchTask": "npm"
+      "preLaunchTask": "npm: watch"
     },
     {
       "name": "Debugger",
@@ -23,7 +23,7 @@
       "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": ["${workspaceRoot}/out/src/**/*.js"],
-      "preLaunchTask": "npm"
+      "preLaunchTask": "npm: watch"
     },
     {
       "name": "Tests",
@@ -34,7 +34,7 @@
       "stopOnEntry": false,
       "sourceMaps": true,
       "outFiles": ["${workspaceRoot}/out/test"],
-      "preLaunchTask": "npm"
+      "preLaunchTask": "npm: watch"
     }
   ],
   "compounds": [
