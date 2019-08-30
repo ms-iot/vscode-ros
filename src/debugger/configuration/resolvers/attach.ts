@@ -156,7 +156,6 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         const processPicker = new process_picker.LocalProcessPicker(processItemsProvider);
         const process = await processPicker.pick();
         config.processId = process.pid;
-        config.commandLine = process.commandLine;
     }
 
     private async resolveCommandLineIfNeeded(config: requests.IAttachRequest) {
@@ -168,11 +167,15 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         if (!config.processId) {
             throw (new Error("No PID specified!"));
         }
-        const result = await promisifiedExec(`ls -l /proc/${config.processId}/exe`);
+        try {
+            const result = await promisifiedExec(`ls -l /proc/${config.processId}/exe`);
 
-        // contains a space
-        const searchTerm = "-> ";
-        const indexOfFirst = result.stdout.indexOf(searchTerm);
-        config.commandLine = result.stdout.substring(indexOfFirst + searchTerm.length);
+            // contains a space
+            const searchTerm = "-> ";
+            const indexOfFirst = result.stdout.indexOf(searchTerm);
+            config.commandLine = result.stdout.substring(indexOfFirst + searchTerm.length);
+        } catch (error) {
+            throw (new Error(`Failed to resolve command line for process [${config.processId}]!`));
+        }
     }
 }
