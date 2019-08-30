@@ -16,7 +16,6 @@ distro if this can't be done automatically.
 
 To start ROS core, use the "ROS: Start Core" command.
 The "ROS Core" indicator in the bottom left will show if the core is currently running, and you can click on this to view parameters etc.
-If you hit F5 you can create a debug configuration to run a `rosrun` or `roslaunch` command (*[not yet supported on Windows](https://github.com/ms-iot/vscode-ros/issues/55)*).
 
 The first time you open the workspace the extension will automatically create build and test tasks and update the
 C++ and Python paths. You can re-run this process later using the appropriate commands.
@@ -32,6 +31,7 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 * Automatically add the ROS C++ include and Python import paths.
 * Format C++ using the ROS `clang-format` style.
 * Preview URDF and Xacro files.
+* Debug a ROS node (C++ or Python) by [attaching to the process][debug_support].
 
 ## Commands
 
@@ -69,12 +69,14 @@ This extension respects the `telemetry.enableTelemetry` setting, learn more abou
 
 A big ***Thank you!*** to everyone that have helped make this extension better!
 
-- Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
-- James Giller ([@JamesGiller](https://github.com/JamesGiller))
+* Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
+* James Giller ([@JamesGiller](https://github.com/JamesGiller))
 
 <!-- link to files -->
 [changelog]: CHANGELOG.md
 [contributing]: CONTRIBUTING.md
+
+[debug_support]: ./doc/debug-support.md
 
 <!-- link to external sites -->
 [ros]: http://ros.org
