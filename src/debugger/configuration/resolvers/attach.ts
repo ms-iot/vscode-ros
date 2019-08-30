@@ -37,6 +37,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         // all ${action:} variables need to be resolved before our resolver propagates the configuration to actual debugger
         await this.resolveRuntimeIfNeeded(this.supportedRuntimeTypes, config);
         await this.resolveProcessIdIfNeeded(config);
+        await this.resolveCommandLineIfNeeded(config);
 
         // propagate debug configuration to Python or C++ debugger depending on the chosen runtime type
         this.launchAttachSession(config as IResolvedAttachRequest);
@@ -136,7 +137,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         }
 
         const chooseRuntimeOptions: vscode.QuickPickOptions = {
-            placeHolder: "Choose runtime type of node to attach to."
+            placeHolder: "Choose runtime type of node to attach to.",
         };
         config.runtime = await vscode.window.showQuickPick(supportedRuntimeTypes, chooseRuntimeOptions).then((runtime): string => {
             if (!runtime) {
@@ -156,5 +157,22 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
         const process = await processPicker.pick();
         config.processId = process.pid;
         config.commandLine = process.commandLine;
+    }
+
+    private async resolveCommandLineIfNeeded(config: requests.IAttachRequest) {
+        // this step is only needed on Ubuntu when user has specified PID of C++ executable to attach to
+        if (os.platform() === "win32" || config.commandLine || config.type !== "C++") {
+            return;
+        }
+
+        if (!config.processId) {
+            throw (new Error("No PID specified!"));
+        }
+        const result = await promisifiedExec(`ls -l /proc/${config.processId}/exe`);
+
+        // contains a space
+        const searchTerm = "-> ";
+        const indexOfFirst = result.stdout.indexOf(searchTerm);
+        config.commandLine = result.stdout.substring(indexOfFirst + searchTerm.length);
     }
 }
