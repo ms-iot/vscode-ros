@@ -105,7 +105,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
 
             let statusMsg = `New ptvsd instance running on ${host}:${port} `;
             statusMsg += `injected into process [${config.processId}].` + os.EOL;
-            statusMsg += `To re-attach to process [${config.processId}], `;
+            statusMsg += `To re-attach to process [${config.processId}] after disconnecting, `;
             statusMsg += `please create a separate Python remote attach debug configuration `;
             statusMsg += `that uses the host and port listed above.`;
             extension.outputChannel.appendLine(statusMsg);
@@ -161,7 +161,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
 
     private async resolveCommandLineIfNeeded(config: requests.IAttachRequest) {
         // this step is only needed on Ubuntu when user has specified PID of C++ executable to attach to
-        if (os.platform() === "win32" || config.commandLine || config.type !== "C++") {
+        if (os.platform() === "win32" || config.commandLine || config.runtime !== "C++") {
             return;
         }
 
