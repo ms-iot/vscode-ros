@@ -69,8 +69,8 @@ This extension respects the `telemetry.enableTelemetry` setting, learn more abou
 
 A big ***Thank you!*** to everyone that have helped make this extension better!
 
-- Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
-- James Giller ([@JamesGiller](https://github.com/JamesGiller))
+* Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
+* James Giller ([@JamesGiller](https://github.com/JamesGiller))
 
 <!-- link to files -->
 [changelog]: CHANGELOG.md

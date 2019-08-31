@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0
+
+* Add support for ROS2 support
+* Add support for attach-debug a ROS node
+* Automate ROS distro selection
+* Fix `rosrun` and `roslaunch` command execution
+* Implementation task provider for `catkin_make_isolated`
+
 ## 0.5.0
 
 * Enable previewing URDF and Xacro files
