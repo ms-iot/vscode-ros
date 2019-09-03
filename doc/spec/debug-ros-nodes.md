@@ -21,7 +21,7 @@ Language-specific debugging capabilities including:
 
 * complicated debugging scenarios like debugging a remote process
 
-We woult want to utilize existing language-specific tools for [C++][ms-vscode.cpptools] and [Python][ms-python.python]:
+We would want to utilize existing language-specific tools for [C++][ms-vscode.cpptools] and [Python][ms-python.python]:
 
 ![architecture][architecture]
 
@@ -39,7 +39,7 @@ What happens afterwards gets handled by 2 processes:
 
 A debug configuration first gets resolved by a registered debug configuration provider in VS Code's context.
 Afterwards, a debug request gets sent to the extension’s debug adapter, which actually handles the debugging process.
-However, the debug adapter is a separate process from the VS Code process, so no `vscode` apis could be called from there.
+However, the debug adapter is a separate process from the VS Code process, so no `vscode` APIs could be called from there.
 
 In our scenario, we need to do everything in the extension context to utilize the functionalities provided by other extensions.
 Ideally, the workflow should be as simple as possible:
@@ -80,9 +80,9 @@ However, Python processes launched by ROS tools (`rosrun` and `roslaunch`) are u
 To debug a Python process without a running `ptvsd` instance, a `ptvsd` instance needs to be injected into the process first with the `--pid <pid>` flag.
 Therefore, for normal Python processes in ROS, the workflow would be:
 
-1. get the pid of the Python process (we reuse the `processPicker` module from `vscode-cpptools`)
+1. get the PID of the Python process (we reuse the `processPicker` module from `vscode-cpptools`)
 2. inject `ptvsd` using API exposed by `vscode-python` (this avoids potential `ptvsd` version mismatch)
-3. start an Python-attach debug session with `vscode-python`
+3. start a Python-attach debug session with `vscode-python`
 
 ### Example for `attach`
 
@@ -106,7 +106,7 @@ Therefore, for normal Python processes in ROS, the workflow would be:
 
 ### Note on attach-debug
 
-Microsoft's VS Code extensions for [C++][ms-vscode.cpptools] and [Python][ms-python.python] provide flexible mechanisims of attaching into a [C++][vscode_cpp_debug] or [Python][vscode_python_debug] process.
+Microsoft's VS Code extensions for [C++][ms-vscode.cpptools] and [Python][ms-python.python] provide flexible mechanisms of attaching into a [C++][vscode_cpp_debug] or [Python][vscode_python_debug] process.
 This extension only aims to enable a basic and generic attach-debug flow.
 Please use language-specific extensions for any specific debugging requirements including:
 
@@ -222,7 +222,7 @@ This is a good example why it is suggested to keep the `.py` filename extension,
 
 ### Why is a stub debug adapter needed
 
-As illustraed in the flow charts above, a stub debug adapter that self-terminates immediately is still needed by `vscode-ros` to handle debug requests.
+As illustrated in the flow charts above, a stub debug adapter that self-terminates immediately is still needed by `vscode-ros` to handle debug requests.
 These debug requests are generated from the `ros`-type debug configurations.
 When debug configurations are executed, they are resolved into debug requests and then sent to corresponding debug adapters.
 It would lead to errors generated in VS Code if no debug adapter is there to handle the debug requests.
