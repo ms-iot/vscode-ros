@@ -121,8 +121,6 @@ Similar to attach-debug, we want to utilize all the language-specific debugging 
 
 ![launch_debug][launch_debug]
 
-*TODO: support language-specific configurations in debug configuration.*
-
 From another perspective, we aim to translate launch configurations in a `.launch` file into debug configurations for VS Code that will be executed all at the same time.
 To do this, we use [the command line functionality of `roslaunch`][roslaunch_commandline] to extract launch requests from a `.launch` file:
 
@@ -130,6 +128,10 @@ To do this, we use [the command line functionality of `roslaunch`][roslaunch_com
 2. load parameters with [`rosparam load`][rosparam]
 3. get the nodes defined in the `.launch` files with `roslaunch --nodes <launch-file>`
 4. get launch requests for each node with `roslaunch --args <node> <launch-file>`
+
+### TODO
+
+* [#122](https://github.com/ms-iot/vscode-ros/issues/122) support language-specific configurations in debug configuration
 
 ### Limitations
 
