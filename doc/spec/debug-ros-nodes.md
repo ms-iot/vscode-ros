@@ -211,7 +211,7 @@ Typically, to debug a Python script, one would need to use either [`pdb`][pdb] o
 python -m pdb ./talker.py
 
 # ptvsd only starts a debugging server inside the process
-python -m ptvsd --host localhost  --port 5678 --wait ./talker.py
+python -m ptvsd --host localhost --port 5678 --wait ./talker.py
 ```
 
 To have these as the final commands, everything before `./talker.py` need to be part of the shebang line.
