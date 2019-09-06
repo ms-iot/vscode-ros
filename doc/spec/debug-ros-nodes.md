@@ -84,6 +84,8 @@ Therefore, for normal Python processes in ROS, the workflow would be:
 2. inject `ptvsd` using API exposed by `vscode-python` (this avoids potential `ptvsd` version mismatch)
 3. start a Python-attach debug session with `vscode-python`
 
+To avoid potential version mismatch between the `ptvsd` module used by the Python extension and the one to be injected into the Python process, we use the [API][vscode_python_api] exposed by `vscode-python` to ensure the same version across processes.
+
 ### Example for `attach`
 
 ```json
@@ -131,7 +133,7 @@ To do this, we use [the command line functionality of `roslaunch`][roslaunch_com
 
 ### TODO
 
-* [#122](https://github.com/ms-iot/vscode-ros/issues/122) support language-specific configurations in debug configuration
+* [ ] [#122](https://github.com/ms-iot/vscode-ros/issues/122) support language-specific configurations in debug configuration
 
 ### Limitations
 
@@ -150,6 +152,7 @@ To do this, we use [the command line functionality of `roslaunch`][roslaunch_com
 
 * currently, when attempting to start multiple Python-launch debug sessions at once, only 1 of them could be connected.
     For this reason, it is limited to have only 1 Python node in the launch file for now.
+    This is related to issues [#7269][vscode_python-issue_7269] and [#6017][vscode_python-issue_6017] in `vscode-python`.
 
 ### Example for `launch`
 
@@ -257,6 +260,7 @@ When this flag is added, `roslaunch` will not start any of the ROS nodes, but in
 
 [ms-python.python]: https://marketplace.visualstudio.com/items?itemName=ms-python.python
 [ms-vscode.cpptools]: https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools
+[vscode_python_api]: https://github.com/microsoft/vscode-python/blob/master/src/client/api.ts
 [vscode_python_debug]: https://code.visualstudio.com/docs/python/debugging
 [vscode_cpp_debug]: https://code.visualstudio.com/docs/cpp/launch-json-reference
 
@@ -267,3 +271,6 @@ When this flag is added, `roslaunch` will not start any of the ROS nodes, but in
 [roslaunch_commandline]: http://wiki.ros.org/roslaunch/Commandline%20Tools
 [rosparam]: http://wiki.ros.org/rosparam
 [ros2_launch]: https://github.com/ros2/launch
+
+[vscode_python-issue_7269]: https://github.com/microsoft/vscode-python/issues/7269
+[vscode_python-issue_6017]: https://github.com/microsoft/vscode-python/issues/6017
