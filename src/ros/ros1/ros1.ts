@@ -157,6 +157,7 @@ export class ROS1 implements ros.ROSApi {
             env: this.env,
             name: "rosrun",
         });
+        this.setTerminalEnv(terminal,this.env);
         terminal.sendText(`rosrun ${packageName} ${executableName} ${argument}`);
         return terminal;
     }
@@ -166,8 +167,17 @@ export class ROS1 implements ros.ROSApi {
             env: this.env,
             name: "roslaunch",
         });
+        this.setTerminalEnv(terminal,this.env);
         terminal.sendText(`roslaunch ${launchFilepath} ${argument}`);
         return terminal;
+    }
+
+    public setTerminalEnv(terminal:vscode.Terminal,env: any) {
+        if (process.platform === "linux"){
+            for(var item in env){
+                terminal.sendText(`export ${item}=${env[item]} >/dev/null`);
+            }
+        }
     }
 
     private _findPackageFiles(packageName: string, filter: string, pattern: string): Promise<string[]> {
