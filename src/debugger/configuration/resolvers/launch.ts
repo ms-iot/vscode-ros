@@ -130,6 +130,14 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 };
                 debugConfig = cppvsdbgLaunchConfig;
             }
+
+            if (!debugConfig) {
+                throw (new Error(`Failed to create a debug configuration!`));
+            }
+            const launched = await vscode.debug.startDebugging(undefined, debugConfig);
+            if (!launched) {
+                throw (new Error(`Failed to start debug session!`));
+            }
         } else {
             try {
                 // this should be guaranteed by roslaunch
@@ -155,10 +163,12 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             let linesToRead: number = 1;
             rl.on("line", async (line) => {
                 if (linesToRead <= 0) {
-                    rl.close();
                     return;
                 }
                 linesToRead--;
+                if (!linesToRead) {
+                    rl.close();
+                }
 
                 // look for Python in shebang line
                 if (line.startsWith("#!") && line.toLowerCase().indexOf("python") !== -1) {
@@ -198,15 +208,15 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                     };
                     debugConfig = cppdbgLaunchConfig;
                 }
-            });
-        }
 
-        if (!debugConfig) {
-            return;
-        }
-        const launched = await vscode.debug.startDebugging(undefined, debugConfig);
-        if (!launched) {
-            throw (new Error(`Failed to start debug session!`));
+                if (!debugConfig) {
+                    throw (new Error(`Failed to create a debug configuration!`));
+                }
+                const launched = await vscode.debug.startDebugging(undefined, debugConfig);
+                if (!launched) {
+                    throw (new Error(`Failed to start debug session!`));
+                }
+            });
         }
     }
 }
