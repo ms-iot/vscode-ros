@@ -6,11 +6,11 @@ import * as fs from "fs";
 import * as yaml from "js-yaml";
 import * as os from "os";
 import * as path from "path";
+import * as readline from "readline";
 import * as shell_quote from "shell-quote";
 import * as tmp from "tmp";
 import * as util from "util";
 import * as vscode from "vscode";
-import * as readline from "readline";
 
 import * as extension from "../../../extension";
 import * as requests from "../../requests";
@@ -56,7 +56,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
             for (const command of commands) {
                 const roslaunchRequest = this.parseRoslaunchCommand(command.stdout);
-                this.executeRoslaunchRequest(roslaunchRequest);
+                this.executeRoslaunchRequest(roslaunchRequest, false);
             }
         });
         // @todo: error handling for Promise.all
@@ -87,26 +87,24 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         return request;
     }
 
-    private async executeRoslaunchRequest(request: IRoslaunchRequest) {
-        request.executable = request.executable.toLowerCase();
+    private async executeRoslaunchRequest(request: IRoslaunchRequest, stopOnEntry: boolean) {
+        let debugConfig: ICppvsdbgLaunchConfiguration | ICppdbgLaunchConfiguration | IPythonLaunchConfiguration;
 
         if (os.platform() === "win32") {
-            if (request.executable.endsWith("python") || request.executable.endsWith("python.exe")) {
+            if (request.executable.toLowerCase().endsWith("python") ||
+                request.executable.toLowerCase().endsWith("python.exe")) {
                 const pythonScript: string = request.arguments.shift();
-                const pythonlaunchdebugconfiguration: IPythonLaunchConfiguration = {
+                const pythonLaunchConfig: IPythonLaunchConfiguration = {
                     name: `Python: launch`,
                     type: "python",
                     request: "launch",
                     program: pythonScript,
                     args: request.arguments,
                     env: request.env,
-                    stopOnEntry: true,
+                    stopOnEntry: stopOnEntry,
                 };
-                const launched = await vscode.debug.startDebugging(undefined, pythonlaunchdebugconfiguration);
-                if (!launched) {
-                    throw (new Error(`Failed to start debug session!`));
-                }
-            } else if (os.platform() === "win32" && request.executable.endsWith(".exe")) {
+                debugConfig = pythonLaunchConfig;
+            } else if (request.executable.endsWith(".exe")) {
                 interface ICppEnvConfig {
                     name: string;
                     value: string;
@@ -120,7 +118,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         });
                     }
                 }
-                const cpplaunchdebugconfiguration: ICppvsdbgLaunchConfiguration = {
+                const cppvsdbgLaunchConfig: ICppvsdbgLaunchConfiguration = {
                     name: "C++: launch",
                     type: "cppvsdbg",
                     request: "launch",
@@ -128,91 +126,87 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                     program: request.executable,
                     args: request.arguments,
                     environment: envConfigs,
-                    stopAtEntry: true,
+                    stopAtEntry: stopOnEntry,
                 };
-                const launched = await vscode.debug.startDebugging(undefined, cpplaunchdebugconfiguration);
-                if (!launched) {
-                    throw (new Error(`Failed to start debug session!`));
-                }
+                debugConfig = cppvsdbgLaunchConfig;
             }
         } else {
             try {
                 // this should be guaranteed by roslaunch
                 fs.accessSync(request.executable, fs.constants.X_OK);
-            }
-            catch (errNotExecutable) {
-                throw (new Error(`Failed to launch ${request.executable}, not executable!`));
+            } catch (errNotExecutable) {
+                throw (new Error(`Error! ${request.executable} is not executable!`));
             }
 
             try {
+                // need to be readable to check shebang line
                 fs.accessSync(request.executable, fs.constants.R_OK);
+            } catch (errNotReadable) {
+                throw (new Error(`Error! ${request.executable} is not readable!`));
+            }
 
-                const fileStream = fs.createReadStream(request.executable);
-                const rl = readline.createInterface({
-                    input: fileStream,
-                    crlfDelay: Infinity,
-                });
+            const fileStream = fs.createReadStream(request.executable);
+            const rl = readline.createInterface({
+                input: fileStream,
+                crlfDelay: Infinity,
+            });
 
-                // we only want to read 1 line to check for shebang line
-                let counter: number = 1;
-                rl.on("line", async (line) => {
-                    if (counter-- <= 0) {
-                        rl.close();
-                        fileStream.destroy();
-                        return;
+            // we only want to read 1 line to check for shebang line
+            let linesToRead: number = 1;
+            rl.on("line", async (line) => {
+                if (linesToRead <= 0) {
+                    rl.close();
+                    return;
+                }
+                linesToRead--;
+
+                // look for Python in shebang line
+                if (line.startsWith("#!") && line.toLowerCase().indexOf("python") !== -1) {
+                    const pythonLaunchConfig: IPythonLaunchConfiguration = {
+                        name: `Python: launch`,
+                        type: "python",
+                        request: "launch",
+                        program: request.executable,
+                        args: request.arguments,
+                        env: request.env,
+                        stopOnEntry: stopOnEntry,
+                    };
+                    debugConfig = pythonLaunchConfig;
+                } else {
+                    interface ICppEnvConfig {
+                        name: string;
+                        value: string;
                     }
-
-                    // look for Python in shebang line
-                    if (line.startsWith("#!") && line.toLowerCase().indexOf("python") !== -1) {
-                        // python
-                        const pythonScript: string = request.executable;
-                        const pythonlaunchdebugconfiguration: IPythonLaunchConfiguration = {
-                            name: `Python: launch`,
-                            type: "python",
-                            request: "launch",
-                            program: pythonScript,
-                            args: request.arguments,
-                            env: request.env,
-                            stopOnEntry: true,
-                        };
-                        const launched = await vscode.debug.startDebugging(undefined, pythonlaunchdebugconfiguration);
-                        if (!launched) {
-                            throw (new Error(`Failed to start debug session!`));
-                        }
-                    } else {
-                        interface ICppEnvConfig {
-                            name: string;
-                            value: string;
-                        }
-                        const envConfigs: ICppEnvConfig[] = [];
-                        for (const key in request.env) {
-                            if (request.env.hasOwnProperty(key)) {
-                                envConfigs.push({
-                                    name: key,
-                                    value: request.env[key],
-                                });
-                            }
-                        }
-                        const cpplaunchdebugconfiguration: ICppdbgLaunchConfiguration = {
-                            name: "C++: launch",
-                            type: "cppdbg",
-                            request: "launch",
-                            cwd: ".",
-                            program: request.executable,
-                            args: request.arguments,
-                            environment: envConfigs,
-                            stopAtEntry: true,
-                        };
-                        const launched = await vscode.debug.startDebugging(undefined, cpplaunchdebugconfiguration);
-                        if (!launched) {
-                            throw (new Error(`Failed to start debug session!`));
+                    const envConfigs: ICppEnvConfig[] = [];
+                    for (const key in request.env) {
+                        if (request.env.hasOwnProperty(key)) {
+                            envConfigs.push({
+                                name: key,
+                                value: request.env[key],
+                            });
                         }
                     }
-                });
-            }
-            catch (errNotReadable) {
-                throw (new Error(`${request.executable} not readable!`));
-            }
+                    const cppdbgLaunchConfig: ICppdbgLaunchConfiguration = {
+                        name: "C++: launch",
+                        type: "cppdbg",
+                        request: "launch",
+                        cwd: ".",
+                        program: request.executable,
+                        args: request.arguments,
+                        environment: envConfigs,
+                        stopAtEntry: stopOnEntry,
+                    };
+                    debugConfig = cppdbgLaunchConfig;
+                }
+            });
+        }
+
+        if (!debugConfig) {
+            return;
+        }
+        const launched = await vscode.debug.startDebugging(undefined, debugConfig);
+        if (!launched) {
+            throw (new Error(`Failed to start debug session!`));
         }
     }
 }
