@@ -17,7 +17,8 @@ import * as requests from "../../requests";
 
 const promisifiedExec = util.promisify(child_process.exec);
 
-interface IRoslaunchRequest {
+interface ILaunchRequest {
+    nodeName: string;
     executable: string;
     arguments: string[];
     cwd: string;
@@ -54,16 +55,16 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         await Promise.all(nodes.map((node: string) => {
             return promisifiedExec(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
-            for (const command of commands) {
-                const roslaunchRequest = this.parseRoslaunchCommand(command.stdout);
-                this.executeRoslaunchRequest(roslaunchRequest, false);
-            }
+            commands.forEach((command, index) => {
+                const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout);
+                this.executeLaunchRequest(launchRequest, false);
+            });
         });
         // @todo: error handling for Promise.all
         return config;
     }
 
-    private parseRoslaunchCommand(command: string): IRoslaunchRequest {
+    private generateLaunchRequest(nodeName: string, command: string): ILaunchRequest {
         // escape backslash in file path
         const parsedArgs = shell_quote.parse(os.platform() === "win32" ? command.replace(/[\\]/g, "\\$&") : command);
 
@@ -76,18 +77,22 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 break;
             }
         }
-        const request: IRoslaunchRequest = {
+        const request: ILaunchRequest = {
+            nodeName: nodeName,
             executable: parsedArgs.shift().toString(),
             arguments: parsedArgs.map((arg) => {
                 return arg.toString();
             }),
             cwd: ".",
-            env: { ...extension.env, ...envConfig },
+            env: {
+                ...extension.env,
+                ...envConfig,
+            },
         };
         return request;
     }
 
-    private async executeRoslaunchRequest(request: IRoslaunchRequest, stopOnEntry: boolean) {
+    private async executeLaunchRequest(request: ILaunchRequest, stopOnEntry: boolean) {
         let debugConfig: ICppvsdbgLaunchConfiguration | ICppdbgLaunchConfiguration | IPythonLaunchConfiguration;
 
         if (os.platform() === "win32") {
@@ -95,7 +100,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 request.executable.toLowerCase().endsWith("python.exe")) {
                 const pythonScript: string = request.arguments.shift();
                 const pythonLaunchConfig: IPythonLaunchConfiguration = {
-                    name: `Python: launch`,
+                    name: request.nodeName,
                     type: "python",
                     request: "launch",
                     program: pythonScript,
@@ -119,7 +124,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                     }
                 }
                 const cppvsdbgLaunchConfig: ICppvsdbgLaunchConfiguration = {
-                    name: "C++: launch",
+                    name: request.nodeName,
                     type: "cppvsdbg",
                     request: "launch",
                     cwd: ".",
@@ -173,7 +178,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 // look for Python in shebang line
                 if (line.startsWith("#!") && line.toLowerCase().indexOf("python") !== -1) {
                     const pythonLaunchConfig: IPythonLaunchConfiguration = {
-                        name: `Python: launch`,
+                        name: request.nodeName,
                         type: "python",
                         request: "launch",
                         program: request.executable,
@@ -197,7 +202,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         }
                     }
                     const cppdbgLaunchConfig: ICppdbgLaunchConfiguration = {
-                        name: "C++: launch",
+                        name: request.nodeName,
                         type: "cppdbg",
                         request: "launch",
                         cwd: ".",
