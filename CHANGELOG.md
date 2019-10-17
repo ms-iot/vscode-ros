@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1
+
+* Enable support for launch-debug a ROS node
+* Update environment sourcing in `ros.createTerminal` to work with user `.bashrc`, https://github.com/ms-iot/vscode-ros/pull/123
+* Update extension to source workspace environment after a ROS build task
+* Fix task provider usage
+* Fix debug config provider upon initialiazing a `launch.json` file
+
 ## 0.6.0
 
 * Add support for ROS2 support
