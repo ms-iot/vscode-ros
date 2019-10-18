@@ -46,7 +46,70 @@ Forks do not automatically sync with the original repository, to keep forks up-t
 
 It is important to know that the above commands will only update the local git copy, the remote of the fork will not be updated. To keep both the local and the remote repositories up-to-date, make sure to do a `git push` after syncing.
 
-<!-- ## Build Instructions -->
+## Build Instructions
+
+Please follow the following instructions to set up a development environment for extension development.
+
+### Dependencies
+
+As a TypeScript project, this extension has dependencies on:
+
+* [`Node.js`][nodejs]
+* `npm` ([distributed with `Node.js`][npmjs-get_npm])
+
+After installing `node` (and `npm`), clone the repository.
+
+```bash
+git clone https://github.com/ms-iot/vscode-ros
+```
+
+### Build
+
+It is recommended to sync with upstream and update dependencies by running [`npm ci`][npmjs-ci] before making changes.
+
+*It is recommended to use `npm ci` instead of [`npm install`][npmjs-install].
+This is because `npm ci` consumes `package-lock.json` to ensure the same version is used for all nested dependencies.*
+
+```bash
+cd vscode-ros
+# sync with upstream
+
+npm ci
+code .
+```
+
+You can now go to the Debug viewlet (`Ctrl+Shift+D`), select `Extension`, and then hit run (`F5`).
+
+This will open a new VS Code window which will have the title `[Extension Development Host]`.
+In this window, open any ROS workspace.
+
+### Debug
+
+In the original VS Code window, you can add breakpoints which will be hit when they are executed.
+
+If you make edits in the extension `.ts` files, just reload/restart (`Ctrl+Shift+F5`) the `[Extension Development Host]` instance of Code to load in the new extension code. Similarly, you could also execute the `Developer: Reload Window` command through command palette in the `[Extension Development Host]` instance.
+
+The debugging instance will automatically reattach.
+
+### Running the tests
+
+To run the tests locally, open the Debug viewlet (`Ctrl+Shift+D`), select `Tests`, then hit run (`F5`).
+
+### Sideloading the extension
+
+After making changes locally, you might want to test it end to end.
+To do this, you can sideload the extension.
+This can be done by [packaging the extension][vscode-package_extension] and loading the `.vsix` directly.
+In the workspace, follow these steps:
+
+```batch
+npm install -g vsce
+npm ci
+vsce package
+```
+
+Then in any VS Code instance, run the command `Extensions: Install from VSIX...`.
+Choose the `.vsix` file generated in the previous step
 
 <!-- ## Contributing with a Pull Request -->
 
@@ -75,3 +138,8 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 [git_configure_remote]: https://help.github.com/en/articles/configuring-a-remote-for-a-fork
 [git_sync_fork]: https://help.github.com/en/articles/syncing-a-fork
 [gitflow_workflow]: https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
+[nodejs]: https://nodejs.org
+[npmjs-get_npm]: https://www.npmjs.com/get-npm
+[npmjs-ci]: https://docs.npmjs.com/cli/ci
+[npmjs-install]: https://docs.npmjs.com/cli/install
+[vscode-package_extension]: https://code.visualstudio.com/api/working-with-extensions/publishing-extension#packaging-extensions
