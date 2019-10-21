@@ -47,6 +47,7 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 | Preview URDF | `ros.previewUrdf` | Preview URDF and Xacro files. Updates after changes are saved. |
 
 ## Roadmap
+
 Project roadmap and workitems are located on the [vscode-ros github projects page](https://github.com/ms-iot/vscode-ros/projects).
 Future projects include:
 
@@ -72,11 +73,13 @@ A big ***Thank you!*** to everyone that have helped make this extension better!
 * Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
 * James Giller ([@JamesGiller](https://github.com/JamesGiller))
 
-<!-- link to files -->
-[changelog]: CHANGELOG.md
-[contributing]: CONTRIBUTING.md
+Contributions are always welcome! Please see our [contributing guide][contributing] for more details!
 
-[debug_support]: ./doc/debug-support.md
+<!-- link to files -->
+<!-- relative links in Visual Studio Marketplace page lead to 404 error, need to use absolute link -->
+[contributing]: https://github.com/ms-iot/vscode-ros/blob/master/CONTRIBUTING.md
+
+[debug_support]: https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md
 
 <!-- link to external sites -->
 [ros]: http://ros.org
