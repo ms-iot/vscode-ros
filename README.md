@@ -1,6 +1,6 @@
 # Visual Studio Code Extension for ROS
 
-[![Build Status](https://dev.azure.com/ros-win/ros-win/_apis/build/status/vscode-ros.ci?branchName=master)](https://dev.azure.com/ros-win/ros-win/_build/latest?definitionId=57&branchName=master)
+[![Build Status][vscode-ros-master-build_status]][vscode-ros-master-build_details]
 
 The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
 
@@ -54,6 +54,18 @@ Future projects include:
 * Support for ROS2 build tool and CLI commands
 * Support for debugging C++ & Python from `roslaunch`
 
+### Get Latest Build
+
+[![Build Status][vscode-ros-master-build_status]][vscode-ros-master-build_details]
+
+The lastest unreleased changes could be added by installing the extension's latest build manually.
+To get the latest build (`.vsix` built from the latest commit), access our [build pipeline][vscode-ros-master-build_details] by clicking on the build badge attached above.
+In the build status page, the generated `.vsix` could be downloaded as an artifact:
+
+![download vsix artifact][download_vsix_artifact]
+
+The downloaded `.vsix` package could be installed with the `Extensions: Install from VSIX...` command from the Command Palette (`Ctrl+Shift+P`), or by choosing the `Install from VSIX...` option in the Extensions tab from any Visual Studio Code instance.
+
 ## Reporting Security Issues
 
 Security issues and bugs should be reported privately, via email, to the Microsoft Security Response Center (MSRC) at [secure@microsoft.com](mailto:secure@microsoft.com). You should receive a response within 24 hours. If for some reason you do not, please follow up via email to ensure we received your original message.
@@ -79,8 +91,14 @@ Contributions are always welcome! Please see our [contributing guide][contributi
 <!-- relative links in Visual Studio Marketplace page lead to 404 error, need to use absolute link -->
 [contributing]: https://github.com/ms-iot/vscode-ros/blob/master/CONTRIBUTING.md
 
+<!-- feature documentation -->
 [debug_support]: https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md
+
+<!-- media -->
+[download_vsix_artifact]: https://github.com/ms-iot/vscode-ros/blob/master/media/documentation/download-vsix-artifact.png
 
 <!-- link to external sites -->
 [ros]: http://ros.org
 [vscode]: https://code.visualstudio.com
+[vscode-ros-master-build_status]: https://dev.azure.com/ros-win/ros-win/_apis/build/status/vscode-ros.ci?branchName=master
+[vscode-ros-master-build_details]: https://dev.azure.com/ros-win/ros-win/_build/latest?definitionId=57&branchName=master
