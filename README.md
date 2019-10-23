@@ -31,8 +31,8 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 * Automatically add the ROS C++ include and Python import paths.
 * Format C++ using the ROS `clang-format` style.
 * Preview URDF and Xacro files.
-* Debug a single ROS node (C++ or Python) by [attaching to the process][debug_support].
-* Debug ROS nodes (C++ or Python) [launched from a `.launch` file][debug_support].
+* Debug a single ROS node (C++ or Python) by [attaching to the process][debug_support-attach].
+* Debug ROS nodes (C++ or Python) [launched from a `.launch` file][debug_support-launch].
 
 ## Commands
 
@@ -93,7 +93,8 @@ Contributions are always welcome! Please see our [contributing guide][contributi
 [contributing]: https://github.com/ms-iot/vscode-ros/blob/master/CONTRIBUTING.md
 
 <!-- feature documentation -->
-[debug_support]: https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md
+[debug_support-attach]: https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md#attach
+[debug_support-launch]: https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md#launch
 
 <!-- media -->
 [download_vsix_artifact]: https://github.com/ms-iot/vscode-ros/blob/master/media/documentation/download-vsix-artifact.png
