@@ -8,7 +8,7 @@ table {
 }
 
 table thead {
-  background: #333;
+  background: var(--vscode-sideBarSectionHeader-background);
 }
 
 table th {
@@ -20,11 +20,11 @@ table td, table th {
 }
 
 table tbody tr {
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--vscode-sideBarSectionHeader-background);
 }
 
 table tbody tr:hover {
-  background: #222;
+  background: var(--vscode-sideBarSectionHeader-background);
 }
 
 #parameters .name {
