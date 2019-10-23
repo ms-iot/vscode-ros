@@ -31,7 +31,8 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 * Automatically add the ROS C++ include and Python import paths.
 * Format C++ using the ROS `clang-format` style.
 * Preview URDF and Xacro files.
-* Debug a ROS node (C++ or Python) by [attaching to the process][debug_support].
+* Debug a single ROS node (C++ or Python) by [attaching to the process][debug_support].
+* Debug ROS nodes (C++ or Python) [launched from a `.launch` file][debug_support].
 
 ## Commands
 
