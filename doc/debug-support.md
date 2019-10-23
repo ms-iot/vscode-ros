@@ -44,7 +44,7 @@ The launch-debug flow provided by `vscode-ros` will not spawn a `rosmaster`.
 ## Note
 
 1. Debugging functionality provided by `vscode-ros` has dependencies on VS Code’s [C++][ms-vscode.cpptools] and [Python][ms-python.python] extensions, and those have dependencies on the version of VS Code. To ensure everything works as expected, please make sure to have everything up-to-date.
-2. To debug a C++ executable, please make sure the binary is [built with debug symbols][ros_answers_debug_symbol] (e.g. ` -DCMAKE_BUILD_TYPE=Debug`).
+2. To debug a C++ executable, please make sure the binary is [built with debug symbols][ros_answers_debug_symbol] (e.g. ` -DCMAKE_BUILD_TYPE=RelWithDebInfo`).
 3. To use VS Code's C++ extension with MSVC on Windows, please make sure the VS Code instance is launched from a Visual Studio command prompt.
 
 <!-- link to files -->
