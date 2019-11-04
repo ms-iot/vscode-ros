@@ -37,7 +37,7 @@ export async function createConfigFiles() {
 }
 
 export async function updateCppProperties(context: vscode.ExtensionContext): Promise<void> {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.UpdateCppProperties);
 
     updateCppPropertiesInternal();
@@ -79,7 +79,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
 }
 
 export function updatePythonPath(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.UpdatePythonPath);
 
     updatePythonPathInternal();

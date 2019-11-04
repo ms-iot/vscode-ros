@@ -2,7 +2,6 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
-import * as path from "path";
 
 export interface IPackageInfo {
     name: string;
@@ -10,9 +9,9 @@ export interface IPackageInfo {
     aiKey: string;
 }
 
-export function getPackageInfo(context: vscode.ExtensionContext): IPackageInfo {
-    const metadataFile: string = "package.json";
-    const metadata = require(path.join(context.extensionPath, metadataFile));
+export function getPackageInfo(extensionId: string): IPackageInfo {
+    const extension = vscode.extensions.getExtension(extensionId);
+    const metadata = extension.packageJSON;
     if (metadata && ("name" in metadata) && ("version" in metadata) && ("aiKey" in metadata)) {
         return {
             name: metadata.name,

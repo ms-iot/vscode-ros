@@ -29,7 +29,7 @@ export default class URDFPreviewManager implements vscode.WebviewPanelSerializer
     public preview(
         resource: vscode.Uri
     ): void {
-        const reporter = telemetry.getReporter(this._context);
+        const reporter = telemetry.getReporter();
         reporter.sendTelemetryCommand(extension.Commands.PreviewURDF);
         if (URDFPreviewManager.handlesUri(resource)) {
             let preview = this.getExistingPreview(resource);

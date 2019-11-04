@@ -10,7 +10,7 @@ import * as telemetry from "../telemetry-helper";
  * Gets stringified settings to pass to the debug server.
  */
 export async function getDebugSettings(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.GetDebugSettings);
 
     return JSON.stringify({ env: extension.env });

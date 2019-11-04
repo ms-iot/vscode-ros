@@ -9,7 +9,7 @@ import * as telemetry from "../telemetry-helper";
 import { rosApi } from "./ros"
 
 export async function rosrun(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.Rosrun);
 
     const terminal = await preparerosrun();
@@ -37,7 +37,7 @@ async function preparerosrun(): Promise<vscode.Terminal> {
 }
 
 export async function roslaunch(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.Roslaunch);
 
     let terminal = await prepareroslaunch();

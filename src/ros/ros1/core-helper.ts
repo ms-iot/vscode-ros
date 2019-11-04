@@ -10,7 +10,7 @@ import * as extension from "../../extension";
 import * as telemetry from "../../telemetry-helper";
 
 export function startCore(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.StartRosCore);
 
     let launchCoreCommand: string = "roscore";
@@ -26,7 +26,7 @@ export function startCore(context: vscode.ExtensionContext) {
 }
 
 export function stopCore(context: vscode.ExtensionContext, api: XmlRpcApi) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.TerminateRosCore);
 
     if (process.platform === "win32") {
@@ -38,7 +38,7 @@ export function stopCore(context: vscode.ExtensionContext, api: XmlRpcApi) {
 }
 
 export function launchMonitor(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.ShowCoreStatus);
 
     const panel = vscode.window.createWebviewPanel(

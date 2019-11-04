@@ -18,7 +18,7 @@ export abstract class BuildTool {
     }
 
     public static async createPackage(context: vscode.ExtensionContext) {
-        const reporter = telemetry.getReporter(context);
+        const reporter = telemetry.getReporter();
         reporter.sendTelemetryCommand(extension.Commands.CreateCatkinPackage);
         return this.current._createPackage();
     }

@@ -115,8 +115,9 @@ export async function activate(context: vscode.ExtensionContext) {
     };
 }
 
-export function deactivate() {
+export async function deactivate() {
     subscriptions.forEach(disposable => disposable.dispose());
+    await telemetry.clearReporter();
 }
 
 /**

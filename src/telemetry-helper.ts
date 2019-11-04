@@ -1,22 +1,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as vscode from "vscode";
 import TelemetryReporter from "vscode-extension-telemetry";
 
 import * as vscode_utils from "./vscode-utils";
 
 let reporterSingleton: TelemetryReporter;
 
-function getTelemetryReporter(context: vscode.ExtensionContext): TelemetryReporter {
+function getTelemetryReporter(): TelemetryReporter {
     if (reporterSingleton) {
         return reporterSingleton;
     }
 
-    const packageInfo = vscode_utils.getPackageInfo(context);
+    const extensionId = "ms-iot.vscode-ros";
+    const packageInfo = vscode_utils.getPackageInfo(extensionId);
     if (packageInfo) {
         reporterSingleton = new TelemetryReporter(packageInfo.name, packageInfo.version, packageInfo.aiKey);
-        context.subscriptions.push(reporterSingleton);
     }
     return reporterSingleton;
 }
@@ -34,8 +33,8 @@ export interface ITelemetryReporter {
 class SimpleReporter implements ITelemetryReporter {
     private telemetryReporter: TelemetryReporter;
 
-    constructor(context: vscode.ExtensionContext) {
-        this.telemetryReporter = getTelemetryReporter(context);
+    constructor() {
+        this.telemetryReporter = getTelemetryReporter();
     }
 
     public sendTelemetryActivate(): void {
@@ -55,6 +54,11 @@ class SimpleReporter implements ITelemetryReporter {
     }
 }
 
-export function getReporter(context: vscode.ExtensionContext): ITelemetryReporter {
-    return (new SimpleReporter(context));
+export function getReporter(): ITelemetryReporter {
+    return (new SimpleReporter());
+}
+
+export async function clearReporter(): Promise<void> {
+    await reporterSingleton.dispose();
+    reporterSingleton = undefined;
 }

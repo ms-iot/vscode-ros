@@ -18,7 +18,7 @@ function getDaemonUri() {
 }
 
 export function launchMonitor(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.ShowCoreStatus);
 
     const panel = vscode.window.createWebviewPanel(
