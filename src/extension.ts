@@ -64,7 +64,7 @@ export enum Commands {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter(context);
+    const reporter = telemetry.getReporter();
 
     extPath = context.extensionPath;
     outputChannel = vscode_utils.createOutputChannel();
