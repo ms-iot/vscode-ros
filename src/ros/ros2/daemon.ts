@@ -36,7 +36,10 @@ export class StatusBarItem {
 
     public constructor() {
         this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
-        this.item.text = "$(question) ROS2 Daemon";
+
+        const waitIcon = "$(clock)";
+        const ros = "ROS";
+        this.item.text = `${waitIcon} ${ros}`;
         this.item.command = extension.Commands.ShowCoreStatus;
         this.ros2cli = new ros2_monitor.XmlRpcApi();
     }
@@ -59,7 +62,16 @@ export class StatusBarItem {
         } catch (error) {
             // do nothing.
         } finally {
-            this.item.text = (status ? "$(check)" : "$(x)") + " ROS2 Daemon";
+            const statusIcon = status ? "$(check)" : "$(x)";
+            let ros = "ROS";
+            const rosVersionChecker = "ROS_VERSION";
+            const rosDistroChecker = "ROS_DISTRO";
+            if (rosVersionChecker in extension.env && rosDistroChecker in extension.env) {
+                const rosVersion: string = extension.env[rosVersionChecker];
+                const rosDistro: string = extension.env[rosDistroChecker];
+                ros += `${rosVersion}.${rosDistro}`;
+            }
+            this.item.text = `${statusIcon} ${ros}`;
             this.timeout = setTimeout(() => this.update(), 200);
         }
     }

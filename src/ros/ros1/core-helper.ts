@@ -185,6 +185,7 @@ export class XmlRpcApi {
 /**
  * Shows the ROS core status in the status bar.
  */
+// tslint:disable-next-line: max-classes-per-file
 export class StatusBarItem {
     private item: vscode.StatusBarItem;
     private timer: NodeJS.Timer;
@@ -192,7 +193,10 @@ export class StatusBarItem {
 
     public constructor(private api: XmlRpcApi) {
         this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 200);
-        this.item.text = "$(question) ROS core";
+
+        const waitIcon = "$(clock)";
+        const ros = "ROS";
+        this.item.text = `${waitIcon} ${ros}`;
         this.item.command = extension.Commands.ShowCoreStatus;
     }
 
@@ -212,7 +216,16 @@ export class StatusBarItem {
             return;
         }
 
-        this.item.text = (status ? "$(check)" : "$(x)") + " ROS core";
+        const statusIcon = status ? "$(check)" : "$(x)";
+        let ros = "ROS";
+        const rosVersionChecker = "ROS_VERSION";
+        const rosDistroChecker = "ROS_DISTRO";
+        if (rosVersionChecker in extension.env && rosDistroChecker in extension.env) {
+            const rosVersion: string = extension.env[rosVersionChecker];
+            const rosDistro: string = extension.env[rosDistroChecker];
+            ros += `${rosVersion}.${rosDistro}`;
+        }
+        this.item.text = `${statusIcon} ${ros}`;
         this.status = status;
     }
 }
