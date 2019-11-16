@@ -64,6 +64,9 @@ export class StatusBarItem {
         } finally {
             const statusIcon = status ? "$(check)" : "$(x)";
             let ros = "ROS";
+
+            // these environment variables are set by the ros_environment package
+            // https://github.com/ros/ros_environment
             const rosVersionChecker = "ROS_VERSION";
             const rosDistroChecker = "ROS_DISTRO";
             if (rosVersionChecker in extension.env && rosDistroChecker in extension.env) {

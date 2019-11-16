@@ -218,12 +218,19 @@ export class StatusBarItem {
 
         const statusIcon = status ? "$(check)" : "$(x)";
         let ros = "ROS";
+
+        // these environment variables are set by the ros_environment package
+        // https://github.com/ros/ros_environment
         const rosVersionChecker = "ROS_VERSION";
         const rosDistroChecker = "ROS_DISTRO";
         if (rosVersionChecker in extension.env && rosDistroChecker in extension.env) {
             const rosVersion: string = extension.env[rosVersionChecker];
             const rosDistro: string = extension.env[rosDistroChecker];
             ros += `${rosVersion}.${rosDistro}`;
+        } else {
+            // for older ROS1 installations with outdated ros_environment
+            // "rosversion --distro" might be needed
+            // ignoring such case for now
         }
         this.item.text = `${statusIcon} ${ros}`;
         this.status = status;
