@@ -10,9 +10,9 @@ Read more about the design and related discussions on the debugging functionalit
 
 `vscode-ros` enables a bootstrapped debugging experience for debugging a ROS (Python or C++) node by attaching to the process.
 
-To get started, create a `ros`-type debug configuration with an `attach` request:
+To get started, create a `ros`-type debug configuration with an `attach` request: (use <kbd>Ctrl</kbd>-<kbd>Space</kbd> to bring up the autocomplete dropdown)
 
-![create attach debug configuration][create_debug_configuration]
+![create attach debug configuration][create_attach_debug_configuration]
 
 ### Attaching to a Python node
 
