@@ -30,7 +30,8 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 * Allows starting, stopping and viewing the ROS core status.
 * Automatically discover `catkin_make` or `catkin build` build tasks.
 * Create catkin packages using `catkin_create_pkg` script or `catkin create pkg`.
-* Run `rosrun` or `roslaunch` (breakpoints currently not supported).
+* Run `rosrun` or `roslaunch`
+* Resolve dependencies with `rosdep` shortcut
 * Syntax highlighting for `.msg`, `.urdf` and other ROS files.
 * Automatically add the ROS C++ include and Python import paths.
 * Format C++ using the ROS `clang-format` style.
@@ -50,14 +51,7 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 | Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. |
 | Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. |
 | Preview URDF | `ros.previewUrdf` | Preview URDF and Xacro files. Updates after changes are saved. |
-
-## Roadmap
-
-Project roadmap and workitems are located on the [vscode-ros github projects page](https://github.com/ms-iot/vscode-ros/projects).
-Future projects include:
-
-* Support for ROS2 build tool and CLI commands
-* Support for debugging C++ & Python from `roslaunch`
+| Run rosdep | `ros.rosdep` | Shortcut for `rosdep install --from-paths src --ignore-src -r -y`. |
 
 ### Get Latest Build
 

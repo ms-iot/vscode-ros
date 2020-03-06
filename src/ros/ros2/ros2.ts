@@ -11,6 +11,7 @@ import * as vscode from "vscode";
 import * as ros from "../ros";
 import * as daemon from "./daemon";
 import * as ros2_monitor from "./ros2-monitor";
+import * as ros_utils from "../utils";
 
 const promisifiedExists = util.promisify(fs.exists);
 const promisifiedExec = util.promisify(child_process.exec);
@@ -144,6 +145,12 @@ export class ROS2 implements ros.ROSApi {
         daemon.stopDaemon();
     }
 
+    public rosdep(): vscode.Terminal {
+      const terminal = ros_utils.createTerminal(this.context);
+      terminal.sendText(`rosdep install --from-paths src --ignore-src -r -y`);
+      return terminal;
+  }
+
     public activateCoreMonitor(): vscode.Disposable {
         const coreStatusItem = new daemon.StatusBarItem();
         coreStatusItem.activate();
@@ -155,19 +162,13 @@ export class ROS2 implements ros.ROSApi {
     }
 
     public activateRosrun(packageName: string, executableName: string, argument: string): vscode.Terminal {
-        const terminal = vscode.window.createTerminal({
-            env: this.env,
-            name: "ros2 run",
-        });
+      const terminal = ros_utils.createTerminal(this.context);
         terminal.sendText(`ros2 run ${packageName} ${executableName} ${argument}`);
         return terminal;
     }
 
     public activateRoslaunch(launchFilepath: string, argument: string): vscode.Terminal {
-        const terminal = vscode.window.createTerminal({
-            env: this.env,
-            name: "ros2 launch",
-        });
+      const terminal = ros_utils.createTerminal(this.context);
         terminal.sendText(`ros2 launch ${launchFilepath} ${argument}`);
         return terminal;
     }

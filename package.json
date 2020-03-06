@@ -85,6 +85,11 @@
                 "command": "ros.previewUrdf",
                 "title": "Preview URDF",
                 "category": "ROS"
+            },
+            {
+                "command": "ros.rosdep",
+                "title": "Install ROS Dependencies for this workspace",
+                "category": "ROS"
             }
         ],
         "configuration": {

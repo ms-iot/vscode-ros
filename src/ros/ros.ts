@@ -57,6 +57,11 @@ export interface ROSApi {
     stopCore: () => void;
 
     /**
+     * Run ROSDep
+     */
+    rosdep: () => void;
+
+    /**
      * Activate ROS Core monitor.
      */
     activateCoreMonitor: () => vscode.Disposable;

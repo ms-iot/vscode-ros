@@ -10,6 +10,7 @@ import * as vscode from "vscode";
 
 import * as ros from "../ros";
 import * as ros_core from "./core-helper";
+import * as ros_utils from "../utils";
 
 const promisifiedExists = util.promisify(fs.exists);
 
@@ -148,25 +149,27 @@ export class ROS1 implements ros.ROSApi {
         return coreStatusItem;
     }
 
+    public rosdep(): vscode.Terminal {
+      const terminal = ros_utils.createTerminal(this.context);
+      this.setTerminalEnv(terminal,this.env);
+      terminal.sendText(`rosdep install --from-paths src --ignore-src -r -y`);
+      return terminal;
+  }
+
+
     public showCoreMonitor() {
         ros_core.launchMonitor(this.context);
     }
 
     public activateRosrun(packageName: string, executableName: string, argument: string): vscode.Terminal {
-        const terminal = vscode.window.createTerminal({
-            env: this.env,
-            name: "rosrun",
-        });
+      const terminal = ros_utils.createTerminal(this.context);
         this.setTerminalEnv(terminal,this.env);
         terminal.sendText(`rosrun ${packageName} ${executableName} ${argument}`);
         return terminal;
     }
 
     public activateRoslaunch(launchFilepath: string, argument: string): vscode.Terminal {
-        const terminal = vscode.window.createTerminal({
-            env: this.env,
-            name: "roslaunch",
-        });
+      const terminal = ros_utils.createTerminal(this.context);
         this.setTerminalEnv(terminal,this.env);
         terminal.sendText(`roslaunch ${launchFilepath} ${argument}`);
         return terminal;

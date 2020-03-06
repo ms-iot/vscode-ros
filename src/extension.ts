@@ -55,6 +55,7 @@ export enum Commands {
     GetDebugSettings = "ros.getDebugSettings",
     Rosrun = "ros.rosrun",
     Roslaunch = "ros.roslaunch",
+    Rosdep = "ros.rosdep",
     ShowCoreStatus = "ros.showCoreStatus",
     StartRosCore = "ros.startCore",
     TerminateRosCore = "ros.stopCore",
@@ -177,9 +178,12 @@ function activateEnvironment(context: vscode.ExtensionContext) {
             ros_cli.rosrun(context);
         }),
         vscode.commands.registerCommand(Commands.Roslaunch, () => {
-            ros_cli.roslaunch(context);
+          ros_cli.roslaunch(context);
         }),
-        vscode.commands.registerCommand(Commands.PreviewURDF, () => {
+        vscode.commands.registerCommand(Commands.Rosdep, () => {
+          rosApi.rosdep();
+      }),
+      vscode.commands.registerCommand(Commands.PreviewURDF, () => {
             URDFPreviewManager.INSTANCE.preview(vscode.window.activeTextEditor.document.uri);
         }),
         vscode.tasks.onDidEndTask((event: vscode.TaskEndEvent) => {

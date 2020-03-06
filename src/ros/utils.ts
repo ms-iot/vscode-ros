@@ -79,9 +79,12 @@ export function getDistros(): Promise<string[]> {
 /**
  * Creates and shows a ROS-sourced terminal.
  */
-export function createTerminal(context: vscode.ExtensionContext) {
+export function createTerminal(context: vscode.ExtensionContext): vscode.Terminal {
     const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.CreateTerminal);
 
-    vscode.window.createTerminal({ name: 'ROS', env: extension.env }).show();
+    const terminal = vscode.window.createTerminal({ name: 'ROS', env: extension.env })
+    terminal.show();
+
+    return terminal;
 }
