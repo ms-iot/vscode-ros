@@ -34,7 +34,7 @@ stages:
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
       - script: |
-          node node_modules/vscode/bin/test
+          npm run test
         displayName: 'Run tests'
 
   - job: build_ubuntu
@@ -52,7 +52,7 @@ stages:
           /usr/bin/Xvfb :10 -ac >> /tmp/Xvfb.out 2>&1 &
           disown -ar
         displayName: 'Start xvfb'
-      - script: 'node node_modules/vscode/bin/test'
+      - script: 'npm run test'
         displayName: 'Run tests'
         env:
           DISPLAY: :10
@@ -68,7 +68,7 @@ stages:
       - template: templates/install-dependencies.yml
       - template: templates/compile.yml
       - script: |
-          node node_modules/vscode/bin/test
+          npm run test
         displayName: 'Run tests'
 
 - stage: publish
