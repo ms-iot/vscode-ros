@@ -16,7 +16,10 @@ import * as requests from "../../requests";
 import * as utils from "../../utils";
 
 const promisifiedExec = util.promisify(child_process.exec);
-const promisifiedSudoExec = util.promisify(sudo.exec);
+const promisifiedSudoExec = util.promisify(
+    (command: any, options: any, cb: any) =>
+        sudo.exec(command, options,
+            (error, stdout, stderr) => cb(error, stdout)));
 
 export interface IResolvedAttachRequest extends requests.IAttachRequest {
     runtime: string;
