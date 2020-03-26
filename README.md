@@ -100,5 +100,5 @@ Contributions are always welcome! Please see our [contributing guide][contributi
 <!-- link to external sites -->
 [ros]: http://ros.org
 [vscode]: https://code.visualstudio.com
-[vscode-ros-master-build_status]: https://github.com/ms-iot/vscode-ros/workflows/.github/workflows/workflow.yml/badge.svg?branch=master
+[vscode-ros-master-build_status]: https://github.com/ms-iot/vscode-ros/workflows/.github/workflows/workflow.yml/badge.svg?branch=master&event=push
 [vscode-ros-master-build_details]: https://github.com/ms-iot/vscode-ros/actions?query=event%3Apush
