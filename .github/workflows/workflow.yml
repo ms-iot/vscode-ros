@@ -9,8 +9,6 @@ on:
     paths-ignore:
       - *.md
       - /media/documentation/**
-    branches:
-      - master
   release:
     types:
       - published
