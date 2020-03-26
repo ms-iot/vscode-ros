@@ -1,6 +1,6 @@
 # Visual Studio Code Extension for ROS
 
-[![Build Status][vscode-ros-master-build_status]][vscode-ros-master-build_details]
+![Build Status][vscode-ros-master-build_status]
 
 The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
 
@@ -95,10 +95,10 @@ Contributions are always welcome! Please see our [contributing guide][contributi
 [debug_support-launch]: https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md#launch
 
 <!-- media -->
-[download_vsix_artifact]: https://github.com/ms-iot/vscode-ros/blob/master/media/documentation/download-vsix-artifact.png
+[download_vsix_artifact]: https://raw.githubusercontent.com/ms-iot/vscode-ros/master/media/documentation/download-vsix-artifact.png
 
 <!-- link to external sites -->
 [ros]: http://ros.org
 [vscode]: https://code.visualstudio.com
-[vscode-ros-master-build_status]: https://dev.azure.com/ros-win/ros-win/_apis/build/status/vscode-ros.ci?branchName=master
-[vscode-ros-master-build_details]: https://dev.azure.com/ros-win/ros-win/_build/latest?definitionId=57&branchName=master
+[vscode-ros-master-build_status]: https://github.com/ms-iot/vscode-ros/workflows/.github/workflows/workflow.yml/badge.svg?branch=master
+[vscode-ros-master-build_details]: https://github.com/ms-iot/vscode-ros/actions?query=event%3Apush

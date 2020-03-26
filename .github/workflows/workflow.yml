@@ -1,8 +1,14 @@
 on:
   push:
+    paths-ignore:
+      - *.md
+      - /media/documentation/**
     branches:
       - master
   pull_request:
+    paths-ignore:
+      - *.md
+      - /media/documentation/**
     branches:
       - master
   release:

@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.3
+
+* Enable `ros.rosdep` extension command.
+* Fix roslaunch C++ node debugging on Windows.
+
+## 0.6.2
+
+* Maintenance release
+* Display `ROS` version and distro for status
+
 ## 0.6.1
 
 * Enable support for launch-debug a ROS node
