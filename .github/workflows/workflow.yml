@@ -1,14 +1,14 @@
 on:
   push:
     paths-ignore:
-      - *.md
-      - /media/documentation/**
+      - "*.md"
+      - "media/documentation/**"
     branches:
       - master
   pull_request:
     paths-ignore:
-      - *.md
-      - /media/documentation/**
+      - "*.md"
+      - "media/documentation/**"
   release:
     types:
       - published
