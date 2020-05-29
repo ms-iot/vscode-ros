@@ -287,7 +287,7 @@
         "tslint": "^6.1.2",
         "typescript": "^3.9.3",
         "vscode-test": "^1.4.0",
-        "mocha": "^7.1.2",
+        "mocha": "^7.2.0",
         "glob": "^7.1.6"
     },
     "extensionDependencies": [
