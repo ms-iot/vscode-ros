@@ -39,15 +39,15 @@ class NotImplementedBuildTool extends BuildTool {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-class CatkinCmakeBuildTool extends BuildTool {
+class CatkinMakeBuildTool extends BuildTool {
     public static async isApplicable(dir: string): Promise<boolean> {
         return pfs.exists(`${dir}/.catkin_workspace`);
     }
 
     protected _registerTaskProvider(): vscode.Disposable[] {
         return [
-            vscode.tasks.registerTaskProvider("catkin_cmake", new catkin.CatkinMakeProvider()),
-            vscode.tasks.registerTaskProvider("catkin_cmake_isolated", new catkin.CatkinMakeIsolatedProvider()),
+            vscode.tasks.registerTaskProvider("catkin_make", new catkin.CatkinMakeProvider()),
+            vscode.tasks.registerTaskProvider("catkin_make_isolated", new catkin.CatkinMakeIsolatedProvider()),
         ];
     }
 
@@ -95,9 +95,9 @@ BuildTool.current = new NotImplementedBuildTool();
  */
 export async function determineBuildTool(dir: string): Promise<boolean> {
     while (dir && path.dirname(dir) !== dir) {
-        if (await CatkinCmakeBuildTool.isApplicable(dir)) {
+        if (await CatkinMakeBuildTool.isApplicable(dir)) {
             extension.setBaseDir(dir);
-            BuildTool.current = new CatkinCmakeBuildTool();
+            BuildTool.current = new CatkinMakeBuildTool();
             return true;
         } else if (await CatkinToolsBuildTool.isApplicable(dir)) {
             extension.setBaseDir(dir);
