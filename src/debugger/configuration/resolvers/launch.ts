@@ -39,8 +39,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         let result = await promisifiedExec(`roslaunch --dump-params ${config.target}`, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from roslaunch:\r\n ${result.stderr}`));
-        } else if (result.stderr.length == 0) {
-            throw (new Error(`roslaunch unexpectedly produced no output Please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
+        } else if (result.stdout.length == 0) {
+            throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
         }
 
 
@@ -60,8 +60,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         result = await promisifiedExec(`roslaunch --nodes ${config.target}`, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from roslaunch:\r\n ${result.stderr}`));
-        } else if (result.stderr.length == 0) {
-            throw (new Error(`roslaunch unexpectedly produced no output, Please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
+        } else if (result.stdout.length == 0) {
+            throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
         }
         const nodes = result.stdout.trim().split(os.EOL);
         await Promise.all(nodes.map((node: string) => {
