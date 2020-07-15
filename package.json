@@ -3,7 +3,7 @@
     "version": "0.6.4-dev",
     "publisher": "ms-iot",
     "engines": {
-        "vscode": "^1.46.0"
+        "vscode": "^1.47.0"
     },
     "author": {
         "name": "Microsoft Corporation"
