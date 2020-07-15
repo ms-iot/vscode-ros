@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.4
+
+* [#241](https://github.com/ms-iot/vscode-ros/pull/241) Fix task provider name mismatch (by @humanoid2050)
+* [#262](https://github.com/ms-iot/vscode-ros/pull/262) Add error handling for ROS launch debug (by @ooeygui)
+* [#263](https://github.com/ms-iot/vscode-ros/pull/263) Fix URDF Preview not functional with vscode v1.47 (by @seanyen)
+
 ## 0.6.3
 
 * Enable `ros.rosdep` extension command.
