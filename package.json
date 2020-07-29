@@ -267,7 +267,7 @@
     },
     "dependencies": {
         "js-yaml": "^3.14.0",
-        "portfinder": "^1.0.27",
+        "portfinder": "^1.0.28",
         "shell-quote": "^1.7.2",
         "sudo-prompt": "^9.2.1",
         "tmp": "^0.2.1",
