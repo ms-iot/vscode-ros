@@ -213,18 +213,23 @@ async function sourceRosAndWorkspace(): Promise<void> {
     }
 
     if (distro) {
-        try {
-            let globalInstallPath: string;
+        let globalInstallPath: string;
+        if (distro.search("/") != -1) { // @TODO: replace with path seperator
+            globalInstallPath = distro;
+        }
+        else {
             if (process.platform === "win32") {
                 globalInstallPath = path.join("C:", "opt", "ros", `${distro}`, "x64");
             } else {
                 globalInstallPath = path.join("/", "opt", "ros", `${distro}`);
             }
-            let setupScript: string = path.format({
-                dir: globalInstallPath,
-                name: "setup",
-                ext: setupScriptExt,
-            });
+        }
+        let setupScript: string = path.format({
+            dir: globalInstallPath,
+            name: "setup",
+            ext: setupScriptExt,
+        });
+        try {
             env = await ros_utils.sourceSetupFile(setupScript, {});
         } catch (err) {
             vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
