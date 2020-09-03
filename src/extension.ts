@@ -214,7 +214,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
 
     if (distro) {
         let globalInstallPath: string;
-        if (distro.search("/") != -1) { // @TODO: replace with path seperator
+        if (`${distro}`.indexOf(path.sep) != -1) {
             globalInstallPath = distro;
         }
         else {
