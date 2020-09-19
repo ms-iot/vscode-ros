@@ -32,18 +32,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             throw new Error("Launch request requires an absolute path as target.");
         }
 
-        await vscode.tasks.fetchTasks()
-            .then(tasks => {
-                const taskToExecute = tasks.filter((task, i) => {
-                    return task.name === config.preLaunchTask;
-                });
-                
-                if (taskToExecute.length === 0) {
-                    throw new Error(`Pre-launch task ${config.preLaunchTask} not found`);
-                }
-                return vscode.tasks.executeTask(taskToExecute[0]);
-            });
-        delete config.preLaunchTask; // Remove preLaunchTask from config to avoid automatic handling of it
+        await this.launchFirstTaskMatchingName(config.preLaunchTask);
+        delete config.preLaunchTask; // Remove preLaunchTask from config to avoid automatic handling of it after return
 
         const rosExecOptions: child_process.ExecOptions = {
             env: extension.env,
@@ -88,6 +78,20 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         });
         // @todo: error handling for Promise.all
         return config;
+    }
+
+    private async launchFirstTaskMatchingName(name: string) {
+        return vscode.tasks.fetchTasks()
+            .then(tasks => {
+                const taskToExecute = tasks.filter((task, i) => {
+                    return task.name === name;
+                });
+                
+                if (taskToExecute.length === 0) {
+                    throw new Error(`Pre-launch task ${name} not found`);
+                }
+                return vscode.tasks.executeTask(taskToExecute[0]);
+            });
     }
 
     private generateLaunchRequest(nodeName: string, command: string): ILaunchRequest {
