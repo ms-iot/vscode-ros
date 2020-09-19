@@ -32,6 +32,19 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             throw new Error("Launch request requires an absolute path as target.");
         }
 
+        await vscode.tasks.fetchTasks()
+            .then(tasks => {
+                const taskToExecute = tasks.filter((task, i) => {
+                    return task.name === config.preLaunchTask;
+                });
+                
+                if (taskToExecute.length === 0) {
+                    throw new Error(`Pre-launch task ${config.preLaunchTask} not found`);
+                }
+                return vscode.tasks.executeTask(taskToExecute[0]);
+            });
+        delete config.preLaunchTask; // Remove preLaunchTask from config to avoid automatic handling of it
+
         const rosExecOptions: child_process.ExecOptions = {
             env: extension.env,
         };
@@ -63,6 +76,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         } else if (result.stdout.length == 0) {
             throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
         }
+
         const nodes = result.stdout.trim().split(os.EOL);
         await Promise.all(nodes.map((node: string) => {
             return promisifiedExec(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
