@@ -58,7 +58,7 @@ export async function launchFirstTaskMatchingName(name: string) {
             });
             
             if (taskToExecute.length === 0) {
-                throw new Error(`Pre-launch task ${name} not found`);
+                throw new Error(`Could not find pre-launch task "${name}".`);
             }
             return vscode.tasks.executeTask(taskToExecute[0]);
         });
