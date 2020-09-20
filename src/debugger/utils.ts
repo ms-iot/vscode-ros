@@ -2,9 +2,29 @@
 // Licensed under the MIT License.
 
 import * as vscode from "vscode";
+import * as util from "util";
 
 import * as extension from "../extension";
 import * as telemetry from "../telemetry-helper";
+
+async function onDidEndTaskProcess(task, timeout) : Promise<vscode.TaskProcessEndEvent> {
+    return new Promise((resolve, reject) => {
+        let timer;
+        let disposable: vscode.Disposable;
+        disposable = vscode.tasks.onDidEndTaskProcess(event => {
+            if (event.execution === task) {
+                clearTimeout(timer);
+                disposable.dispose();
+                resolve(event);
+            }
+        });
+
+        timer = setTimeout(function() {
+            disposable.dispose();
+            reject(new Error("timeout"));
+        }, timeout);
+    });
+}
 
 /**
  * Gets stringified settings to pass to the debug server.
@@ -60,6 +80,21 @@ export async function launchFirstTaskMatchingName(name: string) {
             if (taskToExecute.length === 0) {
                 throw new Error(`Could not find pre-launch task "${name}".`);
             }
+            
+            // vscode.tasks.onDidEndTaskProcess(event => {
+            // });
             return vscode.tasks.executeTask(taskToExecute[0]);
-        });
+        })
+        .then(taskExecution => vscode.tasks.onDidEndTaskProcess(event => {
+            if (event.execution === taskExecution) {
+                if (event && event.exitCode !== 0) {
+                    throw new Error(`Pre-launch task "${name}" failed with exit code ${event.exitCode}.`);
+                }
+            }
+        }));
+        // .then(event => {
+        //     if (event && event.exitCode !== 0) {
+        //         throw new Error(`Pre-launch task "${name}" failed with exit code ${event.exitCode}.`);
+        //     }
+        // });
 }
