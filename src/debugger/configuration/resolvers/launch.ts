@@ -28,12 +28,11 @@ interface ILaunchRequest {
 
 export class LaunchResolver implements vscode.DebugConfigurationProvider {
     // tslint:disable-next-line: max-line-length
-    public async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: requests.ILaunchRequest, token?: vscode.CancellationToken) {
+    public async resolveDebugConfigurationWithSubstitutedVariables(folder: vscode.WorkspaceFolder | undefined, config: requests.ILaunchRequest, token?: vscode.CancellationToken) {
         if (!path.isAbsolute(config.target) || path.extname(config.target) !== ".launch") {
             throw new Error("Launch request requires an absolute path as target.");
         }
-        await utils.launchFirstTaskMatchingName(config.preLaunchTask);
-
+        
         const rosExecOptions: child_process.ExecOptions = {
             env: await extension.resolvedEnv(),
         };

@@ -23,11 +23,11 @@ class RosDebugManager implements vscode.DebugConfigurationProvider {
         return this.configProvider.provideDebugConfigurations(folder, token);
     }
 
-    public async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
+    public async resolveDebugConfigurationWithSubstitutedVariables(folder: vscode.WorkspaceFolder | undefined, config: vscode.DebugConfiguration, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
         if (config.request === "attach") {
-            return this.attachResolver.resolveDebugConfiguration(folder, config as requests.IAttachRequest, token);
+            return this.attachResolver.resolveDebugConfigurationWithSubstitutedVariables(folder, config as requests.IAttachRequest, token);
         } else if (config.request === "launch") {
-            return this.launchResolver.resolveDebugConfiguration(folder, config as requests.ILaunchRequest, token);
+            return this.launchResolver.resolveDebugConfigurationWithSubstitutedVariables(folder, config as requests.ILaunchRequest, token);
         }
     }
 }

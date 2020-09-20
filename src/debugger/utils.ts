@@ -21,10 +21,6 @@ export async function oneTimePromiseFromEvent(eventCall, filter = undefined) : P
     });
 }
 
-async function onDidEndTaskProcess(task) : Promise<vscode.TaskProcessEndEvent> {
-    return oneTimePromiseFromEvent(vscode.tasks.onDidEndTaskProcess, event => event.execution === task);
-}
-
 /**
  * Gets stringified settings to pass to the debug server.
  */
@@ -64,28 +60,4 @@ export async function getPtvsdInjectCommand(host: string, port: number, pid: num
         }
     }
     throw new Error("Failed to retrieve ptvsd from Python extension!");
-}
-
-export async function launchFirstTaskMatchingName(name: string) {
-    if (typeof(name) !== "string") {
-        return;
-    }
-    return vscode.tasks.fetchTasks()
-        .then(tasks => {
-            const taskToExecute = tasks.filter((task, i) => {
-                return task.name === name;
-            });
-            
-            if (taskToExecute.length === 0) {
-                throw new Error(`Could not find pre-launch task "${name}".`);
-            }
-            
-            return vscode.tasks.executeTask(taskToExecute[0]);
-        })
-        .then(taskExecution => onDidEndTaskProcess(taskExecution))
-        .then(event => {
-            if (event && event.exitCode !== 0) {
-                throw new Error(`Pre-launch task "${name}" failed with exit code ${event.exitCode}.`);
-            }
-        });
 }
