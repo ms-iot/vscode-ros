@@ -7,19 +7,25 @@ import * as util from "util";
 import * as extension from "../extension";
 import * as telemetry from "../telemetry-helper";
 
-async function onDidEndTaskProcess(task) : Promise<vscode.TaskProcessEndEvent> {
+async function oneTimePromiseFromEvent(eventCall, filter = undefined) : Promise<any> {
     return new Promise(resolve => {
         let disposable: vscode.Disposable;
-        disposable = vscode.tasks.onDidEndTaskProcess(event => {
-            if (event.execution === task) {
-                disposable.dispose();
-                resolve(event);
+        disposable = eventCall(event => {
+            if (filter && !filter(event)) {
+                return;
             }
+
+            disposable.dispose();
+            resolve(event);
         });
     });
 }
 
-/**
+async function onDidEndTaskProcess(task) : Promise<vscode.TaskProcessEndEvent> {
+    return oneTimePromiseFromEvent(vscode.tasks.onDidEndTaskProcess, event => event.execution === task);
+}
+
+/**zzz
  * Gets stringified settings to pass to the debug server.
  */
 export async function getDebugSettings(context: vscode.ExtensionContext) {
