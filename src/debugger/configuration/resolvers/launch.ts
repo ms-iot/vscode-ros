@@ -32,11 +32,10 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         if (!path.isAbsolute(config.target) || path.extname(config.target) !== ".launch") {
             throw new Error("Launch request requires an absolute path as target.");
         }
-
         await utils.launchFirstTaskMatchingName(config.preLaunchTask);
 
         const rosExecOptions: child_process.ExecOptions = {
-            env: extension.env,
+            env: await extension.resolvedEnv(),
         };
 
         let result = await promisifiedExec(`roslaunch --dump-params ${config.target}`, rosExecOptions);

@@ -7,7 +7,7 @@ import * as util from "util";
 import * as extension from "../extension";
 import * as telemetry from "../telemetry-helper";
 
-async function oneTimePromiseFromEvent(eventCall, filter = undefined) : Promise<any> {
+export async function oneTimePromiseFromEvent(eventCall, filter = undefined) : Promise<any> {
     return new Promise(resolve => {
         let disposable: vscode.Disposable;
         disposable = eventCall(event => {

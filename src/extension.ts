@@ -44,6 +44,13 @@ let onEnvChanged = new vscode.EventEmitter<void>();
  */
 export let onDidChangeEnv = onEnvChanged.event;
 
+export async function resolvedEnv() {
+    if (env === undefined) { // Env reload in progress
+        await debug_utils.oneTimePromiseFromEvent(onDidChangeEnv, () => env !== undefined);
+    }
+    return env
+}
+
 /**
  * Subscriptions to dispose when the environment is changed.
  */

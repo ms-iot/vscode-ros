@@ -84,7 +84,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                 if (os.platform() === "win32") {
                     const processOptions: child_process.ExecOptions = {
                         cwd: extension.baseDir,
-                        env: extension.env,
+                        env: await extension.resolvedEnv(),
                     };
 
                     // "ptvsd --pid" works with child_process.exec() on Windows
