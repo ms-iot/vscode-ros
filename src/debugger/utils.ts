@@ -25,7 +25,7 @@ async function onDidEndTaskProcess(task) : Promise<vscode.TaskProcessEndEvent> {
     return oneTimePromiseFromEvent(vscode.tasks.onDidEndTaskProcess, event => event.execution === task);
 }
 
-/**zzz
+/**
  * Gets stringified settings to pass to the debug server.
  */
 export async function getDebugSettings(context: vscode.ExtensionContext) {
