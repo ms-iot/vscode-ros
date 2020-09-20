@@ -36,13 +36,18 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
     public async resolveDebugConfiguration(folder: vscode.WorkspaceFolder | undefined, config: requests.IAttachRequest, token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration> {
         // ${command:} variables only get resolved before passed to debug adapter, need to be manually resolve here
         // all ${action:} variables need to be resolved before our resolver propagates the configuration to actual debugger
+
+        await utils.launchFirstTaskMatchingName(config.preLaunchTask);
+
         await this.resolveRuntimeIfNeeded(this.supportedRuntimeTypes, config);
         await this.resolveProcessIdIfNeeded(config);
         await this.resolveCommandLineIfNeeded(config);
 
         // propagate debug configuration to Python or C++ debugger depending on the chosen runtime type
         this.launchAttachSession(config as IResolvedAttachRequest);
-        return config;
+
+        // Return null as we have spawned new debug session
+        return null;
     }
 
     private async launchAttachSession(config: IResolvedAttachRequest) {
