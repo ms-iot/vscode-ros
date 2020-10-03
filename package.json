@@ -251,7 +251,7 @@
                 "background": {
                     "activeOnStart": true,
                     "beginsPattern": ".",
-                    "endsPattern": "(process[master]: started with pid|master is already running)"
+                    "endsPattern": "(process\\[master\\]: started with pid|roscore cannot run|master is already running)"
                 }
             },
             {
