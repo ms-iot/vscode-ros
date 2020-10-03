@@ -239,20 +239,89 @@
                     "severity": 4,
                     "message": 5
                 }
+            },
+            {
+                "name": "roscore",
+                "pattern": {
+                    "regexp": ".",
+                    "file": 1,
+                    "line": 2,
+                    "message": 3
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "(process[master]: started with pid|master is already running)"
+                }
+            },
+            {
+                "name": "roslaunch",
+                "pattern": {
+                    "regexp": "^(.*):\\s+(.*):\\s+line\\s+(\\d+),\\s+column\\s+(\\d+)$",
+                    "line": 3,
+                    "column": 4,
+                    "message": 2,
+                    "severity": 1
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "started roslaunch server",
+                    "endsPattern": "ROS_MASTER_URI="
+                }
             }
         ],
         "taskDefinitions": [
             {
-                "type": "catkin_make"
+                "type": "ros",
+                "required": [
+                    "command"
+                ],
+                "properties": {
+                    "command": {
+                        "type": "string",
+                        "description": "command to execute in ROS environment"
+                    },
+                    "args": {
+                        "type": "array",
+                        "description": "Commadn line arguments to command"
+                    }
+                }
             },
             {
-                "type": "catkin_make_isolated"
+                "type": "catkin_make",
+                "properties": {
+                    "args": {
+                        "type": "array",
+                        "description": "Commadn line arguments to catkin_make"
+                    }
+                }
             },
             {
-                "type": "catkin"
+                "type": "catkin_make_isolated",
+                "properties": {
+                    "args": {
+                        "type": "array",
+                        "description": "Commadn line arguments to catkin_make_isolated"
+                    }
+                }
             },
             {
-                "type": "colcon"
+                "type": "catkin",
+                "properties": {
+                    "args": {
+                        "type": "array",
+                        "description": "Commadn line arguments to catkin"
+                    }
+                }
+            },
+            {
+                "type": "colcon",
+                "properties": {
+                    "args": {
+                        "type": "array",
+                        "description": "Commadn line arguments to colcon"
+                    }
+                }
             }
         ]
     },

@@ -19,6 +19,7 @@ import URDFPreviewManager from "./urdfPreview/previewManager"
 
 import * as debug_manager from "./debugger/manager";
 import * as debug_utils from "./debugger/utils";
+import { registerRosShellTaskProvider } from "./build-tool/ros-shell";
 
 /**
  * The catkin workspace base dir.
@@ -152,6 +153,7 @@ function activateEnvironment(context: vscode.ExtensionContext) {
 
     subscriptions.push(rosApi.activateCoreMonitor());
     subscriptions.push(...buildtool.BuildTool.registerTaskProvider());
+    subscriptions.push(...registerRosShellTaskProvider());
 
     debug_manager.registerRosDebugManager(context);
 

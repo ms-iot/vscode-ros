@@ -1,47 +1,46 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import * as child_process from "child_process";
 import * as vscode from "vscode";
 
+import * as child_process from "child_process";
 import * as extension from "../extension";
+import * as common from "./common";
+import * as rosShell from "./ros-shell";
+
+function makeColcon(command: string, args: string[], category?: string): vscode.Task {
+    const task = rosShell.make({type: command, command, args: ['--workspace', extension.baseDir, ...args]}, category)
+
+    return task;
+}
 
 /**
- * Provides colcon build and test tasks.
+ * Provides catkin tools build and test tasks.
  */
 export class ColconProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        const buildCommand = "colcon build";
-        const testCommand = "colcon test";
+        const make = makeColcon('colcon', ['build'], 'build');
+        make.group = vscode.TaskGroup.Build;
 
-        const build = new vscode.Task(
-            { type: "colcon" },
-            vscode.TaskScope.Workspace,
-            "build",
-            "colcon",
-            new vscode.ShellExecution(buildCommand, {
-                env: extension.env,
-            }),
-            []);
-        build.group = vscode.TaskGroup.Build;
-
-        const test = new vscode.Task(
-            { type: "colcon" },
-            vscode.TaskScope.Workspace,
-            "test",
-            "colcon",
-            new vscode.ShellExecution(testCommand, {
-                env: extension.env,
-            }),
-            []);
+        const test = makeColcon('colcon', ['test'], 'test');
         test.group = vscode.TaskGroup.Test;
 
-        return [build, test];
+        return [make, test];
     }
 
     public resolveTask(task: vscode.Task, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
-        return undefined;
+        return rosShell.resolve(task);
     }
+}
+
+/**
+ * Interacts with the user to run a `catkin create pkg` command.
+ */
+export async function createPackage(uri?: vscode.Uri) {
+    const createPkgCommand = (dependencies: string, name: string): string => {
+        return `catkin create pkg --catkin-deps ${dependencies} -- ${name}`;
+    };
+    return common._createPackage(createPkgCommand);
 }
 
 export async function isApplicable(dir: string): Promise<boolean> {

@@ -5,36 +5,31 @@ import * as vscode from "vscode";
 
 import * as extension from "../extension";
 import * as common from "./common";
+import * as rosShell from "./ros-shell";
+
+function makeCatkin(command: string, args: string[], category?: string): vscode.Task {
+    const task = rosShell.make({type: command, command, args: ['--workspace', extension.baseDir, ...args]}, category)
+    task.problemMatchers = ["$catkin-gcc"];
+
+    return task;
+}
 
 /**
  * Provides catkin tools build and test tasks.
  */
 export class CatkinToolsProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        let buildCommand: string;
-        let testCommand: string;
-
-        buildCommand = `catkin build --workspace "${extension.baseDir}"`;
-        testCommand = `${buildCommand} --catkin-make-args run_tests`;
-
-        const make = new vscode.Task({ type: "catkin" }, "make", "catkin");
-        make.execution = new vscode.ShellExecution(buildCommand, {
-            env: extension.env,
-        });
+        const make = makeCatkin('catkin', [], 'build');
         make.group = vscode.TaskGroup.Build;
-        make.problemMatchers = ["$catkin-gcc"];
 
-        const test = new vscode.Task({ type: "catkin" }, "run_tests", "catkin");
-        test.execution = new vscode.ShellExecution(testCommand, {
-            env: extension.env,
-        });
+        const test = makeCatkin('catkin', ['--catkin-make-args', 'run_tests'], 'run_tests');
         test.group = vscode.TaskGroup.Test;
 
         return [make, test];
     }
 
     public resolveTask(task: vscode.Task, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
-        return undefined;
+        return rosShell.resolve(task);
     }
 }
 
