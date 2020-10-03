@@ -15,7 +15,7 @@ function makeColcon(command: string, args: string[], category?: string): vscode.
 }
 
 /**
- * Provides catkin tools build and test tasks.
+ * Provides colcon build and test tasks.
  */
 export class ColconProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
@@ -31,16 +31,6 @@ export class ColconProvider implements vscode.TaskProvider {
     public resolveTask(task: vscode.Task, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
         return rosShell.resolve(task);
     }
-}
-
-/**
- * Interacts with the user to run a `catkin create pkg` command.
- */
-export async function createPackage(uri?: vscode.Uri) {
-    const createPkgCommand = (dependencies: string, name: string): string => {
-        return `catkin create pkg --catkin-deps ${dependencies} -- ${name}`;
-    };
-    return common._createPackage(createPkgCommand);
 }
 
 export async function isApplicable(dir: string): Promise<boolean> {

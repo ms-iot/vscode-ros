@@ -32,7 +32,7 @@ export class CatkinMakeProvider implements vscode.TaskProvider {
     }
 }
 /**
- * Provides catkin_make build and test tasks
+ * Provides catkin_make_isolated build and test tasks
  */
 export class CatkinMakeIsolatedProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
