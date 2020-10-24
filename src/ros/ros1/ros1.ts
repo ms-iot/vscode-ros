@@ -105,7 +105,7 @@ export class ROS1 implements ros.ROSApi {
             return this._findPackageFiles(packageName, `--libexec`, `*.exe`);
         } else {
             const dirs = `catkin_find --without-underlays --libexec --share '${packageName}'`;
-            command = `find $(${dirs}) -type f -executable`;
+            command = `find -L $(${dirs}) -type f -executable`;
             return new Promise((c, e) => child_process.exec(command, { env: this.env }, (err, out) =>
                 err ? e(err) : c(out.trim().split(os.EOL)),
             ));
@@ -118,7 +118,7 @@ export class ROS1 implements ros.ROSApi {
             return this._findPackageFiles(packageName, `--share`, `*.launch`);
         } else {
             const dirs = `catkin_find --without-underlays --share '${packageName}'`;
-            command = `find $(${dirs}) -type f -name *.launch`;
+            command = `find -L $(${dirs}) -type f -name *.launch`;
         }
 
         return new Promise((c, e) => child_process.exec(command, { env: this.env }, (err, out) => {
