@@ -335,7 +335,7 @@
         "test": "node ./out/src/test/runTest.js"
     },
     "dependencies": {
-        "js-yaml": "^3.14.1",
+        "js-yaml": "^4.0.0",
         "portfinder": "^1.0.28",
         "shell-quote": "^1.7.2",
         "sudo-prompt": "^9.2.1",
