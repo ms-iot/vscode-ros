@@ -129,8 +129,8 @@ export class ROS2 implements ros.ROSApi {
         const packages = await this.getPackages();
         const packageBasePath = await packages[packageName]();
         const command: string = (process.platform === "win32") ?
-            `where /r "${packageBasePath}" *.launch.py` :
-            `find $(${packageBasePath}) -type f -name *.launch.py`;
+            `where /r "${packageBasePath}" *launch.py` :
+            `find $(${packageBasePath}) -type f -name *launch.py`;
 
         return new Promise((c, e) => child_process.exec(command, { env: this.env }, (err, out) => {
             err ? e(err) : c(out.trim().split(os.EOL));
