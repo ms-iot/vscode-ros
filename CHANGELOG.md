@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.6.5
+
+* [#365](https://github.com/ms-iot/vscode-ros/pull/365) [ros2] find all launch files (by @Hexafog)
+* [#310](https://github.com/ms-iot/vscode-ros/pull/310) Allow customization of build tool tasks (by @anton-matosov)
+* [#321](https://github.com/ms-iot/vscode-ros/pull/321) Have executable search follow symbolic links (by @nightduck)
+* [#304](https://github.com/ms-iot/vscode-ros/pull/304) Handle preLaunch task explicitly (by @anton-matosov)
+
 ## 0.6.4
 
 * [#241](https://github.com/ms-iot/vscode-ros/pull/241) Fix task provider name mismatch (by @humanoid2050)
