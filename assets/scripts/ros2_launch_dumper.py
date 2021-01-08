@@ -1,0 +1,119 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+import asyncio
+import argparse
+import os
+import sys
+from typing import cast
+from typing import Dict
+from typing import List
+from typing import Text
+from typing import Tuple
+from typing import Union
+from typing import OrderedDict
+
+from ament_index_python.packages import get_package_prefix
+from ament_index_python.packages import PackageNotFoundError
+from ros2launch.api import get_share_file_path_from_package
+from ros2launch.api import is_launch_file
+from ros2launch.api import launch_a_launch_file
+from ros2launch.api import LaunchFileNameCompleter
+from ros2launch.api import MultipleLaunchFilesError
+from ros2launch.api import print_a_launch_file
+from ros2launch.api import print_arguments_of_launch_file
+import launch
+from launch.launch_description_sources import get_launch_description_from_any_launch_file
+from launch.utilities import is_a
+from launch.utilities import normalize_to_list_of_substitutions
+from launch.utilities import perform_substitutions
+from launch import Action
+from launch.actions import ExecuteProcess
+from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.launch_context import LaunchContext
+from launch_ros.actions import PushRosNamespace
+
+
+def parse_launch_arguments(launch_arguments: List[Text]) -> List[Tuple[Text, Text]]:
+    """Parse the given launch arguments from the command line, into list of tuples for launch."""
+    parsed_launch_arguments = OrderedDict()  # type: ignore
+    for argument in launch_arguments:
+        count = argument.count(':=')
+        if count == 0 or argument.startswith(':=') or (count == 1 and argument.endswith(':=')):
+            raise RuntimeError(
+                "malformed launch argument '{}', expected format '<name>:=<value>'"
+                .format(argument))
+        name, value = argument.split(':=', maxsplit=1)
+        parsed_launch_arguments[name] = value  # last one wins is intentional
+    return parsed_launch_arguments.items()
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    arg = parser.add_argument(
+        'launch_full_path',
+        help='Full file path to the launch file')
+    arg = parser.add_argument(
+        'launch_arguments',
+        nargs='*',
+        help="Arguments to the launch file; '<name>:=<value>' (for duplicates, last one wins)")
+
+    args = parser.parse_args()
+
+    path = None
+    launch_arguments = []
+
+    if os.path.exists(args.launch_full_path):
+        path = args.launch_full_path
+    else:
+        raise RuntimeError('No launch file supplied')
+
+    launch_arguments.extend(args.launch_arguments)
+    parsed_launch_arguments = parse_launch_arguments(launch_arguments)
+
+    launch_description = launch.LaunchDescription([
+        launch.actions.IncludeLaunchDescription(
+            launch.launch_description_sources.AnyLaunchDescriptionSource(
+                path
+            ),
+            launch_arguments=parsed_launch_arguments,
+        ),
+    ])
+    descriptions = []
+    descriptions.append(launch_description)
+    ros_specific_arguments: Dict[str, Union[str, List[str]]] = {}
+    context = LaunchContext(argv=launch_arguments)
+    context._set_asyncio_loop(asyncio.get_event_loop())
+
+    try:
+        while descriptions:
+            desc = descriptions.pop()
+            entities = desc.entities
+            entities_future = []
+            while entities:
+                entity = entities.pop()
+                entities_future.append(entity)
+                for sub_entity in entity.get_sub_entities():
+                    if not is_a(sub_entity, Action):
+                        descriptions.append(sub_entity)
+                    else:
+                        entities.append(sub_entity)
+
+            while entities_future:
+                entity = entities_future.pop()
+                try:
+                    entity.execute(context)
+                except Exception as ex:
+                    # print(ex, file=sys.stderr)
+                    continue
+                if is_a(entity, ExecuteProcess):
+                    typed_action = cast(ExecuteProcess, entity)
+                    real_cmd = []
+                    for cmd in typed_action.cmd:
+                        normalized = normalize_to_list_of_substitutions(cmd)
+                        for sub in normalized:
+                            real_cmd.extend(['"' + sub.perform(context) + '"'])
+                    print(' '.join(real_cmd))
+    except Exception as ex:
+        print(ex, file=sys.stderr)

@@ -12,9 +12,9 @@ import * as tmp from "tmp";
 import * as util from "util";
 import * as vscode from "vscode";
 
-import * as extension from "../../../extension";
-import * as requests from "../../requests";
-import * as utils from "../../utils";
+import * as extension from "../../../../extension";
+import * as requests from "../../../requests";
+import * as utils from "../../../utils";
 
 const promisifiedExec = util.promisify(child_process.exec);
 

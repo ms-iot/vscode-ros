@@ -258,13 +258,17 @@ async function sourceRosAndWorkspace(): Promise<void> {
     }
 
     // Source the workspace setup over the top.
-    let workspaceDevelPath: string;
-    workspaceDevelPath = path.join(`${baseDir}`, "devel_isolated");
-    if (!await pfs.exists(workspaceDevelPath)) {
-        workspaceDevelPath = path.join(`${baseDir}`, "devel");
+    // TODO: we should test what's the build tool (catkin vs colcon).
+    let workspaceOverlayPath: string;
+    workspaceOverlayPath = path.join(`${baseDir}`, "devel_isolated");
+    if (!await pfs.exists(workspaceOverlayPath)) {
+        workspaceOverlayPath = path.join(`${baseDir}`, "devel");
+    }
+    if (!await pfs.exists(workspaceOverlayPath)) {
+        workspaceOverlayPath = path.join(`${baseDir}`, "install");
     }
     let wsSetupScript: string = path.format({
-        dir: workspaceDevelPath,
+        dir: workspaceOverlayPath,
         name: "setup",
         ext: setupScriptExt,
     });

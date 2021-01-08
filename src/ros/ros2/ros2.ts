@@ -81,7 +81,10 @@ export class ROS2 implements ros.ROSApi {
 
     public async getWorkspaceIncludeDirs(workspaceDir: string): Promise<string[]> {
         const includes: string[] = [];
-        const opts = { env: this.env };
+        const opts = {
+            env: this.env,
+            cwd: workspaceDir
+        };
         const result = await promisifiedExec(`colcon list -p --base-paths "${workspaceDir}"`, opts);
 
         // error out if we see anything from stderr.
