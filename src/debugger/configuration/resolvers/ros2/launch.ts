@@ -51,8 +51,11 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             args.push(`"${arg}"`);
         }
         let flatten_args = args.join(' ')
+        let ros2_launch_dumper_cmdLine = (process.platform === "win32") ?
+            `python ${ros2_launch_dumper} "${config.target}" ${flatten_args}` :
+            `/usr/bin/env python3 ${ros2_launch_dumper} "${config.target}" ${flatten_args}`;
 
-        let result = await promisifiedExec(`python ${ros2_launch_dumper} "${config.target}" ${flatten_args}`, rosExecOptions);
+        let result = await promisifiedExec(ros2_launch_dumper_cmdLine, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from ROS2 launch dumper:\r\n ${result.stderr}`));
         } else if (result.stdout.length == 0) {
