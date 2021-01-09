@@ -73,55 +73,62 @@ export enum Commands {
 }
 
 export async function activate(context: vscode.ExtensionContext) {
-    const reporter = telemetry.getReporter();
+    let init = vscode.window.withProgress({
+        location: vscode.ProgressLocation.Notification,
+        title: "ROS Extension Initializing...",
+        cancellable: false
+    }, async (progress, token) => {
+        const reporter = telemetry.getReporter();
+        extPath = context.extensionPath;
+        outputChannel = vscode_utils.createOutputChannel();
+        context.subscriptions.push(outputChannel);
 
-    extPath = context.extensionPath;
-    outputChannel = vscode_utils.createOutputChannel();
-    context.subscriptions.push(outputChannel);
-
-    // Activate if we're in a catkin workspace.
-    let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
-    if (!buildToolDetected) {
-        return;
-    }
-
-    // Activate components when the ROS env is changed.
-    context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
-
-    // Activate components which don't require the ROS env.
-    context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(
-        "cpp", new cpp_formatter.CppFormatter()
-    ));
-
-    URDFPreviewManager.INSTANCE.setContext(context);
-
-    // Source the environment, and re-source on config change.
-    let config = vscode_utils.getExtensionConfiguration();
-
-    context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
-        const updatedConfig = vscode_utils.getExtensionConfiguration();
-        const fields = Object.keys(config).filter(k => !(config[k] instanceof Function));
-        const changed = fields.some(key => updatedConfig[key] !== config[key]);
-
-        if (changed) {
-            sourceRosAndWorkspace();
+        // Activate if we're in a catkin workspace.
+        let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
+        if (!buildToolDetected) {
+            return;
         }
 
-        config = updatedConfig;
-    }));
+        // Activate components when the ROS env is changed.
+        context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
 
-    sourceRosAndWorkspace().then(() =>
-    {
-        vscode.window.registerWebviewPanelSerializer('urdfPreview', URDFPreviewManager.INSTANCE);
+        // Activate components which don't require the ROS env.
+        context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(
+            "cpp", new cpp_formatter.CppFormatter()
+        ));
+
+        URDFPreviewManager.INSTANCE.setContext(context);
+
+        // Source the environment, and re-source on config change.
+        let config = vscode_utils.getExtensionConfiguration();
+
+        context.subscriptions.push(vscode.workspace.onDidChangeConfiguration(() => {
+            const updatedConfig = vscode_utils.getExtensionConfiguration();
+            const fields = Object.keys(config).filter(k => !(config[k] instanceof Function));
+            const changed = fields.some(key => updatedConfig[key] !== config[key]);
+
+            if (changed) {
+                sourceRosAndWorkspace();
+            }
+
+            config = updatedConfig;
+        }));
+
+        await sourceRosAndWorkspace().then(() =>
+        {
+            vscode.window.registerWebviewPanelSerializer('urdfPreview', URDFPreviewManager.INSTANCE);
+        });
+
+        reporter.sendTelemetryActivate();
+
+        return {
+            getBaseDir: () => baseDir,
+            getEnv: () => env,
+            onDidChangeEnv: (listener: () => any, thisArg: any) => onDidChangeEnv(listener, thisArg),
+        };
     });
 
-    reporter.sendTelemetryActivate();
-
-    return {
-        getBaseDir: () => baseDir,
-        getEnv: () => env,
-        onDidChangeEnv: (listener: () => any, thisArg: any) => onDidChangeEnv(listener, thisArg),
-    };
+    return await init;
 }
 
 export async function deactivate() {

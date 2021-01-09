@@ -101,6 +101,10 @@ if __name__ == "__main__":
     context._set_asyncio_loop(asyncio.get_event_loop())
 
     try:
+        # * Here we mimic the run loop inside launch_service,
+        #   but without actually kicking off the processes.
+        # * Traverse the sub entities by DFS.
+        # * Shadow the stdout to avoid random print outputs.
         mystring = StringIO()
         sys.stdout = mystring
         while walker:
