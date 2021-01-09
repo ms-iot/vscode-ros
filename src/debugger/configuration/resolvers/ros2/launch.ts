@@ -38,7 +38,10 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         }
 
         const rosExecOptions: child_process.ExecOptions = {
-            env: await extension.resolvedEnv(),
+            env: {
+                ...await extension.resolvedEnv(),
+                ...config.env,
+            },
         };
 
         let ros2_launch_dumper = getExtensionFilePath(path.join("assets", "scripts", "ros2_launch_dumper.py"));
@@ -61,7 +64,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             if (!command)
                 return;
             let process = command.split(' ')[0];
-            const launchRequest = this.generateLaunchRequest(process, command);
+            const launchRequest = this.generateLaunchRequest(process, command, config.env);
             this.executeLaunchRequest(launchRequest, false);
         });
 
@@ -72,21 +75,12 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
     }
 
 
-    private generateLaunchRequest(nodeName: string, command: string): ILaunchRequest {
+    private generateLaunchRequest(nodeName: string, command: string, env: any): ILaunchRequest {
         let parsedArgs: shell_quote.ParseEntry[];
-        const isWindows = os.platform() === "win32";
 
-        if (isWindows) {
-            // https://github.com/ros/ros_comm/pull/1809
-            // escape backslash in file path
-            // parsedArgs = shell_quote.parse(command.replace(/[\\]/g, "\\$&"));
-            // parsedArgs = shell_quote.parse(parsedArgs[2].toString().replace(/[\\]/g, "\\$&"));
-            parsedArgs = shell_quote.parse(command);
-        } else {
-            parsedArgs = shell_quote.parse(command);
-        }
+        parsedArgs = shell_quote.parse(command);
 
-        const envConfig: { [key: string]: string; } = {};
+        const envConfig: { [key: string]: string; } = env;
 
         const request: ILaunchRequest = {
             nodeName: nodeName,

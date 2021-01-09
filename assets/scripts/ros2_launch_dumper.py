@@ -5,6 +5,8 @@ import asyncio
 import argparse
 import os
 import sys
+import subprocess
+from io import StringIO
 from typing import cast
 from typing import Dict
 from typing import List
@@ -49,6 +51,18 @@ def parse_launch_arguments(launch_arguments: List[Text]) -> List[Tuple[Text, Tex
     return parsed_launch_arguments.items()
 
 
+def find_files(file_name):
+    search_results = [file_name]
+    if os.name == 'nt':
+        output = subprocess.Popen(['where', file_name], stdout=subprocess.PIPE, shell=True).communicate()[0]
+        output = output.decode()
+        search_results = output.split(os.linesep)
+    else:
+        # Do we need this on Linux?
+        pass
+    return search_results[0]
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     arg = parser.add_argument(
@@ -80,40 +94,32 @@ if __name__ == "__main__":
             launch_arguments=parsed_launch_arguments,
         ),
     ])
-    descriptions = []
-    descriptions.append(launch_description)
+    walker = []
+    walker.append(launch_description)
     ros_specific_arguments: Dict[str, Union[str, List[str]]] = {}
     context = LaunchContext(argv=launch_arguments)
     context._set_asyncio_loop(asyncio.get_event_loop())
 
     try:
-        while descriptions:
-            desc = descriptions.pop()
-            entities = desc.entities
-            entities_future = []
-            while entities:
-                entity = entities.pop()
-                entities_future.append(entity)
-                for sub_entity in entity.get_sub_entities():
-                    if not is_a(sub_entity, Action):
-                        descriptions.append(sub_entity)
-                    else:
-                        entities.append(sub_entity)
-
-            while entities_future:
-                entity = entities_future.pop()
-                try:
-                    entity.execute(context)
-                except Exception as ex:
-                    # print(ex, file=sys.stderr)
-                    continue
-                if is_a(entity, ExecuteProcess):
-                    typed_action = cast(ExecuteProcess, entity)
-                    real_cmd = []
-                    for cmd in typed_action.cmd:
-                        normalized = normalize_to_list_of_substitutions(cmd)
-                        for sub in normalized:
-                            real_cmd.extend(['"' + sub.perform(context) + '"'])
-                    print(' '.join(real_cmd))
+        mystring = StringIO()
+        sys.stdout = mystring
+        while walker:
+            entity = walker.pop()
+            visit_future = entity.visit(context)
+            if visit_future is not None:
+                visit_future.reverse()
+                walker.extend(visit_future)
+            if is_a(entity, ExecuteProcess):
+                typed_action = cast(ExecuteProcess, entity)
+                if typed_action.process_details is not None:
+                    sys.stdout = sys.__stdout__
+                    commands = []
+                    for cmd in typed_action.process_details['cmd']:
+                        if cmd.strip():
+                            commands.extend(['"{}"'.format(cmd.strip())])
+                    if os.sep not in typed_action.process_details['cmd'][0]:
+                        commands[0] = '"{}"'.format(find_files(typed_action.process_details['cmd'][0]))
+                    print(' '.join(commands))
+                    sys.stdout = mystring
     except Exception as ex:
         print(ex, file=sys.stderr)

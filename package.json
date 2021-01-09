@@ -121,8 +121,16 @@
                             },
                             "args": {
                                 "type": "array",
-                                "description": "Arguments for the roslaunch command",
+                                "description": "Arguments for the roslaunch (or ros2 launch) command",
                                 "default": []
+                            },
+                            "env": {
+                                "type": "object",
+                                "description": "Environment variables defined as a key value pair. Property ends up being the Environment Variable and the value of the property ends up being the value of the Env Variable.",
+                                "default": {},
+                                "additionalProperties": {
+                                    "type": "string"
+                                }
                             }
                         }
                     },
