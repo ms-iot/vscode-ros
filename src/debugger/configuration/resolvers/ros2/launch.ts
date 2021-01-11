@@ -104,17 +104,16 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         let debugConfig: ICppvsdbgLaunchConfiguration | ICppdbgLaunchConfiguration | IPythonLaunchConfiguration;
 
         if (os.platform() === "win32") {
-            if (request.executable.toLowerCase().endsWith("python") ||
-                request.executable.toLowerCase().endsWith("python.exe")) {
-                const pythonScript: string = request.arguments.shift();
+            if (request.executable.toLowerCase().endsWith(".py")) {
                 const pythonLaunchConfig: IPythonLaunchConfiguration = {
                     name: request.nodeName,
                     type: "python",
                     request: "launch",
-                    program: pythonScript,
+                    program: request.executable,
                     args: request.arguments,
                     env: request.env,
                     stopOnEntry: stopOnEntry,
+                    justMyCode: false,
                 };
                 debugConfig = pythonLaunchConfig;
             } else if (request.executable.toLowerCase().endsWith(".exe")) {
@@ -193,6 +192,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         args: request.arguments,
                         env: request.env,
                         stopOnEntry: stopOnEntry,
+                        justMyCode: false,
                     };
                     debugConfig = pythonLaunchConfig;
                 } else {

@@ -143,6 +143,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                     args: request.arguments,
                     env: request.env,
                     stopOnEntry: stopOnEntry,
+                    justMyCode: false,
                 };
                 debugConfig = pythonLaunchConfig;
             } else if (request.executable.endsWith(".exe")) {
@@ -221,6 +222,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         args: request.arguments,
                         env: request.env,
                         stopOnEntry: stopOnEntry,
+                        justMyCode: false,
                     };
                     debugConfig = pythonLaunchConfig;
                 } else {
