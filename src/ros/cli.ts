@@ -13,6 +13,9 @@ export async function rosrun(context: vscode.ExtensionContext) {
     reporter.sendTelemetryCommand(extension.Commands.Rosrun);
 
     const terminal = await preparerosrun();
+    if (!terminal) {
+        return;
+    }
     terminal.show();
 }
 
@@ -41,6 +44,9 @@ export async function roslaunch(context: vscode.ExtensionContext) {
     reporter.sendTelemetryCommand(extension.Commands.Roslaunch);
 
     let terminal = await prepareroslaunch();
+    if (!terminal) {
+        return;
+    }
     terminal.show();
 }
 

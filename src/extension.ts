@@ -136,6 +136,14 @@ export async function deactivate() {
     await telemetry.clearReporter();
 }
 
+async function ensureErrorMessageOnException(callback: (...args: any[]) => any) {
+    try {
+        await callback();
+    } catch (err) {
+        vscode.window.showErrorMessage(err.message);
+    }
+}
+
 /**
  * Activates components which require a ROS env.
  */
@@ -167,40 +175,64 @@ function activateEnvironment(context: vscode.ExtensionContext) {
     // register plugin commands
     subscriptions.push(
         vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
-            buildtool.BuildTool.createPackage(context);
+            ensureErrorMessageOnException(() => {
+                return buildtool.BuildTool.createPackage(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.CreateTerminal, () => {
-            ros_utils.createTerminal(context);
+            ensureErrorMessageOnException(() => {
+                ros_utils.createTerminal(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.GetDebugSettings, () => {
-            debug_utils.getDebugSettings(context);
+            ensureErrorMessageOnException(() => {
+                return debug_utils.getDebugSettings(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.ShowCoreStatus, () => {
-            rosApi.showCoreMonitor();
+            ensureErrorMessageOnException(() => {
+                rosApi.showCoreMonitor();
+            });
         }),
         vscode.commands.registerCommand(Commands.StartRosCore, () => {
-            rosApi.startCore();
+            ensureErrorMessageOnException(() => {
+                rosApi.startCore();
+            });
         }),
         vscode.commands.registerCommand(Commands.TerminateRosCore, () => {
-            rosApi.stopCore();
+            ensureErrorMessageOnException(() => {
+                rosApi.stopCore();
+            });
         }),
         vscode.commands.registerCommand(Commands.UpdateCppProperties, () => {
-            ros_build_utils.updateCppProperties(context);
+            ensureErrorMessageOnException(() => {
+                return ros_build_utils.updateCppProperties(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.UpdatePythonPath, () => {
-            ros_build_utils.updatePythonPath(context);
+            ensureErrorMessageOnException(() => {
+                ros_build_utils.updatePythonPath(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.Rosrun, () => {
-            ros_cli.rosrun(context);
+            ensureErrorMessageOnException(() => {
+                return ros_cli.rosrun(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.Roslaunch, () => {
-          ros_cli.roslaunch(context);
+            ensureErrorMessageOnException(() => {
+                return ros_cli.roslaunch(context);
+            });
         }),
         vscode.commands.registerCommand(Commands.Rosdep, () => {
-          rosApi.rosdep();
-      }),
-      vscode.commands.registerCommand(Commands.PreviewURDF, () => {
-            URDFPreviewManager.INSTANCE.preview(vscode.window.activeTextEditor.document.uri);
+            ensureErrorMessageOnException(() => {
+                rosApi.rosdep();
+            });
+        }),
+        vscode.commands.registerCommand(Commands.PreviewURDF, () => {
+            ensureErrorMessageOnException(() => {
+                URDFPreviewManager.INSTANCE.preview(vscode.window.activeTextEditor.document.uri);
+            });
         }),
         vscode.tasks.onDidEndTask((event: vscode.TaskEndEvent) => {
             if (buildtool.isROSBuildTask(event.execution.task)) {
