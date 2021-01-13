@@ -72,6 +72,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
                 name: "ROS",
             },
         ],
+        version: 4,
     };
 
     const filename = path.join(vscode.workspace.rootPath, ".vscode", "c_cpp_properties.json");
