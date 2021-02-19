@@ -47,8 +47,10 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         let ros2_launch_dumper = getExtensionFilePath(path.join("assets", "scripts", "ros2_launch_dumper.py"));
 
         let args = []
-        for (let arg of config.args) {
-            args.push(`"${arg}"`);
+        if (config.args) {
+            for (let arg of config.args) {
+                args.push(`"${arg}"`);
+            }
         }
         let flatten_args = args.join(' ')
         let ros2_launch_dumper_cmdLine = (process.platform === "win32") ?
