@@ -360,7 +360,7 @@
         "@types/xmlrpc": "^1.3.6",
         "@types/vscode": "^1.53.0",
         "@types/glob": "^7.1.3",
-        "@types/mocha": "^7.0.2",
+        "@types/mocha": "^8.2.1",
         "tslint": "^6.1.3",
         "typescript": "^4.0.5",
         "vscode-test": "^1.4.1",
