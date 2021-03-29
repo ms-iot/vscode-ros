@@ -60,10 +60,9 @@ Versioning of this extension follows the [SemVer guidelines][semver_guidelines].
 This project is not expected to have an insider's channel, so there are just some very simple guidelines to follow in practice:
 
 1. when any change is introduced into the `master` branch after the existing release (at this point, the version number in the `master` branch should be `<current_version>`), update the version number in the `master` branch to `<new_version>-dev`
-2. after branching off to a release branch (`release/*`), the version number in the release branch stays the same as `<new_version>-dev`
-    - if any change comes into the `master` branch (instead of the release branch) at this point, the version number in the `master` branch should be updated to `<even_newer_version>-dev`
-3. after the release branch has been reviewed and is ready to be released, update the version number to `<new_version>` and release
+2. after the `master` branch has been reviewed and is ready to be released, update the version number to `<new_version>` and release
     - a newer version of the extension should be published as soon as the version number becomes `<new_version>`
+3. then, go to step 1.
 
 Reasoning:
 
@@ -74,78 +73,62 @@ Reasoning:
 
 ### Publishing a release
 
-#### Release checklist
+#### Testing before Release
 
-Please review the following before publishing a new release:
+Before preparing a release, you should check the health of this extension, for example,
 
-Metadata:
+1. Check the latest CI status:
+   ![.github/workflows/workflow.yml](https://github.com/ms-iot/vscode-ros/workflows/.github/workflows/workflow.yml/badge.svg?event=push)
+
+2. Run through the basic scenarios manually on Linux and Windows environments.
+    - Start, terminate, and monitor ROS core
+        1. launch ROS core monitor with `ros.showMasterStatus`
+        2. start a new ROS core process in background with `ros.startCore`
+        3. check if ROS core monitor shows parameters and nodes correctly
+        4. termintate the ROS core process with `ros.stopCore`
+        5. check if ROS core monitor shows "offline"
+    - Create a terminal with ROS environment sourced
+        1. start a new ROS terminal with `ros.createTerminal`
+        2. check if ROS environment variables are properly configured
+    - Execute a ROS executable
+        1. start a ROS core process (in another terminal or with `ros.startCore`)
+        2. execute `ros.rosrun` and choose an executable
+        3. check if the executable gets launched
+    - Execute a ROS launch file
+        1. execute `ros.roslaunch` and choose a launch file
+        2. check if the launch file gets launched
+    - Execute URDF preview on a URDF file.
+    - Configure ROS launch debug configuration, set breakpoints and start debugging.
+
+#### Preparing a Release
+
+For each release, we will need to bump the version number and update the documents accordingly.
+
+The following will be touched:
 
 - update `README.md`
 - update `CHANGELOG.md`
-- update version number in `package.json`
+- update version number in `package.json` and `package-lock.json`
 
-Release testing:
+> You can find an example commit [here](https://github.com/ms-iot/vscode-ros/commit/3091180d319d2ca87736cd50c1293dd26151a0b8).
 
-- Start, terminate, and monitor ROS core
-    1. launch ROS core monitor with `ros.showMasterStatus`
-    2. start a new ROS core process in background with `ros.startCore`
-    3. check if ROS core monitor shows parameters and nodes correctly
-    4. termintate the ROS core process with `ros.stopCore`
-    5. check if ROS core monitor shows "offline"
-- Create a terminal with ROS environment sourced
-    1. start a new ROS terminal with `ros.createTerminal`
-    2. check if ROS environment variables are properly configured
-- Execute a ROS executable
-    1. start a ROS core process (in another terminal or with `ros.startCore`)
-    2. execute `ros.rosrun` and choose an executable
-    3. check if the executable gets launched
-- Execute a ROS launch file
-    1. execute `ros.roslaunch` and choose a launch file
-    2. check if the launch file gets launched
+#### Authorizing a release (through GitHub releases)
 
-#### Authorizing a manual release (through the release pipeline)
+The release process is integrated and automated with [GitHub releases](https://docs.github.com/en/github/administering-a-repository/about-releases). Here are 3-easy steps to kick off one.
 
-The release process can be automated by triggering a release pipeline from the [vscode-ros.release pipeline][vscode-ros.release]; however, we will be simplifying the process to only release manually for now.
+1. [Draft a new release](https://github.com/ms-iot/vscode-ros/releases/new).
 
-To authorize a release manually, schedule a release build with the proper release branch for the [vscode-ros.release pipeline][vscode-ros.release].
+2. Fill the version number and release note. (Keep the target branch as `master`.)
+   ![](/media/documentation/draft-release.png)
 
-![schedule a release build][schedule_manual_release_build]
+3. Click `Publish release`.
 
-After the extension is released, the release branch should be:
+Once it is kicked off, GitHub release will automatically tag your latest commit from the `master` and a GitHub action will automatically be triggered to build and publish the extension to VS Code extension marketplace. For example, here is [one release run](https://github.com/ms-iot/vscode-ros/actions/runs/580197093) in the past.
 
-1. tagged with version number
-2. merged back into the `master` branch
-3. deleted
+#### Post-release Activities
 
-#### Working with tags
+To get `master` ready for the next release, it is encouraged to update the version number immediately after a release is published. You can find an example commit [here](https://github.com/ms-iot/vscode-ros/commit/3fd13ba1def4f0eee3a0fc9e0e58db7558e119a3).
 
-Use [tags][git_tagging] to create snapshots of the codebase for each release. To create a new tag, follow these steps in a local `ms-iot/vscode-ros` git repository:
-
-1. Sync with remote
-
-    ```batch
-    git pull
-    ```
-
-2. Create a new tag
-
-    ```batch
-    git tag --list
-    git log --oneline -n <log_number>
-    git tag <tag_name> <commit_id>
-    git push origin <tag_name>
-    ```
-
-3. Remove a tag
-
-    ```batch
-    git tag --list
-    git tag -d <tag_name>
-    git push origin --delete <tag_name>
-    ```
-
-<!-- link to files -->
-[schedule_manual_release_build]: /media/documentation/pipeline-manual-release.png
 
 <!-- link to external sites -->
 [ajshort_vscode-ros]: https://github.com/ajshort/vscode-ros
@@ -153,5 +136,4 @@ Use [tags][git_tagging] to create snapshots of the codebase for each release. To
 [git_tagging]: https://git-scm.com/book/en/v2/Git-Basics-Tagging
 [gitflow_workflow]: https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
 [semver_guidelines]: https://semver.org/#semantic-versioning-specification-semver
-[vscode-ros.ci]: https://ros-win.visualstudio.com/ros-win/_build?definitionId=57
-[vscode-ros.release]: https://ros-win.visualstudio.com/ros-win/_build?definitionId=68
+[vscode-ros.ci]: https://github.com/ms-iot/vscode-ros/actions
