@@ -52,6 +52,11 @@ export class UnknownROS implements ros.ROSApi {
         return;
     }
 
+    public getCoreStatus(): Promise<boolean> {
+        console.error("Unknown ROS distro.");
+        return;
+    }
+
     public rosdep() {
       console.error("Unknown ROS distro.");
       return;

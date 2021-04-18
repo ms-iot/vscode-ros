@@ -15,6 +15,7 @@ import * as vscode from "vscode";
 import * as extension from "../../../../extension";
 import * as requests from "../../../requests";
 import * as utils from "../../../utils";
+import { rosApi } from "../../../../ros/ros";
 
 const promisifiedExec = util.promisify(child_process.exec);
 
@@ -32,7 +33,21 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         if (!path.isAbsolute(config.target) || path.extname(config.target) !== ".launch") {
             throw new Error("Launch request requires an absolute path as target.");
         }
-        
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        // Manage the status of the ROS core, starting one if not present
+        // The ROS core will continue to run until the VSCode window is closed
+        const core_active = rosApi.getCoreStatus();
+        if (!(await core_active).valueOf()) {
+            rosApi.startCore();
+
+            // Wait for the core to start
+            while (!(await rosApi.getCoreStatus()).valueOf()) {
+                await delay(100);
+            }
+        }
+
         const rosExecOptions: child_process.ExecOptions = {
             env: await extension.resolvedEnv(),
         };
