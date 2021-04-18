@@ -16,6 +16,7 @@ import * as extension from "../../../../extension";
 import * as requests from "../../../requests";
 import * as utils from "../../../utils";
 import { rosApi } from "../../../../ros/ros";
+import { env } from "../../../../extension";
 
 const promisifiedExec = util.promisify(child_process.exec);
 
@@ -36,17 +37,27 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         const delay = ms => new Promise(res => setTimeout(res, ms));
 
-        // Manage the status of the ROS core, starting one if not present
-        // The ROS core will continue to run until the VSCode window is closed
-        const core_active = rosApi.getCoreStatus();
-        if (!(await core_active).valueOf()) {
-            rosApi.startCore();
-
-            // Wait for the core to start
-            while (!(await rosApi.getCoreStatus()).valueOf()) {
-                await delay(100);
+        switch(env.ROS_VERSION.trim()) {
+            case "1": {
+                // Manage the status of the ROS core, starting one if not present
+                // The ROS core will continue to run until the VSCode window is closed
+                const core_active = rosApi.getCoreStatus();
+                if (!(await core_active).valueOf()) {
+                    rosApi.startCore();
+        
+                    // Wait for the core to start
+                    while (!(await rosApi.getCoreStatus()).valueOf()) {
+                        await delay(100);
+                    }
+                }
+                break;
+            }
+            case "2": {
+                // TODO, support starting the ROS2 daemon automatically
+                break;
             }
         }
+        
 
         const rosExecOptions: child_process.ExecOptions = {
             env: await extension.resolvedEnv(),
