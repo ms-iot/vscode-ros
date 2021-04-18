@@ -126,6 +126,20 @@ export class ROS1 implements ros.ROSApi {
         }));
     }
 
+    public findPackageTestFiles(packageName: string): Promise<string[]> {
+        let command: string;
+        if (process.platform === "win32") {
+            return this._findPackageFiles(packageName, `--share`, `*.test`);
+        } else {
+            const dirs = `catkin_find --without-underlays --share '${packageName}'`;
+            command = `find -L $(${dirs}) -type f -name *.test`;
+        }
+        
+        return new Promise((c, e) => child_process.exec(command, { env: this.env }, (err, out) => {
+            err ? e(err) : c(out.trim().split(os.EOL));
+        }));
+    }
+
     public startCore() {
         if (typeof this.env.ROS_MASTER_URI === "undefined") {
             return;
@@ -172,6 +186,13 @@ export class ROS1 implements ros.ROSApi {
       const terminal = ros_utils.createTerminal(this.context);
         this.setTerminalEnv(terminal,this.env);
         terminal.sendText(`roslaunch ${launchFilepath} ${argument}`);
+        return terminal;
+    }
+
+    public activateRostest(launchFilepath: string, argument: string): vscode.Terminal {
+      const terminal = ros_utils.createTerminal(this.context);
+        this.setTerminalEnv(terminal,this.env);
+        terminal.sendText(`rostest ${launchFilepath} ${argument}`);
         return terminal;
     }
 

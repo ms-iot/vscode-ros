@@ -42,6 +42,11 @@ export class UnknownROS implements ros.ROSApi {
         return;
     }
 
+    public findPackageTestFiles(packageName: string): Promise<string[]> {
+        console.error("Unknown ROS distro.");
+        return;
+    }
+
     public startCore() {
         console.error("Unknown ROS distro.");
         return;
@@ -73,6 +78,11 @@ export class UnknownROS implements ros.ROSApi {
     }
 
     public activateRoslaunch(launchFilepath: string, argument: string): vscode.Terminal {
+        console.error("Unknown ROS distro.");
+        return;
+    }
+    
+    public activateRostest(launchFilepath: string, argument: string): vscode.Terminal {
         console.error("Unknown ROS distro.");
         return;
     }

@@ -140,6 +140,13 @@ export class ROS2 implements ros.ROSApi {
         }));
     }
 
+    public async findPackageTestFiles(packageName: string): Promise<string[]> {
+        // TODO: ROS2 rostest equivalent not implemented yet
+        return new Promise((resolve, reject) => {
+            resolve([]);
+        });
+    }
+
     public async startCore() {
         daemon.startDaemon();
     }
@@ -174,5 +181,10 @@ export class ROS2 implements ros.ROSApi {
       const terminal = ros_utils.createTerminal(this.context);
         terminal.sendText(`ros2 launch ${launchFilepath} ${argument}`);
         return terminal;
+    }
+
+    public activateRostest(launchFilepath: string, argument: string): vscode.Terminal {
+        console.error("ROS2 rostest equivalent not implemented yet");
+        return;
     }
 }

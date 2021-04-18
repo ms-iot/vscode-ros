@@ -57,6 +57,11 @@
                 "category": "ROS"
             },
             {
+                "command": "ros.rostest",
+                "title": "Run a ROS test file (rostest)",
+                "category": "ROS"
+            },
+            {
                 "command": "ros.showCoreStatus",
                 "title": "Show Core Status",
                 "category": "ROS"
