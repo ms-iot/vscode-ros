@@ -149,7 +149,7 @@ export class ROS2 implements ros.ROSApi {
     }
 
     public getCoreStatus(): Promise<boolean> {
-        // TODO: Core status checking not implemented for ROS2
+        // TODO(#431): Core status checking not implemented for ROS2
         return;
     }
 

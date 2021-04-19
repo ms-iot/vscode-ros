@@ -60,7 +60,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 break;
             }
             case "2": {
-                // TODO, support starting the ROS2 daemon automatically
+                // TODO(#431), support starting the ROS2 daemon automatically
                 break;
             }
         }
