@@ -83,14 +83,11 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel = vscode_utils.createOutputChannel();
         context.subscriptions.push(outputChannel);
 
-        // Activate if we're in a catkin workspace.
+        // Determine if we're in a catkin workspace.
         let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
-        if (!buildToolDetected) {
-            return;
-        }
 
         // Activate components when the ROS env is changed.
-        context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
+        context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context, buildToolDetected)));
 
         // Activate components which don't require the ROS env.
         context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(
@@ -147,7 +144,7 @@ async function ensureErrorMessageOnException(callback: (...args: any[]) => any) 
 /**
  * Activates components which require a ROS env.
  */
-function activateEnvironment(context: vscode.ExtensionContext) {
+function activateEnvironment(context: vscode.ExtensionContext, buildToolDetected: boolean) {
     // Clear existing disposables.
     while (subscriptions.length > 0) {
         subscriptions.pop().dispose();
@@ -167,18 +164,15 @@ function activateEnvironment(context: vscode.ExtensionContext) {
     rosApi.setContext(context, env);
 
     subscriptions.push(rosApi.activateCoreMonitor());
-    subscriptions.push(...buildtool.BuildTool.registerTaskProvider());
+    if (buildToolDetected) {
+        subscriptions.push(...buildtool.BuildTool.registerTaskProvider());
+    }
     subscriptions.push(...registerRosShellTaskProvider());
 
     debug_manager.registerRosDebugManager(context);
 
     // register plugin commands
     subscriptions.push(
-        vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
-            ensureErrorMessageOnException(() => {
-                return buildtool.BuildTool.createPackage(context);
-            });
-        }),
         vscode.commands.registerCommand(Commands.CreateTerminal, () => {
             ensureErrorMessageOnException(() => {
                 ros_utils.createTerminal(context);
@@ -224,22 +218,43 @@ function activateEnvironment(context: vscode.ExtensionContext) {
                 return ros_cli.roslaunch(context);
             });
         }),
-        vscode.commands.registerCommand(Commands.Rosdep, () => {
-            ensureErrorMessageOnException(() => {
-                rosApi.rosdep();
-            });
-        }),
         vscode.commands.registerCommand(Commands.PreviewURDF, () => {
             ensureErrorMessageOnException(() => {
                 URDFPreviewManager.INSTANCE.preview(vscode.window.activeTextEditor.document.uri);
             });
         }),
-        vscode.tasks.onDidEndTask((event: vscode.TaskEndEvent) => {
-            if (buildtool.isROSBuildTask(event.execution.task)) {
-                sourceRosAndWorkspace();
-            }
-        }),
     );
+
+    // Register commands dependent on a workspace
+    if (buildToolDetected) {
+        subscriptions.push(
+            vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
+                ensureErrorMessageOnException(() => {
+                    return buildtool.BuildTool.createPackage(context);
+                });
+            }),
+            vscode.commands.registerCommand(Commands.Rosdep, () => {
+                ensureErrorMessageOnException(() => {
+                    rosApi.rosdep();
+                });
+            }),
+            vscode.tasks.onDidEndTask((event: vscode.TaskEndEvent) => {
+                if (buildtool.isROSBuildTask(event.execution.task)) {
+                    sourceRosAndWorkspace();
+                }
+            }),
+        );
+    }
+    else {
+        subscriptions.push(
+            vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
+                vscode.window.showErrorMessage(`${Commands.CreateCatkinPackage} requires a catkin workspace to be opened`);
+            }),
+            vscode.commands.registerCommand(Commands.Rosdep, () => {
+                vscode.window.showErrorMessage(`${Commands.Rosdep} requires a catkin workspace to be opened`);
+            }),
+        );
+    }
 
     // Generate config files if they don't already exist.
     ros_build_utils.createConfigFiles();
