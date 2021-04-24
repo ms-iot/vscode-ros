@@ -24,7 +24,7 @@ export class RosDebugConfigurationProvider implements vscode.DebugConfigurationP
                 if (!packageName) {
                     return [];
                 }
-                const launchFiles = await rosApi.findPackageLaunchFiles(packageName);
+                const launchFiles = (await rosApi.findPackageLaunchFiles(packageName)).concat(await rosApi.findPackageTestFiles(packageName));
                 const launchFileBasenames = launchFiles.map((filename) => path.basename(filename));
                 const target = await vscode.window.showQuickPick(
                     launchFileBasenames, { placeHolder: "Choose a launch file" });

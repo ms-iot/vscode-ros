@@ -29,7 +29,7 @@ interface ILaunchRequest {
 export class LaunchResolver implements vscode.DebugConfigurationProvider {
     // tslint:disable-next-line: max-line-length
     public async resolveDebugConfigurationWithSubstitutedVariables(folder: vscode.WorkspaceFolder | undefined, config: requests.ILaunchRequest, token?: vscode.CancellationToken) {
-        if (!path.isAbsolute(config.target) || path.extname(config.target) !== ".launch") {
+        if (!path.isAbsolute(config.target) || (path.extname(config.target) !== ".launch" && path.extname(config.target) !== ".test")) {
             throw new Error("Launch request requires an absolute path as target.");
         }
         
