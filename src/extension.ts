@@ -256,8 +256,10 @@ function activateEnvironment(context: vscode.ExtensionContext, buildToolDetected
         );
     }
 
-    // Generate config files if they don't already exist.
-    ros_build_utils.createConfigFiles();
+    // Generate config files if they don't already exist, but only for catkin workspaces
+    if (buildToolDetected) {
+        ros_build_utils.createConfigFiles();
+    }
 }
 
 /**
