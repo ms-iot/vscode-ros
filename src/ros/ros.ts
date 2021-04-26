@@ -47,6 +47,12 @@ export interface ROSApi {
     findPackageLaunchFiles: (packageName: string) => Promise<string[]>;
 
     /**
+     * list all .test files inside a package
+     * @param packageName 
+     */
+    findPackageTestFiles: (packageName: string) => Promise<string[]>;
+
+    /**
      * Start ROS Core
      */
     startCore: () => void;
@@ -80,6 +86,11 @@ export interface ROSApi {
      * Activate a terminal for roslaunch.
      */
     activateRoslaunch: (launchFilepath: string, argument: string) => vscode.Terminal;
+
+    /**
+     * Activate a terminal for rostest.
+     */
+    activateRostest: (launchFilepath: string, argument: string) => vscode.Terminal;
 }
 
 const ros1Api: ROSApi = new ros1.ROS1();

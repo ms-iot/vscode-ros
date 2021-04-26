@@ -33,8 +33,11 @@ function getExtensionFilePath(extensionFile: string): string {
 export class LaunchResolver implements vscode.DebugConfigurationProvider {
     // tslint:disable-next-line: max-line-length
     public async resolveDebugConfigurationWithSubstitutedVariables(folder: vscode.WorkspaceFolder | undefined, config: requests.ILaunchRequest, token?: vscode.CancellationToken) {
-        if (!path.isAbsolute(config.target) || path.extname(config.target) !== ".py") {
+        if (!path.isAbsolute(config.target)) {
             throw new Error("Launch request requires an absolute path as target.");
+        }
+        else if (path.extname(config.target) !== ".py" && path.extname(config.target) !== ".xml") {
+            throw new Error("Launch request requires an extension '.py' or '.xml' as target.");
         }
 
         const rosExecOptions: child_process.ExecOptions = {

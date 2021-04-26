@@ -70,3 +70,35 @@ async function prepareroslaunch(): Promise<vscode.Terminal> {
     }
     return rosApi.activateRoslaunch(launchFilePath, argument);
 }
+
+export async function rostest(context: vscode.ExtensionContext) {
+    const reporter = telemetry.getReporter();
+    reporter.sendTelemetryCommand(extension.Commands.Rostest);
+
+    let terminal = await preparerostest();
+    if (!terminal) {
+        return;
+    }
+    terminal.show();
+}
+
+async function preparerostest(): Promise<vscode.Terminal> {
+    const packageName = await vscode.window.showQuickPick(rosApi.getPackageNames(), {
+        placeHolder: "Choose a package",
+    });
+    if (!packageName) {
+        return;
+    }
+    const launchFiles = (await rosApi.findPackageLaunchFiles(packageName)).concat(await rosApi.findPackageTestFiles(packageName));
+    const launchFileBasenames = launchFiles.map((filename) => path.basename(filename));
+    let target = await vscode.window.showQuickPick(launchFileBasenames, { placeHolder: "Choose a launch file" });
+    const launchFilePath = launchFiles[launchFileBasenames.indexOf(target)];
+    if (!launchFilePath) {
+        return;
+    }
+    let argument = await vscode.window.showInputBox({ placeHolder: "Enter any extra arguments" });
+    if (argument == undefined) {
+        return;
+    }
+    return rosApi.activateRostest(launchFilePath, argument);
+}
