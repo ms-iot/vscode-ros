@@ -370,7 +370,7 @@
         "typescript": "^4.0.5",
         "vscode-test": "^1.4.1",
         "mocha": "^7.2.0",
-        "glob": "^7.1.6"
+        "glob": "^7.1.7"
     },
     "extensionDependencies": [
         "ms-python.python",
