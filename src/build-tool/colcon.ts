@@ -8,8 +8,9 @@ import * as extension from "../extension";
 import * as common from "./common";
 import * as rosShell from "./ros-shell";
 
-function makeColcon(command: string, args: string[], category?: string): vscode.Task {
-    const task = rosShell.make({type: command, command, args: ['--workspace', extension.baseDir, ...args]}, category)
+function makeColcon(command: string, verb: string, args: string[], category?: string): vscode.Task {
+    const task = rosShell.make({type: command, command, args: [verb, '--base-paths', extension.baseDir, ...args]},
+                               category)
 
     return task;
 }
@@ -19,10 +20,10 @@ function makeColcon(command: string, args: string[], category?: string): vscode.
  */
 export class ColconProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        const make = makeColcon('colcon', ['build'], 'build');
+        const make = makeColcon('colcon', 'build', [], 'build');
         make.group = vscode.TaskGroup.Build;
 
-        const test = makeColcon('colcon', ['test'], 'test');
+        const test = makeColcon('colcon', 'test', [], 'test');
         test.group = vscode.TaskGroup.Test;
 
         return [make, test];
