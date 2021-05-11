@@ -4,7 +4,7 @@ The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot O
 
 ## Getting Started
 
-The extension will automatically start when you open a catkin workspace.
+The extension will automatically start when you open a `catkin` or `colcon` workspace.
 The build system (e.g. catkin_make or catkin build) will automatically be confirmed from the hidden files associated with
 each system.
 The ROS distro will automatically be confirmed from the parent environment, or you will be prompted to select a ROS
@@ -12,10 +12,10 @@ distro if this can't be done automatically.
 
 > You must build the catkin workspace at least once before the extension will recognise it.
 
-To start ROS core, use the "ROS: Start Core" command.
-The "ROS Core" indicator in the bottom left will show if the core is currently running, and you can click on this to view parameters etc.
+To start ROS core, you can use the `ROS: Start Core` command from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
+The `ROS Core` indicator in the bottom left will show if the core is currently running, and you can click on this taskbar item to view the status of ROS.
 
-The first time you open the workspace the extension will automatically create build and test tasks and update the
+The first time you open a ROS workspace the extension will automatically create build and test tasks and update the
 C++ and Python paths. You can re-run this process later using the appropriate commands.
 
 ## Talk Video
@@ -38,28 +38,19 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 * Debug ROS nodes (C++ or Python) [launched from a `.launch` file][debug_support-launch].
 
 ## Commands
+You can access the following commands from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
 
-| Name | Command | Description |
-|:---:|:---:|:---|
-| Create Catkin Package | `ros.createCatkinPackage` | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. |
-| Create Terminal | `ros.createTerminal` | Create a terminal with ROS sourced. |
-| Show Core Status | `ros.showCoreStatus` | Open a detail view showing ROS core runtime status. |
-| Start Core | `ros.startCore` | Spawn a ROS core |
-| Stop Core | `ros.stopCore` | Terminate the ROS core |
-| Update C++ Properties | `ros.updateCppProperties` | Update the C++ include path to include ROS. |
-| Update Python Path | `ros.updatePythonPath` | Update the Python path to include ROS. |
-| Preview URDF | `ros.previewUrdf` | Preview URDF and Xacro files. Updates after changes are saved. |
-| Run rosdep | `ros.rosdep` | Shortcut for `rosdep install --from-paths src --ignore-src -r -y`. |
-
-### Get Latest Build
-
-The lastest unreleased changes could be added by installing the extension's latest build manually.
-To get the latest build (`.vsix` built from the latest commit), access our [build pipeline][vscode-ros-master-build_details].
-In the build status page, the generated `.vsix` could be downloaded as an artifact:
-
-![download vsix artifact][download_vsix_artifact]
-
-The downloaded `.vsix` package could be installed with the `Extensions: Install from VSIX...` command from the Command Palette (`Ctrl+Shift+P`), or by choosing the `Install from VSIX...` option in the Extensions tab from any Visual Studio Code instance.
+| Name | Description |
+|---|:---|
+| ROS: Create Catkin Package | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. |
+| ROS: Create Terminal | Create a terminal with the ROS environment. |
+| ROS: Show Core Status | Open a detail view showing ROS core runtime status. |
+| ROS: Start Core | Start ROS core. |
+| ROS: Stop Core | Terminate ROS core. |
+| ROS: Update C++ Properties | Update the C++ include path to include ROS. |
+| ROS: Update Python Path | Update the Python path to include ROS. |
+| ROS: Preview URDF | Preview URDF and Xacro files. Updates after changes are saved. |
+| ROS: Install ROS Dependencies for this workspace using rosdep | Shortcut for `rosdep install --from-paths src --ignore-src -r -y`. |
 
 ## Reporting Security Issues
 
@@ -73,14 +64,19 @@ This extension collects usage data and sends it to Microsoft to help improve our
 
 This extension respects the `telemetry.enableTelemetry` setting, learn more about [this option](https://code.visualstudio.com/docs/supporting/faq#_how-to-disable-telemetry-reporting).
 
-## Contributors
+## Contribution
+Contributions are always welcome! Please see our [contributing guide][contributing] for more details!
 
 A big ***Thank you!*** to everyone that have helped make this extension better!
 
 * Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
 * James Giller ([@JamesGiller](https://github.com/JamesGiller))
 
-Contributions are always welcome! Please see our [contributing guide][contributing] for more details!
+### ROS Web Tools
+This extension leverages [ROS Web Tools](http://robotwebtools.org/) for URDF Previewing.
+
+*Russell Toris, Julius Kammerl, David Lu, Jihoon Lee, Odest Chadwicke Jenkins, Sarah Osentoski, Mitchell Wills, and Sonia Chernova. [Robot Web Tools: Efficient Messaging for Cloud Robotics](http://robotwebtools.org/pdf/paper.pdf). In Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2015*
+
 
 <!-- link to files -->
 <!-- relative links in Visual Studio Marketplace page lead to 404 error, need to use absolute link -->
