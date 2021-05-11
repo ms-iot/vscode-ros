@@ -54,14 +54,14 @@ function applyURDF(urdfText) {
 
     window.urdfModel = new ROSLIB.UrdfModel({
         string : urdfText,
-        path: "vscode-webview-resource:"
+        path: "https:"
       });
 
     var tfClient = new TFFakeClient();
 
     window.urdfScene = new ROS3D.Urdf({
       urdfModel : window.urdfModel,
-      path: "vscode-webview-resource:",
+      path: "https:",
       tfClient : tfClient,
       loader : ROS3D.COLLADA_LOADER_2
     });

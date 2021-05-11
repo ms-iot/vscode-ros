@@ -129,8 +129,16 @@ export default class URDFPreview
 
                 packagePath = packagePath.substr(1);
             }
-            let newUri = this._webview.webview.asWebviewUri(vscode.Uri.file(packagePath));
-            urdfText = urdfText.replace('package://' + match[1], newUri.toString().replace('vscode-webview-resource:', ''));
+            let normPath = path.normalize(packagePath);
+            let vsPath = vscode.Uri.file(normPath);
+            let newUri = this._webview.webview.asWebviewUri(vsPath);
+            let hackThePath = newUri.toString().replace('https:', '');
+
+            // HACKHACK - the RosWebTools will alwayse prefix the paths with a '/' if we don't pass a prefix.
+            // to workaround this without changing RWT, we are stripping off the known protocol, and passing the
+            // resulting path into RWT with that known prefix as an option. Internally it will see that there is a prefix
+            // and combine them. 
+            urdfText = urdfText.replace('package://' + match[1], hackThePath);
         }
 
         var previewFile = this._resource.toString();

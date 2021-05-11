@@ -3,7 +3,7 @@
     "version": "0.6.8-dev",
     "publisher": "ms-iot",
     "engines": {
-        "vscode": "^1.53.0"
+        "vscode": "^1.56.0"
     },
     "author": {
         "name": "Microsoft Corporation"
@@ -93,7 +93,7 @@
             },
             {
                 "command": "ros.rosdep",
-                "title": "Install ROS Dependencies for this workspace",
+                "title": "Install ROS Dependencies for this workspace using rosdep",
                 "category": "ROS"
             }
         ],
@@ -358,19 +358,19 @@
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {
+        "@types/glob": "^7.1.3",
         "@types/js-yaml": "^4.0.1",
-        "@types/node": "^15.0.1",
+        "@types/mocha": "^8.2.2",
+        "@types/node": "^15.0.2",
         "@types/shell-quote": "^1.7.0",
         "@types/tmp": "^0.2.0",
+        "@types/vscode": "^1.56.0",
         "@types/xmlrpc": "^1.3.6",
-        "@types/vscode": "^1.53.0",
-        "@types/glob": "^7.1.3",
-        "@types/mocha": "^7.0.2",
+        "glob": "^7.1.7",
+        "mocha": "^8.3.2",
         "tslint": "^6.1.3",
-        "typescript": "^4.0.5",
-        "vscode-test": "^1.4.1",
-        "mocha": "^7.2.0",
-        "glob": "^7.1.6"
+        "typescript": "^4.2.4",
+        "vscode-test": "^1.5.2"
     },
     "extensionDependencies": [
         "ms-python.python",
