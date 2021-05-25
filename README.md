@@ -53,7 +53,7 @@ You can access the following commands from the [Visual Studio Code command palle
 | ROS: Install ROS Dependencies for this workspace using rosdep | Shortcut for `rosdep install --from-paths src --ignore-src -r -y`. |
 
 ## Launch Debugging
-The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes. The VSCode extension currently supports debugging ROS written in Python and C++, and the nodes must be placed in a ROS launch file with the extension `.launch` or `.py`.
+The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes. The VSCode extension currently supports debugging ROS written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2.
 
 To debug a C++ ROS node, please build your workspace using `RelWithDebInfo` in order to generate debug symbols needed for the C++ debugger:
 
