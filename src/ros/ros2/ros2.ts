@@ -155,6 +155,11 @@ export class ROS2 implements ros.ROSApi {
         daemon.stopDaemon();
     }
 
+    public getCoreStatus(): Promise<boolean> {
+        // TODO(#431): Core status checking not implemented for ROS2
+        return;
+    }
+
     public rosdep(): vscode.Terminal {
       const terminal = ros_utils.createTerminal(this.context);
       terminal.sendText(`rosdep install --from-paths src --ignore-src -r -y`);
