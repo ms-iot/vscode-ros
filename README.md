@@ -10,15 +10,15 @@ each system.
 The ROS distro will automatically be confirmed from the parent environment, or you will be prompted to select a ROS
 distro if this can't be done automatically.
 
-> You must build the catkin workspace at least once before the extension will recognise it.
+> NOTE: You must build the catkin workspace at least once before the extension will recognise it.
 
-To start ROS core, you can use the `ROS: Start Core` command from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
+To start ROS core, you can use the `ROS: Start Core` command from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette). This command pallet can be accessed by pressing `ctrl` + `shift` + `p`.
 The `ROS Core` indicator in the bottom left will show if the core is currently running, and you can click on this taskbar item to view the status of ROS.
 
 The first time you open a ROS workspace the extension will automatically create build and test tasks and update the
 C++ and Python paths. You can re-run this process later using the appropriate commands.
 
-## Talk Video
+## Video Walkthrough
 
 [![ROSCON 2019 ROS Extension Talk Video](https://i.vimeocdn.com/video/839088609_640.webp)](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667)
 
@@ -51,6 +51,21 @@ You can access the following commands from the [Visual Studio Code command palle
 | ROS: Update Python Path | Update the Python path to include ROS. |
 | ROS: Preview URDF | Preview URDF and Xacro files. Updates after changes are saved. |
 | ROS: Install ROS Dependencies for this workspace using rosdep | Shortcut for `rosdep install --from-paths src --ignore-src -r -y`. |
+
+## Launch Debugging
+The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes. The VSCode extension currently supports debugging ROS written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2.
+
+To debug a C++ ROS node, please build your workspace using `RelWithDebInfo` in order to generate debug symbols needed for the C++ debugger:
+
+**ROS1**
+```bash
+catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo
+```
+
+**ROS2**
+```bash
+colcon build --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+```
 
 ## Reporting Security Issues
 
