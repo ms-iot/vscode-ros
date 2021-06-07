@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.8
+
+* [#443]https://github.com/ms-iot/vscode-ros/issues/443) URDF preview not working
+* Updated dependencies
+* Updated attribution
+
 ## 0.6.7
 
 * [#391](https://github.com/ms-iot/vscode-ros/pull/391) Launch debug args is optional. (by @seanyen)

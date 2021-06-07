@@ -154,6 +154,10 @@ export class ROS1 implements ros.ROSApi {
         ros_core.stopCore(this.context, this._getXmlRpcApi());
     }
 
+    public getCoreStatus(): Promise<boolean> {
+        return this._getXmlRpcApi().check();
+    }
+
     public activateCoreMonitor(): vscode.Disposable {
         if (typeof this.env.ROS_MASTER_URI === "undefined") {
             return null;
