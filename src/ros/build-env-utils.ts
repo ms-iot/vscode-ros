@@ -22,13 +22,9 @@ export async function createConfigFiles() {
         updatePythonPathInternal();
     }
 
-    // Ensure the ".vscode" directory exists then update the C++ path.
     const dir = path.join(vscode.workspace.rootPath, ".vscode");
 
-    if (!await pfs.exists(dir)) {
-        await pfs.mkdir(dir);
-    }
-
+    // Update the C++ path.
     pfs.exists(path.join(dir, "c_cpp_properties.json")).then(exists => {
         if (!exists) {
             updateCppPropertiesInternal();
@@ -74,6 +70,13 @@ async function updateCppPropertiesInternal(): Promise<void> {
         ],
         version: 4,
     };
+
+    // Ensure the ".vscode" directory exists then update the C++ path.
+    const dir = path.join(vscode.workspace.rootPath, ".vscode");
+
+    if (!await pfs.exists(dir)) {
+        await pfs.mkdir(dir);
+    }
 
     const filename = path.join(vscode.workspace.rootPath, ".vscode", "c_cpp_properties.json");
     await pfs.writeFile(filename, JSON.stringify(cppProperties, undefined, 2));
