@@ -63,6 +63,11 @@ export interface ROSApi {
     stopCore: () => void;
 
     /**
+     * Get ROS Core status
+     */
+    getCoreStatus: () => Promise<boolean>;
+
+    /**
      * Run ROSDep
      */
     rosdep: () => void;
