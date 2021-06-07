@@ -24,7 +24,7 @@ export abstract class BuildTool {
     }
 
     protected abstract _registerTaskProvider(): vscode.Disposable[];
-    protected abstract async _createPackage(): Promise<void>;
+    protected abstract _createPackage(): Promise<void>;
 }
 
 // tslint:disable-next-line: max-classes-per-file

@@ -15,6 +15,8 @@ import * as vscode from "vscode";
 import * as extension from "../../../../extension";
 import * as requests from "../../../requests";
 import * as utils from "../../../utils";
+import { rosApi } from "../../../../ros/ros";
+import { env } from "../../../../extension";
 
 const promisifiedExec = util.promisify(child_process.exec);
 
@@ -32,7 +34,38 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         if (!path.isAbsolute(config.target) || (path.extname(config.target) !== ".launch" && path.extname(config.target) !== ".test")) {
             throw new Error("Launch request requires an absolute path as target.");
         }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        switch (env.ROS_VERSION.trim()) {
+            case "1": {
+                // Manage the status of the ROS core, starting one if not present
+                // The ROS core will continue to run until the VSCode window is closed
+                const core_active = rosApi.getCoreStatus();
+                if (!(await core_active).valueOf()) {
+                    rosApi.startCore();
         
+                    // Wait for the core to start up to a timeout
+                    const timeout_ms: number = 3000;
+                    const interval_ms: number = 100;
+                    let attempts: number = 0;
+                    while (!(await rosApi.getCoreStatus()).valueOf() && attempts * interval_ms < timeout_ms) {
+                        attempts += 1;
+                        await delay(interval_ms);
+                    }
+                    if (attempts * interval_ms >= timeout_ms) {
+                        throw (new Error('Timed out waiting for ROSCore to start. Start ROSCore manually to avoid this error.'));
+                    }
+                }
+                break;
+            }
+            case "2": {
+                // TODO(#431), support starting the ROS2 daemon automatically
+                break;
+            }
+        }
+        
+
         const rosExecOptions: child_process.ExecOptions = {
             env: await extension.resolvedEnv(),
         };
