@@ -124,8 +124,13 @@ function applyURDF(urdfText) {
         height : urdf.clientHeight,
         background : '#00000000',
         alpha : 0.001,
-        antialias : true
+        antialias : true,
+        intensity : 0.1
       });
+      // Add a dominant hemisphere light for even lighting
+      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+      hemiLight.position.set(0, 0, 10);
+      window.viewer.addObject(hemiLight);
 
       // Add a grid.
       window.viewer.addObject(new ROS3D.Grid());
