@@ -16,6 +16,12 @@
         "Debuggers",
         "Other"
     ],
+    "capabilities": {
+        "untrustedWorkspaces": {
+            "supported": false,
+            "description": "The Visual Studio Code ROS Extension calls ROS on behalf of packages in the workspace. This can execute code from within the workspace. For this reason, this extension requires a fully trusted workspace."
+        }
+    },
     "keywords": [
         "ros",
         "robot"
