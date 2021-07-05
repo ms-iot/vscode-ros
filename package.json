@@ -367,7 +367,7 @@
         "@types/glob": "^7.1.3",
         "@types/js-yaml": "^4.0.1",
         "@types/mocha": "^8.2.2",
-        "@types/node": "^15.12.1",
+        "@types/node": "^16.0.0",
         "@types/shell-quote": "^1.7.0",
         "@types/tmp": "^0.2.0",
         "@types/vscode": "^1.56.0",
