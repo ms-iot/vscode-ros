@@ -16,7 +16,7 @@ export function execChildProcess(process: string, workingDirectory: string): Pro
                 return;
             }
 
-            if (stderr && stderr.length > 0) {
+            if (stderr && stderr.length > 0 && !stderr.includes('screen size is bogus')) {
                 reject(new Error(stderr));
                 return;
             }
