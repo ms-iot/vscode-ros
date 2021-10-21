@@ -15,6 +15,7 @@ import * as vscode from "vscode";
 import * as extension from "../../../../extension";
 import * as requests from "../../../requests";
 import * as utils from "../../../utils";
+import { rosApi } from "../../../../ros/ros";
 
 const promisifiedExec = util.promisify(child_process.exec);
 
@@ -38,6 +39,30 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         }
         else if (path.extname(config.target) !== ".py" && path.extname(config.target) !== ".xml") {
             throw new Error("Launch request requires an extension '.py' or '.xml' as target.");
+        }
+
+        const delay = ms => new Promise(res => setTimeout(res, ms));
+
+        // Manage the status of the ROS2 Daemon, starting one if not present
+        if (await rosApi.getCoreStatus() == false) {
+            console.log("ROS Daemon is not active, attempting to start automatically");
+            rosApi.startCore();
+
+            // Wait for the core to start up to a timeout
+            const timeout_ms: number = 30000;
+            const interval_ms: number = 100;
+            let timeWaited: number = 0;
+            while (await rosApi.getCoreStatus() == false && 
+                timeWaited < timeout_ms) {
+                timeWaited += interval_ms;
+                await delay(interval_ms);
+            }
+
+            console.log("Waited " + timeWaited + " for ROS2 Daemon to start");
+
+            if (timeWaited >= timeout_ms) {
+                throw new Error('Timed out (' + timeWaited / 1000 + ' seconds) waiting for ROS2 Daemon to start. Start ROS2 Daemon manually to avoid this error.');
+            }
         }
 
         const rosExecOptions: child_process.ExecOptions = {
@@ -223,6 +248,13 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         args: request.arguments,
                         environment: envConfigs,
                         stopAtEntry: stopOnEntry,
+                        setupCommands: [
+                            {
+                                text: "-enable-pretty-printing",
+                                description: "Enable pretty-printing for gdb",
+                                ignoreFailures: true
+                            }
+                        ]
                     };
                     debugConfig = cppdbgLaunchConfig;
                 }

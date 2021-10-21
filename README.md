@@ -1,32 +1,13 @@
 # Visual Studio Code Extension for ROS
 
-The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development. Providing an easier and more stream-lined developer experience.
+The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development for ROS1 and ROS2 on Windows and Linux. 
 
-## Getting Started
-
-The extension will automatically start when you open a `catkin` or `colcon` workspace.
-The build system (e.g. catkin_make or catkin build) will automatically be confirmed from the hidden files associated with
-each system.
-The ROS distro will automatically be confirmed from the parent environment, or you will be prompted to select a ROS
-distro if this can't be done automatically.
-
-> NOTE: You must build the catkin workspace at least once before the extension will recognise it.
-
-To start ROS core, you can use the `ROS: Start Core` command from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette). This command pallet can be accessed by pressing `ctrl` + `shift` + `p`.
-The `ROS Core` indicator in the bottom left will show if the core is currently running, and you can click on this taskbar item to view the status of ROS.
-
-The first time you open a ROS workspace the extension will automatically create build and test tasks and update the
-C++ and Python paths. You can re-run this process later using the appropriate commands.
-
-## Video Walkthrough
-
-[![ROSCON 2019 ROS Extension Talk Video](https://i.vimeocdn.com/video/839088609_640.webp)](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667)
 
 ## Features
 
 * Automatic ROS environment configuration.
 * Allows starting, stopping and viewing the ROS core status.
-* Automatically discover `catkin_make` or `catkin build` build tasks.
+* Automatically create `catkin_make` or `catkin build` build tasks.
 * Create catkin packages using `catkin_create_pkg` script or `catkin create pkg`.
 * Run `rosrun` or `roslaunch`
 * Resolve dependencies with `rosdep` shortcut
@@ -38,34 +19,42 @@ C++ and Python paths. You can re-run this process later using the appropriate co
 * Debug ROS nodes (C++ or Python) [launched from a `.launch` file][debug_support-launch].
 
 ## Commands
-You can access the following commands from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette).
+
+You can access the following commands from the [Visual Studio Code command pallet](https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette), typically accessed by pressing `ctrl` + `shift` + `p` and typing the command name you'd like to use from the table below.
 
 | Name | Description |
 |---|:---|
 | ROS: Create Catkin Package | Create a catkin package. You can right click on a folder in the explorer to create it in a specific location. |
 | ROS: Create Terminal | Create a terminal with the ROS environment. |
-| ROS: Show Core Status | Open a detail view showing ROS core runtime status. |
-| ROS: Start Core | Start ROS core. |
-| ROS: Stop Core | Terminate ROS core. |
-| ROS: Update C++ Properties | Update the C++ include path to include ROS. |
-| ROS: Update Python Path | Update the Python path to include ROS. |
-| ROS: Preview URDF | Preview URDF and Xacro files. Updates after changes are saved. |
+| ROS: Show Status | Open a detail view showing ROS core runtime status. |
+| ROS: Start | Start ROS1 core or ROS2 Daemon. |
+| ROS: Stop  | Terminate ROS core or ROS2 Daemon. |
+| ROS: Update C++ Properties | Update the C++ IntelliSense configuration to include ROS and your ROS components. |
+| ROS: Update Python Path | Update the Python IntelliSense configuration to include ROS. |
+| ROS: Preview URDF | Preview URDF and Xacro files. The display will update after the root URDF changes are saved. |
 | ROS: Install ROS Dependencies for this workspace using rosdep | Shortcut for `rosdep install --from-paths src --ignore-src -r -y`. |
 
+## Tutorials and Walkthroughs
+
+| Name | Description |
+|---|:---|
+| [Attaching to a running ROS Node][debug_support-attach] | Learn how to attach VSCode to a running ROS node |
+| [Debugging all ROS Nodes in a launch file ][debug_support-launch] | Learn how to set up VSCode to debug the nodes in a ROS Launch file |
+| [ROSCON 2019 ROS Extension Talk Video](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667) | Walkthrough of VSCode from ROSCon 2019|
+
+
+## Getting Started
+
+The VSCode ROS extension will attempt to detect and automatically configure the workspace for the appropriate ROS Distro.
+
+The extension will automatically start when you open a `catkin` or `colcon` workspace.
+The build system (e.g. catkin_make or catkin build) will automatically be confirmed from the hidden files associated with
+each system. 
+
+
 ## Launch Debugging
+
 The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes. The VSCode extension currently supports debugging ROS written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2.
-
-To debug a C++ ROS node, please build your workspace using `RelWithDebInfo` in order to generate debug symbols needed for the C++ debugger:
-
-**ROS1**
-```bash
-catkin_make -DCMAKE_BUILD_TYPE=RelWithDebInfo
-```
-
-**ROS2**
-```bash
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
-```
 
 ## Reporting Security Issues
 

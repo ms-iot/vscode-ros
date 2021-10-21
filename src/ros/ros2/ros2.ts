@@ -155,9 +155,9 @@ export class ROS2 implements ros.ROSApi {
         daemon.stopDaemon();
     }
 
-    public getCoreStatus(): Promise<boolean> {
-        // TODO(#431): Core status checking not implemented for ROS2
-        return;
+    public async getCoreStatus(): Promise<boolean> {
+        const ros2cliApi = new ros2_monitor.XmlRpcApi();
+        return ros2cliApi.check();
     }
 
     public rosdep(): vscode.Terminal {

@@ -32,7 +32,7 @@ interface ICppdbgLaunchConfiguration {
     /**
      * One or more GDB/LLDB commands to execute in order to setup the underlying debugger. Example: \"setupCommands\": [ { \"text\": \"-enable-pretty-printing\", \"description\": \"Enable GDB pretty printing\", \"ignoreFailures\": true }].
      */
-    setupCommands?: Array<{ text: string; type: string; ignoreFailures: boolean; }>;
+    setupCommands?: Array<{ text: string; description: string; ignoreFailures: boolean; }>;
 
     /**
      * If provided, this replaces the default commands used to launch a target with some other commands. For example, this can be \"-target-attach\" in order to attach to a target process. An empty command list replaces the launch commands with nothing, which can be useful if the debugger is being provided launch options as command line options. Example: \"customLaunchSetupCommands\": [ { \"text\": \"target-run\", \"description\": \"run target\", \"ignoreFailures\": false }].

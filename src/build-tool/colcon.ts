@@ -3,14 +3,16 @@
 
 import * as vscode from "vscode";
 
+import * as path from "path";
 import * as child_process from "child_process";
 import * as extension from "../extension";
 import * as common from "./common";
 import * as rosShell from "./ros-shell";
 
 function makeColcon(command: string, verb: string, args: string[], category?: string): vscode.Task {
-    const task = rosShell.make({type: command, command, args: [verb, '--base-paths', extension.baseDir, ...args]},
+    const task = rosShell.make({type: command, command, args: [verb, '--symlink-install', '--event-handlers', 'console_cohesion+', '--base-paths', extension.baseDir, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
                                category)
+    task.problemMatchers = ["$catkin-gcc"];
 
     return task;
 }
@@ -35,10 +37,23 @@ export class ColconProvider implements vscode.TaskProvider {
 }
 
 export async function isApplicable(dir: string): Promise<boolean> {
-    const opts = { dir, env: extension.env };
-    const { stdout, stderr } = await child_process.exec("colcon -h", opts);
-    for await (const line of stderr) {
-        return false;
+    let colconCommand: string;
+    const srcDir = path.join(dir, "src")
+
+    if (process.platform === "win32") {
+        colconCommand = `colcon --log-base nul list --base-paths \"${srcDir}\"`;
+    } else {
+        colconCommand = `colcon --log-base /dev/null list --base-paths ${srcDir}`;
     }
-    return true;
+
+    const { stdout, stderr } = await child_process.exec(colconCommand);
+
+    // Does this workspace have packages?
+    for await (const line of stdout) {
+        // Yes.
+        return true;
+    }
+
+    // no.
+    return false;
 }

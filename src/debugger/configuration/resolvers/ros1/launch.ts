@@ -37,38 +37,28 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         const delay = ms => new Promise(res => setTimeout(res, ms));
 
-        switch (env.ROS_VERSION.trim()) {
-            case "1": {
-                // Manage the status of the ROS core, starting one if not present
-                // The ROS core will continue to run until the VSCode window is closed
-                if (await rosApi.getCoreStatus() == false) {
-                    console.log("ROS Core is not active, attempting to start automatically");
-                    rosApi.startCore();
-        
-                    // Wait for the core to start up to a timeout
-                    const timeout_ms: number = 30000;
-                    const interval_ms: number = 100;
-                    let timeWaited: number = 0;
-                    while (await rosApi.getCoreStatus() == false && 
-                        timeWaited < timeout_ms) {
-                        timeWaited += interval_ms;
-                        await delay(interval_ms);
-                    }
+        // Manage the status of the ROS core, starting one if not present
+        // The ROS core will continue to run until the VSCode window is closed
+        if (await rosApi.getCoreStatus() == false) {
+            console.log("ROS Core is not active, attempting to start automatically");
+            rosApi.startCore();
 
-                    console.log("Waited " + timeWaited + " for ROS Core to start");
-
-                    if (timeWaited >= timeout_ms) {
-                        throw new Error('Timed out (' + timeWaited / 1000 + ' seconds) waiting for ROS Core to start. Start ROSCore manually to avoid this error.');
-                    }
-                }
-                break;
+            // Wait for the core to start up to a timeout
+            const timeout_ms: number = 30000;
+            const interval_ms: number = 100;
+            let timeWaited: number = 0;
+            while (await rosApi.getCoreStatus() == false && 
+                timeWaited < timeout_ms) {
+                timeWaited += interval_ms;
+                await delay(interval_ms);
             }
-            case "2": {
-                // TODO(#431), support starting the ROS2 daemon automatically
-                break;
+
+            console.log("Waited " + timeWaited + " for ROS Core to start");
+
+            if (timeWaited >= timeout_ms) {
+                throw new Error('Timed out (' + timeWaited / 1000 + ' seconds) waiting for ROS Core to start. Start ROSCore manually to avoid this error.');
             }
         }
-        
 
         const rosExecOptions: child_process.ExecOptions = {
             env: await extension.resolvedEnv(),
@@ -285,6 +275,13 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         args: request.arguments,
                         environment: envConfigs,
                         stopAtEntry: stopOnEntry,
+                        setupCommands: [
+                            {
+                                text: "-enable-pretty-printing",
+                                description: "Enable pretty-printing for gdb",
+                                ignoreFailures: true
+                            }
+                        ]
                     };
                     debugConfig = cppdbgLaunchConfig;
                 }

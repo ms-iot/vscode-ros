@@ -6,3 +6,5 @@ node_modules
 .vscode-test
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+
+vscode-ros-dev.vsix

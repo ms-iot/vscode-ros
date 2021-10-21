@@ -98,6 +98,12 @@ export class XmlRpcApi {
         this.client = xmlrpc.createClient(getDaemonUri());
     }
 
+    public check() : Promise<boolean> {
+        // the ROS2 CLI doesn't have an API which returns detailed status, 
+        // so we're just using another endpoint to verify it is running
+        return this.methodCall("get_node_names_and_namespaces").then(() => true, () => false);
+    }
+
     public getNodeNamesAndNamespaces() : Promise<any> {
         return this.methodCall("get_node_names_and_namespaces");
     }
