@@ -356,7 +356,7 @@
     "dependencies": {
         "js-yaml": "^4.1.0",
         "portfinder": "^1.0.28",
-        "shell-quote": "^1.7.2",
+        "shell-quote": "^1.7.3",
         "sudo-prompt": "^9.2.1",
         "tmp": "^0.2.1",
         "vscode-debugadapter": "^1.47.0",
