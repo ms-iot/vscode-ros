@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.9
+* [#429] Contribution by RyanDraves - Start ROS Core/Daemon if not running when launch debugging
+* [#435] Contribution by RyanDraves - Support ROS Test launch file debugging
+* [#470] Support VSCode Trusted Workspaces feature
+* [#476] Fixes to auto-launch
+* [#498] Support GDB Pretty Printing for Watch Window
+* [#497] No longer droping Log folders all over
+* [#499] ROS2 colcon Fixes, neutralize commands between ROS1 and ROS2
+* [#501] Fixes when using ROS in a container
+* Update many dependencies
+* Update documentation
+
 ## 0.6.8
 
 * [#443]https://github.com/ms-iot/vscode-ros/issues/443) URDF preview not working

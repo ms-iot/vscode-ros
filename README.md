@@ -1,6 +1,6 @@
 # Visual Studio Code Extension for ROS
 
-The [Visual Studio Code][vscode] Extension for ROS provides support for [Robot Operating System (ROS)][ros] development for ROS1 and ROS2 on Windows and Linux. 
+The [Visual Studio Code][vscode] Extension for ROS[^1] provides support for [Robot Operating System (ROS)][ros] development for ROS1 and ROS2 on Windows and Linux. 
 
 
 ## Features
@@ -54,7 +54,54 @@ each system.
 
 ## Launch Debugging
 
-The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes. The VSCode extension currently supports debugging ROS written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2.
+The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes, written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2. 
+
+### Automatic creation of a launch.json with ROS Launch support
+`vscode/launch.json` is a file which defines a debug launch configuration within VSCode. 
+
+To create a `launch.json` with ROS debugging support 
+
+  1. C++ or Python file is selected, vscode uses the selected file to seed the launch creation UI. 
+  1. Click the `Run and Debug` tab on the left sidebar
+  1. Select the link to create a `launch.json` file. 
+  1. VSCode will drop down from the command pallet with a list of options, which includes 'ROS'. Select this option. 
+  1. In the next dialog, type the name of the ROS package containing a launch file you'd like to debug. 
+  1. Then find the launch file.
+
+Once this is created, you can use the play button in the title bar, or the "start debugging" accelerator key, or from the command palle (CTRL-SHIFT-P), select `Debug: Start Debugging`.
+
+> NOTE: Other VSCode extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a blank launch.json file, then use the manual option.
+
+Other Notes:
+  * Create a new ROS launch file with just the nodes you'd like to debug, and a separate ROS launch file with all other ROS nodes.
+  * Debugging a launch file with Gazebo or rviz is not supported as this time. Please split these out into separate launch files.
+  * ROS Run is not supported.
+  * Traditional XML launch files are supported for ROS1, and python based launch files are supported for ROS2.
+
+### Manually adding a launch file to an existing launch.json
+If you have an existing `launch.json` file (or if there is an extension conflict as mentioned above), you can manually add a launch configuration by adding a new block like this. 
+```json
+  {
+      "name": "ROS: Launch my file",
+      "request": "launch",
+      "target": "full path to launch file",
+      "type": "ros"
+  }
+```
+Be sure to include the full path to your launch file, including file extension.
+
+### ROS Launch Configuration options
+The ROS Launch configuration block supports the following configuration:
+
+| Option | Description |
+|---|:---|
+| name | The name which will be displayed in the VSCode UI launch configuration |
+| request | `launch` or `attach` for launching a ROS launch file, or attaching using the attach UI for Pyton or C++ |
+| target | the launch file path |
+| type | must be `ros` to indicate to VSCode that this is a ROS launch configuration |
+| symbolSearchPath | A semicolon delimited search path for Windows symbols, including ROS for Windows symbols downloaded from https://ros-win.visualstudio.com/ros-win/_build |
+| additionalSOLibSearchPath | A semicolon delimited search path for Linux symbols |
+| sourceFileMap | A mapping of Source files from where Symbols expect and the location you have on disk. |
 
 ## Reporting Security Issues
 
@@ -97,3 +144,5 @@ This extension leverages [ROS Web Tools](http://robotwebtools.org/) for URDF Pre
 [ros]: http://ros.org
 [vscode]: https://code.visualstudio.com
 [vscode-ros-master-build_details]: https://github.com/ms-iot/vscode-ros/actions?query=event%3Apush
+
+[^1]: ROS is a trademark of Open Robotics.
