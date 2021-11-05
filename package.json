@@ -359,7 +359,7 @@
         "shell-quote": "^1.7.2",
         "sudo-prompt": "^9.2.1",
         "tmp": "^0.2.1",
-        "vscode-debugadapter": "^1.47.0",
+        "vscode-debugadapter": "^1.50.0",
         "vscode-extension-telemetry": "^0.4.2",
         "xmlrpc": "^1.3.2"
     },
