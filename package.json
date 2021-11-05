@@ -356,10 +356,10 @@
     "dependencies": {
         "js-yaml": "^4.1.0",
         "portfinder": "^1.0.28",
-        "shell-quote": "^1.7.2",
+        "shell-quote": "^1.7.3",
         "sudo-prompt": "^9.2.1",
         "tmp": "^0.2.1",
-        "vscode-debugadapter": "^1.47.0",
+        "vscode-debugadapter": "^1.50.0",
         "vscode-extension-telemetry": "^0.4.2",
         "xmlrpc": "^1.3.2"
     },
@@ -367,7 +367,7 @@
         "@types/glob": "^7.1.4",
         "@types/js-yaml": "^4.0.4",
         "@types/mocha": "^9.0.0",
-        "@types/node": "^15.12.1",
+        "@types/node": "^16.11.6",
         "@types/shell-quote": "^1.7.1",
         "@types/tmp": "^0.2.2",
         "@types/vscode": "^1.56.0",
