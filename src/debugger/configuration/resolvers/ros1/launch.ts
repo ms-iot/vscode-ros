@@ -26,6 +26,9 @@ interface ILaunchRequest {
     arguments: string[];
     cwd: string;
     env: { [key: string]: string };
+    symbolSearchPath?: string;
+    additionalSOLibSearchPath?: string;
+    sourceFileMap?: { [key: string]: string };
 }
 
 export class LaunchResolver implements vscode.DebugConfigurationProvider {
@@ -97,7 +100,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             return promisifiedExec(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
             commands.forEach((command, index) => {
-                const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout);
+                const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout, config);
                 this.executeLaunchRequest(launchRequest, false);
             });
         });
@@ -108,7 +111,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
     }
 
 
-    private generateLaunchRequest(nodeName: string, command: string): ILaunchRequest {
+    private generateLaunchRequest(nodeName: string, command: string, config: requests.ILaunchRequest): ILaunchRequest {
         let parsedArgs: shell_quote.ParseEntry[];
         const isWindows = os.platform() === "win32";
 
@@ -151,6 +154,11 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 ...extension.env,
                 ...envConfig,
             },
+
+            symbolSearchPath: config.symbolSearchPath, 
+            additionalSOLibSearchPath: config.additionalSOLibSearchPath, 
+            sourceFileMap: config.sourceFileMap
+
         };
         return request;
     }
@@ -196,6 +204,9 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                     args: request.arguments,
                     environment: envConfigs,
                     stopAtEntry: stopOnEntry,
+                    symbolSearchPath: request.symbolSearchPath,
+                    sourceFileMap: request.sourceFileMap
+
                 };
                 debugConfig = cppvsdbgLaunchConfig;
             }
@@ -275,6 +286,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                         args: request.arguments,
                         environment: envConfigs,
                         stopAtEntry: stopOnEntry,
+                        additionalSOLibSearchPath: request.additionalSOLibSearchPath,
+                        sourceFileMap: request.sourceFileMap,
                         setupCommands: [
                             {
                                 text: "-enable-pretty-printing",
