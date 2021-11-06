@@ -254,10 +254,10 @@ function activateEnvironment(context: vscode.ExtensionContext, buildToolDetected
     else {
         subscriptions.push(
             vscode.commands.registerCommand(Commands.CreateCatkinPackage, () => {
-                vscode.window.showErrorMessage(`${Commands.CreateCatkinPackage} requires a catkin workspace to be opened`);
+                vscode.window.showErrorMessage(`${Commands.CreateCatkinPackage} requires a ROS workspace to be opened`);
             }),
             vscode.commands.registerCommand(Commands.Rosdep, () => {
-                vscode.window.showErrorMessage(`${Commands.Rosdep} requires a catkin workspace to be opened`);
+                vscode.window.showErrorMessage(`${Commands.Rosdep} requires a ROS workspace to be opened`);
             }),
         );
     }
