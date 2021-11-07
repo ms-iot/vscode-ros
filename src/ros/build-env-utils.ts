@@ -47,7 +47,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
     const workspaceIncludes = await rosApi.getWorkspaceIncludeDirs(extension.baseDir);
     includes = includes.concat(workspaceIncludes);
 
-    if (process.platform === "win32") {
+    if (process.platform === "linux") {
         includes.push(path.join("/", "usr", "include"));
     }
 
