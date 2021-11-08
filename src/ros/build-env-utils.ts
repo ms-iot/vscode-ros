@@ -47,7 +47,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
     const workspaceIncludes = await rosApi.getWorkspaceIncludeDirs(extension.baseDir);
     includes = includes.concat(workspaceIncludes);
 
-    if (process.platform !== "win32") {
+    if (process.platform === "linux") {
         includes.push(path.join("/", "usr", "include"));
     }
 
@@ -61,8 +61,8 @@ async function updateCppPropertiesInternal(): Promise<void> {
         configurations: [
             {
                 browse: {
-                    databaseFilename: "",
-                    limitSymbolsToIncludedHeaders: true,
+                    databaseFilename: "${workspaceFolder}/.vscode/browse.vc.db",
+                    limitSymbolsToIncludedHeaders: false,
                 },
                 includePath: includes,
                 name: "ROS",
@@ -70,6 +70,13 @@ async function updateCppPropertiesInternal(): Promise<void> {
         ],
         version: 4,
     };
+
+    if (process.platform === "linux") {
+        cppProperties.configurations[0].intelliSenseMode = "gcc-" + process.arch
+        cppProperties.configurations[0].compilerPath = "/usr/bin/gcc"
+        cppProperties.configurations[0].cStandard = "gnu11"
+        cppProperties.configurations[0].cppStandard = "c++14"
+    }
 
     // Ensure the ".vscode" directory exists then update the C++ path.
     const dir = path.join(vscode.workspace.rootPath, ".vscode");
