@@ -360,14 +360,14 @@
         "sudo-prompt": "^9.2.1",
         "tmp": "^0.2.1",
         "vscode-debugadapter": "^1.50.0",
-        "vscode-extension-telemetry": "^0.4.2",
+        "vscode-extension-telemetry": "^0.4.3",
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {
         "@types/glob": "^7.2.0",
         "@types/js-yaml": "^4.0.4",
         "@types/mocha": "^9.0.0",
-        "@types/node": "^16.11.6",
+        "@types/node": "^16.11.7",
         "@types/shell-quote": "^1.7.1",
         "@types/tmp": "^0.2.2",
         "@types/vscode": "^1.62.0",
