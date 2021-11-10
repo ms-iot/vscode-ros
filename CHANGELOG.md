@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.7.0
-* Update 3rd party disclosure and attrbiution
+* Update 3rd party disclosure and attribution
 
 ## 0.6.9
 * [#429] Contribution by RyanDraves - Start ROS Core/Daemon if not running when launch debugging
