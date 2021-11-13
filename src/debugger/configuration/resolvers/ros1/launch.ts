@@ -105,6 +105,12 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout, config);
                 if (launchRequest != null) {
                   this.executeLaunchRequest(launchRequest, false);
+                } else {
+                    const process = child_process.exec(command.stdout, rosExecOptions, (err, out) => {
+                        if (err) {
+                            throw (new Error(`Error from ${command.stdout}:\r\n ${err}`));
+                        }
+                    })
                 }
             });
         });
@@ -155,14 +161,15 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
          let executableName = path.basename(executable, path.extname(executable));
 
         // If this executable is just launched, don't attach a debugger.
-        if (config.launch?.indexOf(executableName) != -1) {
+        if (config.launch && 
+            config.launch.indexOf(executableName) != -1) {
           return null;
         }
 
         // If a specific list of nodes is specified, then determine if this is one of them.
         // If no specific nodes specifed, attach to all unless specifically ignored., 
         if (config.attachDebugger == null ||
-          config.attachDebugger.indexOf(executableName) != -1) {
+            config.attachDebugger.indexOf(executableName) != -1) {
 
           const request: ILaunchRequest = {
               nodeName: nodeName,
@@ -175,7 +182,6 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                   ...extension.env,
                   ...envConfig,
               },
-
               symbolSearchPath: config.symbolSearchPath, 
               additionalSOLibSearchPath: config.additionalSOLibSearchPath, 
               sourceFileMap: config.sourceFileMap
