@@ -274,13 +274,31 @@ function activateEnvironment(context: vscode.ExtensionContext, buildToolDetected
 async function sourceRosAndWorkspace(): Promise<void> {
     env = undefined;
 
+    const kWorkspaceConfigTimeout = 30000; // ms
+
     const config = vscode_utils.getExtensionConfiguration();
-    const distro = config.get("distro", "");
+    let distro = config.get("distro", "");
     let setupScriptExt: string;
     if (process.platform === "win32") {
         setupScriptExt = ".bat";
     } else {
         setupScriptExt = ".bash";
+    }
+
+    // Is there a distro defined either by setting or environment?
+    if (!distro && !process.env.ROS_DISTRO)
+    {
+        // No? Try to find one.
+        const installedDistros = await ros_utils.getDistros();
+        if (!installedDistros.length) {
+            throw new Error("ROS has not been found on this system.");
+        } else if (installedDistros.length === 1) {
+            // if there is only one distro installed, directly choose it
+            config.update("distro", installedDistros[0]);
+        } else {
+            const message = "Multiple ROS distros found. Configure this workspace by setting \"ros.distro\": \"<ROS Distro>\" in settings.json or in the ROS extension settings.";
+            await vscode.window.setStatusBarMessage(message, kWorkspaceConfigTimeout);
+        }
     }
 
     if (distro) {
@@ -302,23 +320,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         }
     } else if (process.env.ROS_DISTRO) {
         env = process.env;
-    } else {
-        const installedDistros = await ros_utils.getDistros();
-        if (!installedDistros.length) {
-            throw new Error("No ROS distro found!");
-        } else if (installedDistros.length === 1) {
-            // if there is only one distro installed, directly choose it
-            config.update("distro", installedDistros[0]);
-        } else {
-            const message = "The ROS distro is not configured.";
-            const configure = "Configure";
-
-            if (await vscode.window.showErrorMessage(message, configure) === configure) {
-                config.update("distro", await vscode.window.showQuickPick(installedDistros));
-            }
-        }
     }
-
     // Source the workspace setup over the top.
     // TODO: we should test what's the build tool (catkin vs colcon).
     let workspaceOverlayPath: string;
