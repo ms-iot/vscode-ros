@@ -122,6 +122,7 @@ A big ***Thank you!*** to everyone that have helped make this extension better!
 
 * Andrew Short ([@ajshort](https://github.com/ajshort)), **original author**
 * James Giller ([@JamesGiller](https://github.com/JamesGiller))
+* PickNikRobotics ([@PickNikRobotics](https://github.com/PickNikRobotics)) for code formatting
 
 ### ROS Web Tools
 This extension leverages [ROS Web Tools](http://robotwebtools.org/) for URDF Previewing.
