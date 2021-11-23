@@ -28,6 +28,8 @@ interface ILaunchRequest {
     symbolSearchPath?: string;
     additionalSOLibSearchPath?: string;
     sourceFileMap?: { [key: string]: string };
+    launch?: string[];    // Scripts or executables to just launch without attaching a debugger
+    attachDebugger?: string[];    // If specified, Scripts or executables to debug; otherwise attaches to everything not ignored
 }
 
 function getExtensionFilePath(extensionFile: string): string {
@@ -78,8 +80,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         let ros2_launch_dumper = getExtensionFilePath(path.join("assets", "scripts", "ros2_launch_dumper.py"));
 
         let args = []
-        if (config.args) {
-            for (let arg of config.args) {
+        if (config.arguments) {
+            for (let arg of config.arguments) {
                 args.push(`"${arg}"`);
             }
         }
@@ -96,12 +98,22 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         }
 
         let commands = result.stdout.split(os.EOL);
-        commands.forEach((command) => {
-            if (!command)
+        commands.forEach(async (command) => {
+            if (!command) {
                 return;
+            }
+
             let process = command.split(' ')[0];
             const launchRequest = this.generateLaunchRequest(process, command, config);
-            this.executeLaunchRequest(launchRequest, false);
+            if (launchRequest != null) {
+              this.executeLaunchRequest(launchRequest, false);
+            } else {
+                const process = child_process.exec(command, rosExecOptions, (err, out) => {
+                    if (err) {
+                        throw (new Error(`Error from ${command}:\r\n ${err}`));
+                    }
+                })
+            }
         });
 
         // @todo: error handling for Promise.all
@@ -116,24 +128,45 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         parsedArgs = shell_quote.parse(command);
 
-        const envConfig: { [key: string]: string; } = config.env;
+        let executable = parsedArgs.shift().toString();
 
-        const request: ILaunchRequest = {
-            nodeName: nodeName,
-            executable: parsedArgs.shift().toString(),
-            arguments: parsedArgs.map((arg) => {
-                return arg.toString();
-            }),
-            cwd: ".",
-            env: {
-                ...extension.env,
-                ...envConfig,
-            },
-            symbolSearchPath: config.symbolSearchPath, 
-            additionalSOLibSearchPath: config.additionalSOLibSearchPath, 
-            sourceFileMap: config.sourceFileMap
-        };
-        return request;
+         // return rviz instead of rviz.exe, or spawner instead of spawner.py
+         // This allows the user to run filter out genericly. 
+        let executableName = path.basename(executable, path.extname(executable));
+
+        // If this executable is just launched, don't attach a debugger.
+        if (config.launch && 
+            config.launch.indexOf(executableName) != -1) {
+          return null;
+        }
+
+        // If a specific list of nodes is specified, then determine if this is one of them.
+        // If no specific nodes specifed, attach to all unless specifically ignored.
+        if (config.attachDebugger == null ||
+          config.attachDebugger.indexOf(executableName) != -1) {
+
+          const envConfig: { [key: string]: string; } = config.env;
+
+          const request: ILaunchRequest = {
+              nodeName: nodeName,
+              executable: executable,
+              arguments: parsedArgs.map((arg) => {
+                  return arg.toString();
+              }),
+              cwd: ".",
+              env: {
+                  ...extension.env,
+                  ...envConfig,
+              },
+              symbolSearchPath: config.symbolSearchPath, 
+              additionalSOLibSearchPath: config.additionalSOLibSearchPath, 
+              sourceFileMap: config.sourceFileMap
+          };
+
+          return request;
+        }
+
+        return null;
     }
 
     private async executeLaunchRequest(request: ILaunchRequest, stopOnEntry: boolean) {

@@ -38,7 +38,8 @@
     "preview": true,
     "main": "./out/src/extension",
     "activationEvents": [
-        "*"
+        "*",
+        "onDebugResolve:ros"
     ],
     "contributes": {
         "commands": [
