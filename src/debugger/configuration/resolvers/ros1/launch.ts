@@ -29,6 +29,8 @@ interface ILaunchRequest {
     symbolSearchPath?: string;
     additionalSOLibSearchPath?: string;
     sourceFileMap?: { [key: string]: string };
+    launch?: string[];    // Scripts or executables to just launch without attaching a debugger
+    attachDebugger?: string[];    // If specified, Scripts or executables to debug; otherwise attaches to everything not ignored
 }
 
 export class LaunchResolver implements vscode.DebugConfigurationProvider {
@@ -99,9 +101,17 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         await Promise.all(nodes.map((node: string) => {
             return promisifiedExec(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
-            commands.forEach((command, index) => {
+            commands.forEach(async (command, index) => {
                 const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout, config);
-                this.executeLaunchRequest(launchRequest, false);
+                if (launchRequest != null) {
+                  this.executeLaunchRequest(launchRequest, false);
+                } else {
+                    const process = child_process.exec(command.stdout, rosExecOptions, (err, out) => {
+                        if (err) {
+                            throw (new Error(`Error from ${command.stdout}:\r\n ${err}`));
+                        }
+                    })
+                }
             });
         });
         // @todo: error handling for Promise.all
@@ -143,24 +153,44 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 break;
             }
         }
-        const request: ILaunchRequest = {
-            nodeName: nodeName,
-            executable: parsedArgs.shift().toString(),
-            arguments: parsedArgs.map((arg) => {
-                return arg.toString();
-            }),
-            cwd: ".",
-            env: {
-                ...extension.env,
-                ...envConfig,
-            },
 
-            symbolSearchPath: config.symbolSearchPath, 
-            additionalSOLibSearchPath: config.additionalSOLibSearchPath, 
-            sourceFileMap: config.sourceFileMap
+        let executable = parsedArgs.shift().toString();
 
-        };
-        return request;
+        // return rviz instead of rviz.exe, or spawner instead of spawner.py
+         // This allows the user to run filter out genericly. 
+         let executableName = path.basename(executable, path.extname(executable));
+
+        // If this executable is just launched, don't attach a debugger.
+        if (config.launch && 
+            config.launch.indexOf(executableName) != -1) {
+          return null;
+        }
+
+        // If a specific list of nodes is specified, then determine if this is one of them.
+        // If no specific nodes specifed, attach to all unless specifically ignored., 
+        if (config.attachDebugger == null ||
+            config.attachDebugger.indexOf(executableName) != -1) {
+
+          const request: ILaunchRequest = {
+              nodeName: nodeName,
+              executable: executable,
+              arguments: parsedArgs.map((arg) => {
+                  return arg.toString();
+              }),
+              cwd: ".",
+              env: {
+                  ...extension.env,
+                  ...envConfig,
+              },
+              symbolSearchPath: config.symbolSearchPath, 
+              additionalSOLibSearchPath: config.additionalSOLibSearchPath, 
+              sourceFileMap: config.sourceFileMap
+
+          };
+          return request;
+        }
+
+        return null;
     }
 
     private async executeLaunchRequest(request: ILaunchRequest, stopOnEntry: boolean) {
