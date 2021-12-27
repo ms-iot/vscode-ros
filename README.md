@@ -38,8 +38,8 @@ You can access the following commands from the [Visual Studio Code command palle
 
 | Name | Description |
 |---|:---|
-| [Attaching to a running ROS Node][debug_support-attach] | Learn how to attach VSCode to a running ROS node |
-| [Debugging all ROS Nodes in a launch file ][debug_support-launch] | Learn how to set up VSCode to debug the nodes in a ROS Launch file |
+| [Attaching to a running ROS Node](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to attach VSCode to a running ROS node |
+| [Debugging all ROS Nodes in a launch file ](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to set up VSCode to debug the nodes in a ROS Launch file |
 | [ROSCON 2019 ROS Extension Talk Video](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667) | Walkthrough of VSCode from ROSCon 2019|
 
 
@@ -70,7 +70,7 @@ To create a `launch.json` with ROS debugging support
 
 Once this is created, you can use the play button in the title bar, or the "start debugging" accelerator key, or from the command palle (CTRL-SHIFT-P), select `Debug: Start Debugging`.
 
-> NOTE: Other VSCode extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a blank launch.json file, then use the manual option.
+> NOTE: Other VSCode extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a blank launch.json file, then use the manual option described below.
 
 Other Notes:
   * Create a new ROS launch file with just the nodes you'd like to debug, and a separate ROS launch file with all other ROS nodes.
