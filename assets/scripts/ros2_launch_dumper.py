@@ -13,7 +13,6 @@ from typing import List
 from typing import Text
 from typing import Tuple
 from typing import Union
-from typing import OrderedDict
 
 from ament_index_python.packages import get_package_prefix
 from ament_index_python.packages import PackageNotFoundError
@@ -39,7 +38,7 @@ from launch_ros.actions import PushRosNamespace
 
 def parse_launch_arguments(launch_arguments: List[Text]) -> List[Tuple[Text, Text]]:
     """Parse the given launch arguments from the command line, into list of tuples for launch."""
-    parsed_launch_arguments = OrderedDict()  # type: ignore
+    parsed_launch_arguments = {}  # type: ignore; 3.7+ dict is ordered.
     for argument in launch_arguments:
         count = argument.count(':=')
         if count == 0 or argument.startswith(':=') or (count == 1 and argument.endswith(':=')):
