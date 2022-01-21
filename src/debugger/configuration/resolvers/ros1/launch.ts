@@ -158,11 +158,21 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         // return rviz instead of rviz.exe, or spawner instead of spawner.py
          // This allows the user to run filter out genericly. 
-         let executableName = path.basename(executable, path.extname(executable));
+        let executableName = path.basename(executable, path.extname(executable));
+
+
 
         // If this executable is just launched, don't attach a debugger.
         if (config.launch && 
             config.launch.indexOf(executableName) != -1) {
+          return null;
+        }
+
+        // Filter shell scripts - just launch them
+        //  https://github.com/ms-iot/vscode-ros/issues/474 
+        let executableExt = path.extname(executable);
+        if (executableExt && 
+            ["bash", "sh", "bat", "cmd", "ps1"].includes(executableExt)) {
           return null;
         }
 

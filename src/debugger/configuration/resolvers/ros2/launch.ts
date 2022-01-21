@@ -140,6 +140,14 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
           return null;
         }
 
+        // Filter shell scripts - just launch them
+        //  https://github.com/ms-iot/vscode-ros/issues/474 
+        let executableExt = path.extname(executable);
+        if (executableExt && 
+            ["bash", "sh", "bat", "cmd", "ps1"].includes(executableExt)) {
+          return null;
+        }
+
         // If a specific list of nodes is specified, then determine if this is one of them.
         // If no specific nodes specifed, attach to all unless specifically ignored.
         if (config.attachDebugger == null ||
