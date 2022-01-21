@@ -39,7 +39,8 @@
     "main": "./out/src/extension",
     "activationEvents": [
         "*",
-        "onDebugResolve:ros"
+        "onDebugResolve:ros",
+        "onDebugDynamicConfigurations:ros"
     ],
     "contributes": {
         "commands": [
