@@ -1,6 +1,6 @@
 {
     "name": "vscode-ros",
-    "version": "0.6.9",
+    "version": "0.7.0",
     "publisher": "ms-iot",
     "engines": {
         "vscode": "^1.62.0"
@@ -360,7 +360,7 @@
         "shell-quote": "^1.7.3",
         "sudo-prompt": "^9.2.1",
         "tmp": "^0.2.1",
-        "vscode-debugadapter": "^1.50.0",
+        "vscode-debugadapter": "^1.51.0",
         "vscode-extension-telemetry": "^0.4.3",
         "xmlrpc": "^1.3.2"
     },
