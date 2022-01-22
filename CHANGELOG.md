@@ -2,6 +2,12 @@
 
 ## 0.7.0
 * Update 3rd party disclosure and attribution
+* Update Dependencies
+* [#544] Contribution by @vigiroux - Bogus Screen Size
+* [#587] Enable System Symbols
+* [#594] Improve IntelliSense by updating the C++ properties correctly
+* [#605] Support *Experimental* launch filtering - enable 'launch only' and 'debug only' Filters. 
+* [#608] Reduce annoying dialogs from the ROS extension
 
 ## 0.6.9
 * [#429] Contribution by RyanDraves - Start ROS Core/Daemon if not running when launch debugging
