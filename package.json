@@ -375,7 +375,7 @@
         "@types/vscode": "^1.63.1",
         "@types/xmlrpc": "^1.3.7",
         "glob": "^7.2.0",
-        "mocha": "^9.1.4",
+        "mocha": "^9.2.0",
         "tslint": "^6.1.3",
         "typescript": "^4.5.5",
         "vscode-test": "^1.6.1"
