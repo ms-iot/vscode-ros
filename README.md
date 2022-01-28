@@ -42,7 +42,6 @@ You can access the following commands from the [Visual Studio Code command palle
 | [Debugging all ROS Nodes in a launch file ](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to set up VSCode to debug the nodes in a ROS Launch file |
 | [ROSCON 2019 ROS Extension Talk Video](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667) | Walkthrough of VSCode from ROSCon 2019|
 
-
 ## Getting Started
 
 The VSCode ROS extension will attempt to detect and automatically configure the workspace for the appropriate ROS Distro.
@@ -57,20 +56,20 @@ each system.
 The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes, written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2. 
 
 ### Automatic creation of a launch.json with ROS Launch support
-`vscode/launch.json` is a file which defines a debug launch configuration within VSCode. 
+`.vscode/launch.json` is a file which defines a debug launch configuration within VSCode. 
 
-To create a `launch.json` with ROS debugging support 
+To create a `.vscode/launch.json` with ROS debugging support 
 
   1. C++ or Python file is selected, vscode uses the selected file to seed the launch creation UI. 
   1. Click the `Run and Debug` tab on the left sidebar
-  1. Select the link to create a `launch.json` file. 
+  1. Select the link to create a `.vscode/launch.json` file. 
   1. VSCode will drop down from the command pallet with a list of options, which includes 'ROS'. Select this option. 
   1. In the next dialog, type the name of the ROS package containing a launch file you'd like to debug. 
   1. Then find the launch file.
 
 Once this is created, you can use the play button in the title bar, or the "start debugging" accelerator key, or from the command palle (CTRL-SHIFT-P), select `Debug: Start Debugging`.
 
-> NOTE: Other VSCode extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a blank launch.json file, then use the manual option described below.
+> NOTE: Other VSCode extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a new file called `.vscode/launch.json`, then use the manual option described below.
 
 Other Notes:
   * Create a new ROS launch file with just the nodes you'd like to debug, and a separate ROS launch file with all other ROS nodes.
@@ -81,12 +80,18 @@ Other Notes:
 ### Manually adding a launch file to an existing launch.json
 If you have an existing `launch.json` file (or if there is an extension conflict as mentioned above), you can manually add a launch configuration by adding a new block like this. 
 ```json
-  {
-      "name": "ROS: Launch my file",
-      "request": "launch",
-      "target": "full path to launch file",
-      "type": "ros"
-  }
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+          "name": "ROS: Launch my file",
+          "request": "launch",
+          "target": "<full path to your launch.py or launch file>",
+          "launch": ["rviz", "gz", "gzserver", "gzclient"],
+          "type": "ros"
+      }
+    ]
+}  
 ```
 Be sure to include the full path to your launch file, including file extension.
 
@@ -103,8 +108,8 @@ The ROS Launch configuration block supports the following configuration:
 | symbolSearchPath | A semicolon delimited search path for Windows symbols, including ROS for Windows symbols downloaded from https://ros-win.visualstudio.com/ros-win/_build |
 | additionalSOLibSearchPath | A semicolon delimited search path for Linux symbols |
 | sourceFileMap | A mapping of Source files from where Symbols expect and the location you have on disk. |
-| launch | If specified, a list of executables to just launch, attaching to everything else. e.g. `launch: ["rviz", "gz", "gzserver", "gzclient"]` which prevents attaching a debugger to rviz and gazebo. NOTE: the debugger will ignore file extension x.py is the same as x.exe. |
-| attachDebugger | If specified, a list of executables to debug. `attachDebugger: ["my_ros_node"]` will only attach to my_ros_node.exe, my_ros_node.py or my_ros_node. |
+| launch | If specified, a list of executables to just launch, attaching to everything else. e.g. `"launch": ["rviz", "gz", "gzserver", "gzclient"]` which prevents attaching a debugger to rviz and gazebo. NOTE: the debugger will ignore file extension x.py is the same as x.exe. |
+| attachDebugger | If specified, a list of executables to debug. `"attachDebugger": ["my_ros_node"]` will only attach to my_ros_node.exe, my_ros_node.py or my_ros_node. |
 
 ## Reporting Security Issues
 
