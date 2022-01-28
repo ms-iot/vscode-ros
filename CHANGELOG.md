@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.0
+* Update Dependencies
+* [#654] Ignore Scripts such as .sh, .bash, .bat, .ps1 and .cmd
+* [#655] Support Debugging on Jetson Nano by fixing the launch debugging python script
+* [#656] Fix Lifecycle node debugging, by addressing a hanging background thread.
+
 ## 0.7.0
 * Update 3rd party disclosure and attribution
 * Update Dependencies
