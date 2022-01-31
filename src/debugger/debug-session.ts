@@ -1,8 +1,8 @@
 // Copyright (c) Andrew Short. All rights reserved.
 // Licensed under the MIT License.
 
-import * as adapter from "vscode-debugadapter";
-import * as protocol from "vscode-debugprotocol";
+import * as adapter from "@vscode/debugadapter";
+import * as protocol from "@vscode/debugprotocol";
 
 import * as requests from "./requests";
 
