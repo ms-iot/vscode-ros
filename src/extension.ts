@@ -84,11 +84,8 @@ export async function activate(context: vscode.ExtensionContext) {
         outputChannel = vscode_utils.createOutputChannel();
         context.subscriptions.push(outputChannel);
 
-        // Determine if we're in a catkin workspace.
-        let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
-
         // Activate components when the ROS env is changed.
-        context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context, buildToolDetected)));
+        context.subscriptions.push(onDidChangeEnv(activateEnvironment.bind(null, context)));
 
         // Activate components which don't require the ROS env.
         context.subscriptions.push(vscode.languages.registerDocumentFormattingEditProvider(
@@ -145,7 +142,7 @@ async function ensureErrorMessageOnException(callback: (...args: any[]) => any) 
 /**
  * Activates components which require a ROS env.
  */
-function activateEnvironment(context: vscode.ExtensionContext, buildToolDetected: boolean) {
+async function activateEnvironment(context: vscode.ExtensionContext) {
     // Clear existing disposables.
     while (subscriptions.length > 0) {
         subscriptions.pop().dispose();
@@ -158,6 +155,9 @@ function activateEnvironment(context: vscode.ExtensionContext, buildToolDetected
     if (typeof env.ROS_VERSION === "undefined") {
         return;
     }
+
+    // Determine if we're in a catkin workspace.
+    let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
 
     // http://www.ros.org/reps/rep-0149.html#environment-variables
     // Learn more about ROS_VERSION definition.
