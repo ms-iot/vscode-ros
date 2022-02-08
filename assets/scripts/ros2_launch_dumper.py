@@ -119,7 +119,8 @@ if __name__ == "__main__":
                 typed_action = cast(ExecuteProcess, entity)
                 if typed_action.process_details is not None:
                     sys.stdout = sys.__stdout__
-                    commands = []
+                        # Prefix this with a tab character so the caller knows this is a line to be processed.
+                    commands = ['\t']
                     for cmd in typed_action.process_details['cmd']:
                         if cmd.strip():
                             commands.extend(['"{}"'.format(cmd.strip())])
