@@ -112,7 +112,12 @@
                 "ros.distro": {
                     "type": "string",
                     "description": "ROS installation distro to be sourced."
+                },
+                "ros.rosSetupScript": {
+                    "type": "string",
+                    "description": "ROS workspace setup script. Overrides ros.distro."
                 }
+
             }
         },
         "debuggers": [
