@@ -284,6 +284,13 @@ async function sourceRosAndWorkspace(): Promise<void> {
     }
 
     const config = vscode_utils.getExtensionConfiguration();
+    let isolateEnvironment = config.get("isolateEnvironment", "");
+    if (!isolateEnvironment) {
+        // Capture the host environment unless specifically isolated
+        env = process.env;
+    }
+
+
     let rosSetupScript = config.get("rosSetupScript", "");
 
     // If the workspace setup script is not set, try to find the ROS setup script in the environment
@@ -293,7 +300,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
         // Try to support cases where the setup script doesn't make sense on different environments, such as host vs container.
         if (await pfs.exists(rosSetupScript)){
             try {
-                env = await ros_utils.sourceSetupFile(rosSetupScript, {});
+                env = await ros_utils.sourceSetupFile(rosSetupScript, env);
 
                 attemptWorkspaceDiscovery = false;
             } catch (err) {
@@ -335,7 +342,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
                     name: "setup",
                     ext: setupScriptExt,
                 });
-                env = await ros_utils.sourceSetupFile(setupScript, {});
+                env = await ros_utils.sourceSetupFile(setupScript, env);
             } catch (err) {
                 vscode.window.showErrorMessage(`Could not source ROS setup script at "${setupScript}".`);
             }

@@ -116,8 +116,12 @@
                 "ros.rosSetupScript": {
                     "type": "string",
                     "description": "ROS workspace setup script. Overrides ros.distro."
+                },
+                "ros.isolateEnvironment": {
+                    "type": "bool",
+                    "default": false,
+                    "description": "Specify if the extension should capture the environment VSCode is running in to pass to child processes."
                 }
-
             }
         },
         "debuggers": [
