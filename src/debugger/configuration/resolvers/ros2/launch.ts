@@ -77,6 +77,9 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             },
         };
 
+        console.log("Executing dumper with the following environment:");
+        console.log(rosExecOptions.env);
+
         let ros2_launch_dumper = getExtensionFilePath(path.join("assets", "scripts", "ros2_launch_dumper.py"));
 
         let args = []
@@ -91,10 +94,14 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             `/usr/bin/env python3 ${ros2_launch_dumper} "${config.target}" ${flatten_args}`;
 
         let result = await promisifiedExec(ros2_launch_dumper_cmdLine, rosExecOptions);
+
         if (result.stderr) {
-            throw (new Error(`Error from ROS2 launch dumper:\r\n ${result.stderr}`));
-        } else if (result.stdout.length == 0) {
-            throw (new Error(`ROS2 launch dumper unexpectedly produced no output.`));
+            // Having stderr output is not nessesarily a problem, but it is useful for debugging
+            console.log(`ROS2 launch processor produced stderr output:\r\n ${result.stderr}`);
+        }        
+
+        if (result.stdout.length == 0) {
+            throw (new Error(`ROS2 launch processor was unable to produce a node list.\r\n ${result.stderr}`));
         }
 
         let commands = result.stdout.split(os.EOL);

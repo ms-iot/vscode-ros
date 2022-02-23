@@ -276,8 +276,6 @@ async function sourceRosAndWorkspace(): Promise<void> {
 
     const kWorkspaceConfigTimeout = 30000; // ms
 
-    const config = vscode_utils.getExtensionConfiguration();
-    let distro = config.get("distro", "");
     let setupScriptExt: string;
     if (process.platform === "win32") {
         setupScriptExt = ".bat";
@@ -285,41 +283,72 @@ async function sourceRosAndWorkspace(): Promise<void> {
         setupScriptExt = ".bash";
     }
 
-    // Is there a distro defined either by setting or environment?
-    if (!distro && !process.env.ROS_DISTRO)
-    {
-        // No? Try to find one.
-        const installedDistros = await ros_utils.getDistros();
-        if (!installedDistros.length) {
-            throw new Error("ROS has not been found on this system.");
-        } else if (installedDistros.length === 1) {
-            // if there is only one distro installed, directly choose it
-            config.update("distro", installedDistros[0]);
-        } else {
-            const message = "Multiple ROS distros found. Configure this workspace by setting \"ros.distro\": \"<ROS Distro>\" in settings.json or in the ROS extension settings.";
-            await vscode.window.setStatusBarMessage(message, kWorkspaceConfigTimeout);
-        }
+    const config = vscode_utils.getExtensionConfiguration();
+    let isolateEnvironment = config.get("isolateEnvironment", "");
+    if (!isolateEnvironment) {
+        // Capture the host environment unless specifically isolated
+        env = process.env;
     }
 
-    if (distro) {
-        try {
-            let globalInstallPath: string;
-            if (process.platform === "win32") {
-                globalInstallPath = path.join("C:", "opt", "ros", `${distro}`, "x64");
-            } else {
-                globalInstallPath = path.join("/", "opt", "ros", `${distro}`);
+
+    let rosSetupScript = config.get("rosSetupScript", "");
+
+    // If the workspace setup script is not set, try to find the ROS setup script in the environment
+    let attemptWorkspaceDiscovery = true;
+
+    if (rosSetupScript) {
+        // Try to support cases where the setup script doesn't make sense on different environments, such as host vs container.
+        if (await pfs.exists(rosSetupScript)){
+            try {
+                env = await ros_utils.sourceSetupFile(rosSetupScript, env);
+
+                attemptWorkspaceDiscovery = false;
+            } catch (err) {
+                vscode.window.showErrorMessage(`A workspace setup script was provided in the configuration, but could not source "${rosSetupScript}". Attempting standard discovery.`);
             }
-            let setupScript: string = path.format({
-                dir: globalInstallPath,
-                name: "setup",
-                ext: setupScriptExt,
-            });
-            env = await ros_utils.sourceSetupFile(setupScript, {});
-        } catch (err) {
-            vscode.window.showErrorMessage(`Could not source the setup file for ROS distro "${distro}".`);
         }
-    } else if (process.env.ROS_DISTRO) {
-        env = process.env;
+    }
+    
+    if (attemptWorkspaceDiscovery) {
+        let distro = config.get("distro", "");
+
+        // Is there a distro defined either by setting or environment?
+        if (!distro && !process.env.ROS_DISTRO)
+        {
+            // No? Try to find one.
+            const installedDistros = await ros_utils.getDistros();
+            if (!installedDistros.length) {
+                throw new Error("ROS has not been found on this system.");
+            } else if (installedDistros.length === 1) {
+                // if there is only one distro installed, directly choose it
+                config.update("distro", installedDistros[0]);
+            } else {
+                const message = "Unable to determine ROS distribution, please configure this workspace by adding \"ros.distro\": \"<ROS Distro>\" in settings.json";
+                await vscode.window.setStatusBarMessage(message, kWorkspaceConfigTimeout);
+            }
+        }
+
+        if (distro) {
+            let setupScript: string;
+            try {
+                let globalInstallPath: string;
+                if (process.platform === "win32") {
+                    globalInstallPath = path.join("C:", "opt", "ros", `${distro}`, "x64");
+                } else {
+                    globalInstallPath = path.join("/", "opt", "ros", `${distro}`);
+                }
+                setupScript = path.format({
+                    dir: globalInstallPath,
+                    name: "setup",
+                    ext: setupScriptExt,
+                });
+                env = await ros_utils.sourceSetupFile(setupScript, env);
+            } catch (err) {
+                vscode.window.showErrorMessage(`Could not source ROS setup script at "${setupScript}".`);
+            }
+        } else if (process.env.ROS_DISTRO) {
+            env = process.env;
+        }
     }
     // Source the workspace setup over the top.
     // TODO: we should test what's the build tool (catkin vs colcon).

@@ -20,6 +20,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
         }
         else {
             exportEnvCommand = `bash -c "source '${filename}' && env"`;
+            console.log ("executing " + exportEnvCommand);
         }
 
         let processOptions: child_process.ExecOptions = {
@@ -34,7 +35,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
                     if (index !== -1) {
                         env[line.substr(0, index)] = line.substr(index + 1);
                     }
-
+                    
                     return env;
                 }, {}));
             } else {
