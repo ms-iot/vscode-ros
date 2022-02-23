@@ -41,6 +41,17 @@ You can access the following commands from the [Visual Studio Code command palle
 | [Attaching to a running ROS Node](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to attach VSCode to a running ROS node |
 | [Debugging all ROS Nodes in a launch file ](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to set up VSCode to debug the nodes in a ROS Launch file |
 | [ROSCON 2019 ROS Extension Talk Video](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667) | Walkthrough of VSCode from ROSCon 2019|
+| [Deep Dive - Episode 0](https://youtu.be/PBbEhRf8QjE) |  About the VSCode ROS extension @ a Polyhobbyist |
+| [Deep Dive - Episode 1](https://youtu.be/bupAju0UAMg) |  Installing on Windows & WSL @ a Polyhobbyist |
+| [Deep Dive - Episode 2](https://youtu.be/-NaEPoIg2Ds) |  Installing on Linux @ a Polyhobbyist |
+| [Deep Dive - Episode 3](https://youtu.be/N2vqBvPQdhE) |  General Usage with ROS1 @ a Polyhobbyist |
+| [Deep Dive - Episode 4](https://youtu.be/k2TLdXHjVsU) |  General Usage with ROS2 @ a Polyhobbyist |
+| [Deep Dive - Episode 5](https://youtu.be/A6ABRdL0ckg) |  Debugging Python @ a Polyhobbyist |
+| Deep Dive - Episode 6 (coming soon) |  Debugging C++ @ a Polyhobbyist |
+| Deep Dive - Episode 7 (coming soon) |  Using with SSH @ a Polyhobbyist |
+| Deep Dive - Episode 8 (coming soon) |  Using with with Containers @ a Polyhobbyist |
+| Deep Dive - Episode 9 (coming soon) |  Advanced Debugging @ a Polyhobbyist |
+
 
 ## Getting Started
 
@@ -108,8 +119,36 @@ The ROS Launch configuration block supports the following configuration:
 | symbolSearchPath | A semicolon delimited search path for Windows symbols, including ROS for Windows symbols downloaded from https://ros-win.visualstudio.com/ros-win/_build |
 | additionalSOLibSearchPath | A semicolon delimited search path for Linux symbols |
 | sourceFileMap | A mapping of Source files from where Symbols expect and the location you have on disk. |
-| launch | If specified, a list of executables to just launch, attaching to everything else. e.g. `"launch": ["rviz", "gz", "gzserver", "gzclient"]` which prevents attaching a debugger to rviz and gazebo. NOTE: the debugger will ignore file extension x.py is the same as x.exe. |
+| launch | If specified, a list of executables to just launch, attaching to everything else. e.g. `"launch": ["rviz", "gz", "gzserver", "gzclient"]` which prevents attaching a debugger to rviz and gazebo. NOTE: the debugger will ignore file extension: x.py is the same as x.exe. |
 | attachDebugger | If specified, a list of executables to debug. `"attachDebugger": ["my_ros_node"]` will only attach to my_ros_node.exe, my_ros_node.py or my_ros_node. |
+
+### Workspace and Global Settings
+The ROS extension supports the following global settings, which can be overridden in the workspace.
+
+| Json Option | Setting Name | Description |
+|---|:---|---|
+| ros.distro | ROS installation distro to be sourced | The Distribution to be sourced. On linux, this cause the extension to look for the ROS setup script in `/opt/ros/{distro}/setup.bash`. On Windows, `c:\opt\ros\{distro}\setup.bat` | 
+| ros.rosSetupScript | ROS workspace setup script. Overrides ros.distro. | If specified, this will cause the extension to source this script before generating the launch debugging or ROS terminal environment. This overrides the ros.distro, and can be used to specify user scripts or ROS installs in a different location. |
+| ros.isolateEnvironment | Specify if the extension should not capture the environment VSCode is running in to pass to child processes. | Off by default, This setting will prevent the ROS extension from capturing it's hosting environment in case this would conflict with the ROS environment. |
+
+Workspace example:
+
+``` bash
+└── .vscode
+    ├── launch.json
+    ├── settings.json
+    └── tasks.json
+```
+
+`settings.json`
+```json
+{
+    "ros.distro": "foxy",
+    "ros.rosSetupScript": "/opt/ros/foxy/install/setup.bash",
+    "ros.isolateEnvironment": "false"
+}
+```
+
 
 ## Reporting Security Issues
 

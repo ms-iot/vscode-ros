@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.1
+* Update Dependencies
+* Update Docs
+* Add Video Deep Dives
+* [645] Fix for launch ROS1 file parameters
+* [678] Ability to specify a startup script instead of inferring from distro
+* [671] Prevent spurreous output and stderr with output from preventing ROS2 launch file debugging
+
 ## 0.8.0
 * Update Dependencies
 * [#654] Ignore Scripts such as .sh, .bash, .bat, .ps1 and .cmd
