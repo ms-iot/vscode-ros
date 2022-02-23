@@ -69,7 +69,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             env: await extension.resolvedEnv(),
         };
 
-        let result = await promisifiedExec(`roslaunch --dump-params ${config.target}`, rosExecOptions);
+        let result = await promisifiedExec(`roslaunch --dump-params ${config.target} ${config.args.join(' ')}`, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from roslaunch:\r\n ${result.stderr}`));
         } else if (result.stdout.length == 0) {
@@ -90,7 +90,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             });
         }
 
-        result = await promisifiedExec(`roslaunch --nodes ${config.target}`, rosExecOptions);
+        result = await promisifiedExec(`roslaunch --nodes ${config.target} ${config.args.join(' ')}`, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from roslaunch:\r\n ${result.stderr}`));
         } else if (result.stdout.length == 0) {
@@ -99,7 +99,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         const nodes = result.stdout.trim().split(os.EOL);
         await Promise.all(nodes.map((node: string) => {
-            return promisifiedExec(`roslaunch --args ${node} ${config.target}`, rosExecOptions);
+            return promisifiedExec(`roslaunch --args ${node} ${config.target} ${config.args.join(' ')}`, rosExecOptions);
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
             commands.forEach(async (command, index) => {
                 const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout, config);
