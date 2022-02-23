@@ -120,7 +120,7 @@
                 "ros.isolateEnvironment": {
                     "type": "bool",
                     "default": false,
-                    "description": "Specify if the extension should capture the environment VSCode is running in to pass to child processes."
+                    "description": "Specify if the extension should not capture the environment VSCode is running in to pass to child processes."
                 }
             }
         },
