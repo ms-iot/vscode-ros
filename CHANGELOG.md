@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.2
+* Correct ROS1 launch command that does not contain arguments
+
 ## 0.8.1
 * Update Dependencies
 * Update Docs

@@ -1,6 +1,6 @@
 {
     "name": "vscode-ros",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "publisher": "ms-iot",
     "engines": {
         "vscode": "^1.63.1"
@@ -141,9 +141,9 @@
                                 "description": "Absolute path to launch file",
                                 "default": ""
                             },
-                            "args": {
+                            "arguments": {
                                 "type": "array",
-                                "description": "Arguments for the roslaunch (or ros2 launch) command",
+                                "description": "Arguments for the roslaunch or ros2 launch command",
                                 "default": []
                             },
                             "env": {
@@ -153,6 +153,31 @@
                                 "additionalProperties": {
                                     "type": "string"
                                 }
+                            },
+                            "symbolSearchPath": {
+                                "type": "string",
+                                "description": "Semicolon separated list of directories to use to search for symbol (that is, pdb) files. Example: \"c:\\dir1;c:\\dir2\"",
+                                "default": ""
+                            },
+                            "additionalSOLibSearchPath": {
+                                "type": "string",
+                                "description": "Semicolon separated list of directories to use to search for .so files",
+                                "default": ""
+                            },
+                            "sourceFileMap": {
+                                "type": "string",
+                                "description": "Optional source file mappings passed to the debug engine. Example: '{ \"/original/source/path\":\"/current/source/path\" }'",
+                                "default": ""
+                            },
+                            "launch": {
+                                "type": "array",
+                                "description": "A list of Scripts or executables to just launch without attaching a debugger",
+                                "default": ""
+                            },
+                            "attachDebugger": {
+                                "type": "array",
+                                "description": "A specific list of executables to just attach a debugger. Useful for large compostions with where only a few nodes need to be debugged",
+                                "default": ""
                             }
                         }
                     },

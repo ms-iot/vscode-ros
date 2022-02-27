@@ -69,11 +69,18 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             env: await extension.resolvedEnv(),
         };
 
-        let result = await promisifiedExec(`roslaunch --dump-params ${config.target} ${config.args.join(' ')}`, rosExecOptions);
+        // If the configuration has arguments,
+        let configArgs :string = "";
+        if (config.arguments)
+        {
+            configArgs = config.arguments.join(' ');
+        }
+
+        let result = await promisifiedExec(`roslaunch --dump-params ${config.target} ${configArgs}`, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from roslaunch:\r\n ${result.stderr}`));
         } else if (result.stdout.length == 0) {
-            throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
+            throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target} ${configArgs}\" in a ros terminal.`));
         }
 
 
@@ -90,16 +97,16 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             });
         }
 
-        result = await promisifiedExec(`roslaunch --nodes ${config.target} ${config.args.join(' ')}`, rosExecOptions);
+        result = await promisifiedExec(`roslaunch --nodes ${config.target} ${configArgs}`, rosExecOptions);
         if (result.stderr) {
             throw (new Error(`Error from roslaunch:\r\n ${result.stderr}`));
         } else if (result.stdout.length == 0) {
-            throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target}\" in a ros terminal.`));
+            throw (new Error(`roslaunch unexpectedly produced no output, please test by running \"roslaunch --dump-params ${config.target} ${configArgs}\" in a ros terminal.`));
         }
 
         const nodes = result.stdout.trim().split(os.EOL);
         await Promise.all(nodes.map((node: string) => {
-            return promisifiedExec(`roslaunch --args ${node} ${config.target} ${config.args.join(' ')}`, rosExecOptions);
+            return promisifiedExec(`roslaunch --args ${node} ${config.target} ${configArgs}`, rosExecOptions);
         })).then((commands: Array<{ stdout: string; stderr: string; }>) => {
             commands.forEach(async (command, index) => {
                 const launchRequest = this.generateLaunchRequest(nodes[index], command.stdout, config);
