@@ -61,7 +61,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
         configurations: [
             {
                 browse: {
-                    databaseFilename: "${workspaceFolder}/.vscode/browse.vc.db",
+                    databaseFilename: "${default}",
                     limitSymbolsToIncludedHeaders: false,
                 },
                 includePath: includes,
