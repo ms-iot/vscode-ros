@@ -10,6 +10,7 @@ import * as telemetry from "../../telemetry-helper";
 
 function getDaemonPort() {
     let basePort: number = 11511;
+    basePort += Number(process.env.ROS_DOMAIN_ID) || 0
     return basePort;
 }
 
