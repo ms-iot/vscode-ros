@@ -10,8 +10,8 @@
       "args": ["--extensionDevelopmentPath=${workspaceRoot}"],
       "stopOnEntry": false,
       "sourceMaps": true,
-      "outFiles": ["${workspaceRoot}/out/src/**/*.js"],
-      "preLaunchTask": "npm: watch"
+      "outFiles": ["${workspaceRoot}/dist/**/*.js"],
+      "preLaunchTask": "npm: webpack"
     },
     {
       "name": "Debugger",

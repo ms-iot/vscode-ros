@@ -1,6 +1,6 @@
 {
     "name": "vscode-ros",
-    "version": "0.8.3",
+    "version": "0.9.0",
     "publisher": "ms-iot",
     "engines": {
         "vscode": "^1.68.0"
@@ -36,9 +36,17 @@
         "url": "https://github.com/ms-iot/vscode-ros/issues"
     },
     "preview": true,
-    "main": "./out/src/extension",
+    "main": "./dist/extension",
     "activationEvents": [
-        "*",
+        "onLanguage:cpp",
+        "onLanguage:python",
+        "onLanguage:csharp",
+        "onCommand",
+        "workspaceContains:**/package.xml",
+        "onWebviewPanel:ros2Status",
+        "onWebviewPanel:ros2Status",
+        "onWebviewPanel:urdfPreview",
+        "onDebug",
         "onDebugResolve:ros",
         "onDebugDynamicConfigurations:ros"
     ],
@@ -381,22 +389,40 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "tsc -p ./",
         "package:dev": "vsce package -o vscode-ros-dev.vsix",
         "compile": "tsc -p ./",
-        "lint": "tslint -p ./",
-        "watch": "tsc -watch -p ./",
+        "lint": "eslint -p ./",
         "pretest": "npm run compile",
-        "test": "node ./out/src/test/runTest.js"
+        "test": "node ./out/src/test/runTest.js",
+        "vscode:prepublish": "npm run package",
+        "webpack": "webpack --mode development",
+        "watch": "webpack --mode development --watch",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "test-compile": "tsc -p ./"
     },
     "dependencies": {
+        "@vscode/debugadapter": "^1.51.0",
+        "@vscode/extension-telemetry": "^0.6.2",
+        "assert": "^2.0.0",
+        "buffer": "^6.0.3",
+        "console-browserify": "^1.2.0",
+        "constants-browserify": "^1.0.0",
+        "crypto-browserify": "^3.12.0",
+        "domain-browser": "^4.22.0",
+        "https-browserify": "^1.0.0",
         "js-yaml": "^4.1.0",
+        "os-browserify": "^0.3.0",
+        "path-browserify": "^1.0.1",
         "portfinder": "^1.0.28",
+        "querystring-es3": "^0.2.1",
         "shell-quote": "^1.7.3",
+        "stream-browserify": "^3.0.0",
+        "stream-http": "^3.2.0",
+        "string_decoder": "^1.3.0",
         "sudo-prompt": "^9.2.1",
+        "timers-browserify": "^2.0.12",
         "tmp": "^0.2.1",
-        "vscode-debugadapter": "^1.51.0",
-        "vscode-extension-telemetry": "^0.4.5",
+        "tslib": "^2.4.0",
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {
@@ -410,9 +436,12 @@
         "@types/xmlrpc": "^1.3.7",
         "glob": "^8.0.1",
         "mocha": "^9.2.2",
+        "ts-loader": "^9.3.1",
         "tslint": "^6.1.3",
         "typescript": "^4.6.3",
-        "vscode-test": "^1.6.1"
+        "vscode-test": "^1.6.1",
+        "webpack": "^5.63.0",
+        "webpack-cli": "^4.9.1"
     },
     "extensionDependencies": [
         "ms-python.python",
