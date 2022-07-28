@@ -320,6 +320,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
             if (!installedDistros.length) {
                 throw new Error("ROS has not been found on this system.");
             } else if (installedDistros.length === 1) {
+                
                 // if there is only one distro installed, directly choose it
                 config.update("distro", installedDistros[0]);
             } else {

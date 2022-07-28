@@ -396,7 +396,7 @@
         "test": "node ./out/src/test/runTest.js",
         "vscode:prepublish": "npm run package",
         "webpack": "webpack --mode development",
-        "webpack-dev": "webpack --mode development --watch",
+        "watch": "webpack --mode development --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
         "test-compile": "tsc -p ./"
     },
@@ -421,7 +421,7 @@
         "timers-browserify": "^2.0.12",
         "tmp": "^0.2.1",
         "@vscode/debugadapter": "^1.51.0",
-        "@vscode/extension-telemetry": "^0.4.5",
+        "@vscode/extension-telemetry": "^0.6.2",
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {
@@ -438,7 +438,7 @@
         "tslint": "^6.1.3",
         "typescript": "^4.6.3",
         "vscode-test": "^1.6.1",
-        "ts-loader": "^7.0.5",
+        "ts-loader": "^9.3.1",
         "webpack": "^5.63.0",
         "webpack-cli": "^4.9.1"
     },
