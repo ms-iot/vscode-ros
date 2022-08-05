@@ -401,7 +401,7 @@
         "test-compile": "tsc -p ./"
     },
     "dependencies": {
-        "@vscode/debugadapter": "^1.51.0",
+        "@vscode/debugadapter": "^1.57.0",
         "@vscode/extension-telemetry": "^0.6.2",
         "assert": "^2.0.0",
         "buffer": "^6.0.3",
