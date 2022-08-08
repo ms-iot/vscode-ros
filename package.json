@@ -413,7 +413,7 @@
         "js-yaml": "^4.1.0",
         "os-browserify": "^0.3.0",
         "path-browserify": "^1.0.1",
-        "portfinder": "^1.0.28",
+        "portfinder": "^1.0.29",
         "querystring-es3": "^0.2.1",
         "shell-quote": "^1.7.3",
         "stream-browserify": "^3.0.0",
