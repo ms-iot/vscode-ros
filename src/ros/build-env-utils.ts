@@ -9,7 +9,7 @@ import * as pfs from "../promise-fs";
 import * as telemetry from "../telemetry-helper";
 import { rosApi } from "./ros";
 
-const PYTHON_AUTOCOMPLETE_PATHS = "python.autoComplete.extraPaths";
+const PYTHON_AUTOCOMPLETE_PATHS = "python.analysis.extraPaths";
 
 /**
  * Creates config files which don't exist.
