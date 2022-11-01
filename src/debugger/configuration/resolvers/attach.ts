@@ -70,6 +70,13 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
                     request: "attach",
                     program: config.commandLine,
                     processId: config.processId,
+                    setupCommands: [
+                        {
+                            text: "-enable-pretty-printing",
+                            description: "Enable pretty-printing for gdb",
+                            ignoreFailures: true
+                        }
+                    ]
                 };
                 debugConfig = cppdbgAttachConfig;
             }
