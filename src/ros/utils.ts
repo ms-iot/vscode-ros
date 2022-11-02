@@ -19,7 +19,8 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
             exportEnvCommand = `cmd /c "\"${filename}\" && set"`;
         }
         else {
-            exportEnvCommand = `bash -c "source '${filename}' && env"`;
+            // Force login shell, so ROS sources correctly in containers.
+            exportEnvCommand = `bash --login -c "source '${filename}' && env"`;
             console.log ("executing " + exportEnvCommand);
         }
 
@@ -57,7 +58,7 @@ export function xacro(filename: string): Promise<any> {
         if (process.platform === "win32") {
             xacroCommand = `cmd /c "xacro "${filename}""`;
         } else {
-            xacroCommand = `bash -c "xacro '${filename}' && env"`;
+            xacroCommand = `bash --login -c "xacro '${filename}' && env"`;
         }
 
         child_process.exec(xacroCommand, processOptions, (error, stdout, _stderr) => {

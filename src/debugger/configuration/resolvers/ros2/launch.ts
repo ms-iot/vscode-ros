@@ -3,6 +3,7 @@
 
 import * as child_process from "child_process";
 import * as fs from "fs";
+import * as fsp from "fs/promises";
 import * as yaml from "js-yaml";
 import * as os from "os";
 import * as path from "path";
@@ -32,6 +33,11 @@ interface ILaunchRequest {
     attachDebugger?: string[];    // If specified, Scripts or executables to debug; otherwise attaches to everything not ignored
 }
 
+interface ICppEnvConfig {
+    name: string;
+    value: string;
+}
+
 function getExtensionFilePath(extensionFile: string): string {
     return path.resolve(extension.extPath, extensionFile);
 }
@@ -39,11 +45,10 @@ function getExtensionFilePath(extensionFile: string): string {
 export class LaunchResolver implements vscode.DebugConfigurationProvider {
     // tslint:disable-next-line: max-line-length
     public async resolveDebugConfigurationWithSubstitutedVariables(folder: vscode.WorkspaceFolder | undefined, config: requests.ILaunchRequest, token?: vscode.CancellationToken) {
-        if (!path.isAbsolute(config.target)) {
-            throw new Error("Launch request requires an absolute path as target.");
-        }
-        else if (path.extname(config.target) !== ".py" && path.extname(config.target) !== ".xml") {
-            throw new Error("Launch request requires an extension '.py' or '.xml' as target.");
+        await fsp.access(config.target, fs.constants.R_OK);
+
+        if (path.extname(config.target) !== ".py" && path.extname(config.target) !== ".xml" && path.extname(config.target) !== ".yaml") {
+            throw new Error("Launch request requires an extension '.py', '.xml' or '.yaml' as target.");
         }
 
         const delay = ms => new Promise(res => setTimeout(res, ms));
@@ -63,11 +68,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 await delay(interval_ms);
             }
 
-            console.log("Waited " + timeWaited + " for ROS2 Daemon to start");
-
-            if (timeWaited >= timeout_ms) {
-                throw new Error('Timed out (' + timeWaited / 1000 + ' seconds) waiting for ROS2 Daemon to start. Start ROS2 Daemon manually to avoid this error.');
-            }
+            console.log("Waited " + timeWaited + " for ROS2 Daemon to start. Proceeding without the Daemon.");
         }
 
         const rosExecOptions: child_process.ExecOptions = {
@@ -188,50 +189,86 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         return null;
     }
 
+    private createPythonLaunchConfig(request: ILaunchRequest, stopOnEntry: boolean): IPythonLaunchConfiguration {
+        const pythonLaunchConfig: IPythonLaunchConfiguration = {
+            name: request.nodeName,
+            type: "python",
+            request: "launch",
+            program: request.executable,
+            args: request.arguments,
+            env: request.env,
+            stopOnEntry: stopOnEntry,
+            justMyCode: false,
+        };
+
+        return pythonLaunchConfig;
+    }
+
+    private createCppLaunchConfig(request: ILaunchRequest, stopOnEntry: boolean): ICppvsdbgLaunchConfiguration {
+        const envConfigs: ICppEnvConfig[] = [];
+        for (const key in request.env) {
+            if (request.env.hasOwnProperty(key)) {
+                envConfigs.push({
+                    name: key,
+                    value: request.env[key],
+                });
+            }
+        }
+
+        const cppvsdbgLaunchConfig: ICppvsdbgLaunchConfiguration = {
+            name: request.nodeName,
+            type: "cppvsdbg",
+            request: "launch",
+            cwd: ".",
+            program: request.executable,
+            args: request.arguments,
+            environment: envConfigs,
+            stopAtEntry: stopOnEntry,
+            symbolSearchPath: request.symbolSearchPath,
+            sourceFileMap: request.sourceFileMap
+
+        };
+
+        return cppvsdbgLaunchConfig;
+    }
+
     private async executeLaunchRequest(request: ILaunchRequest, stopOnEntry: boolean) {
         let debugConfig: ICppvsdbgLaunchConfiguration | ICppdbgLaunchConfiguration | IPythonLaunchConfiguration;
 
         if (os.platform() === "win32") {
-            if (request.executable.toLowerCase().endsWith(".py")) {
-                const pythonLaunchConfig: IPythonLaunchConfiguration = {
-                    name: request.nodeName,
-                    type: "python",
-                    request: "launch",
-                    program: request.executable,
-                    args: request.arguments,
-                    env: request.env,
-                    stopOnEntry: stopOnEntry,
-                    justMyCode: false,
-                };
-                debugConfig = pythonLaunchConfig;
-            } else if (request.executable.toLowerCase().endsWith(".exe")) {
-                interface ICppEnvConfig {
-                    name: string;
-                    value: string;
-                }
-                const envConfigs: ICppEnvConfig[] = [];
-                for (const key in request.env) {
-                    if (request.env.hasOwnProperty(key)) {
-                        envConfigs.push({
-                            name: key,
-                            value: request.env[key],
-                        });
-                    }
-                }
-                const cppvsdbgLaunchConfig: ICppvsdbgLaunchConfiguration = {
-                    name: request.nodeName,
-                    type: "cppvsdbg",
-                    request: "launch",
-                    cwd: ".",
-                    program: request.executable,
-                    args: request.arguments,
-                    environment: envConfigs,
-                    stopAtEntry: stopOnEntry,
-                    symbolSearchPath: request.symbolSearchPath,
-                    sourceFileMap: request.sourceFileMap
+            let executable = request.executable.toLowerCase();
 
-                };
-                debugConfig = cppvsdbgLaunchConfig;
+            if (executable.endsWith(".exe")) {
+
+                // On Windows, colcon will compile Python scripts, C# and Rust programs to .exe. 
+                // Discriminate between different runtimes by introspection.
+
+                // Python
+                // rosnode.py will be compiled into install\rosnode\Lib\rosnode\rosnode.exe
+                // rosnode.py will also be copied into install\rosnode\Lib\site-packages\rosnode.py
+
+                let nodeName = path.basename(executable, ".exe");
+                let pythonPath = path.join(path.dirname(executable), "..", "site-packages", nodeName, nodeName + ".py");
+
+                try {
+                    await fsp.access(pythonPath, fs.constants.R_OK);
+
+                    // If the python file is available, then treat it as python and fall through.
+                    request.executable = executable = pythonPath;
+                } catch {
+                    // The python file is not available then this must be...
+
+                    // C#? Todo
+
+                    // Rust? Todo
+
+                    // C++
+                    debugConfig = this.createCppLaunchConfig(request, stopOnEntry);
+                }
+            }
+
+            if (executable.endsWith(".py")) {
+                debugConfig = this.createPythonLaunchConfig(request, stopOnEntry);
             }
 
             if (!debugConfig) {
@@ -242,19 +279,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 throw (new Error(`Failed to start debug session!`));
             }
         } else {
-            try {
-                // this should be guaranteed by roslaunch
-                fs.accessSync(request.executable, fs.constants.X_OK);
-            } catch (errNotExecutable) {
-                throw (new Error(`Error! ${request.executable} is not executable!`));
-            }
-
-            try {
-                // need to be readable to check shebang line
-                fs.accessSync(request.executable, fs.constants.R_OK);
-            } catch (errNotReadable) {
-                throw (new Error(`Error! ${request.executable} is not readable!`));
-            }
+            // this should be guaranteed by roslaunch
+            await fsp.access(request.executable, fs.constants.X_OK | fs.constants.R_OK);
 
             const fileStream = fs.createReadStream(request.executable);
             const rl = readline.createInterface({
@@ -275,51 +301,9 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
                 // look for Python in shebang line
                 if (line.startsWith("#!") && line.toLowerCase().indexOf("python") !== -1) {
-                    const pythonLaunchConfig: IPythonLaunchConfiguration = {
-                        name: request.nodeName,
-                        type: "python",
-                        request: "launch",
-                        program: request.executable,
-                        args: request.arguments,
-                        env: request.env,
-                        stopOnEntry: stopOnEntry,
-                        justMyCode: false,
-                    };
-                    debugConfig = pythonLaunchConfig;
+                    debugConfig = this.createPythonLaunchConfig(request, stopOnEntry);
                 } else {
-                    interface ICppEnvConfig {
-                        name: string;
-                        value: string;
-                    }
-                    const envConfigs: ICppEnvConfig[] = [];
-                    for (const key in request.env) {
-                        if (request.env.hasOwnProperty(key)) {
-                            envConfigs.push({
-                                name: key,
-                                value: request.env[key],
-                            });
-                        }
-                    }
-                    const cppdbgLaunchConfig: ICppdbgLaunchConfiguration = {
-                        name: request.nodeName,
-                        type: "cppdbg",
-                        request: "launch",
-                        cwd: ".",
-                        program: request.executable,
-                        args: request.arguments,
-                        environment: envConfigs,
-                        stopAtEntry: stopOnEntry,
-                        additionalSOLibSearchPath: request.additionalSOLibSearchPath,
-                        sourceFileMap: request.sourceFileMap,
-                        setupCommands: [
-                            {
-                                text: "-enable-pretty-printing",
-                                description: "Enable pretty-printing for gdb",
-                                ignoreFailures: true
-                            }
-                        ]
-                    };
-                    debugConfig = cppdbgLaunchConfig;
+                    debugConfig = this.createCppLaunchConfig(request, stopOnEntry);
                 }
 
                 if (!debugConfig) {
