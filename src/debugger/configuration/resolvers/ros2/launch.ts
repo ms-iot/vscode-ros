@@ -236,9 +236,9 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         let debugConfig: ICppvsdbgLaunchConfiguration | ICppdbgLaunchConfiguration | IPythonLaunchConfiguration;
 
         if (os.platform() === "win32") {
-            let executable = request.executable.toLowerCase();
+            let nodePath = path.parse(request.executable);
 
-            if (executable.endsWith(".exe")) {
+            if (nodePath.ext.toLowerCase() === ".exe") {
 
                 // On Windows, colcon will compile Python scripts, C# and Rust programs to .exe. 
                 // Discriminate between different runtimes by introspection.
@@ -247,14 +247,14 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 // rosnode.py will be compiled into install\rosnode\Lib\rosnode\rosnode.exe
                 // rosnode.py will also be copied into install\rosnode\Lib\site-packages\rosnode.py
 
-                let nodeName = path.basename(executable, ".exe");
-                let pythonPath = path.join(path.dirname(executable), "..", "site-packages", nodeName, nodeName + ".py");
+                let pythonPath = path.join(nodePath.dir, "..", "site-packages", nodePath.name, nodePath.name + ".py");
 
                 try {
                     await fsp.access(pythonPath, fs.constants.R_OK);
 
                     // If the python file is available, then treat it as python and fall through.
-                    request.executable = executable = pythonPath;
+                    request.executable = pythonPath;
+                    debugConfig = this.createPythonLaunchConfig(request, stopOnEntry);
                 } catch {
                     // The python file is not available then this must be...
 
@@ -265,9 +265,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                     // C++
                     debugConfig = this.createCppLaunchConfig(request, stopOnEntry);
                 }
-            }
-
-            if (executable.endsWith(".py")) {
+            } else if (nodePath.ext.toLowerCase() === ".py") {
                 debugConfig = this.createPythonLaunchConfig(request, stopOnEntry);
             }
 
