@@ -34,6 +34,7 @@ export function setBaseDir(dir: string) {
  * The sourced ROS environment.
  */
 export let env: any;
+export let processingWorkspace = false;
 
 export let extPath: string;
 export let outputChannel: vscode.OutputChannel;
@@ -217,6 +218,13 @@ async function ensureErrorMessageOnException(callback: (...args: any[]) => any) 
  * Activates components which require a ROS env.
  */
 async function activateEnvironment(context: vscode.ExtensionContext) {
+
+    if (processingWorkspace) {
+        return;
+    }
+
+    processingWorkspace = true;
+
     // Clear existing disposables.
     while (subscriptions.length > 0) {
         subscriptions.pop().dispose();
@@ -275,6 +283,8 @@ async function activateEnvironment(context: vscode.ExtensionContext) {
     if (buildToolDetected) {
         ros_build_utils.createConfigFiles();
     }
+
+    processingWorkspace = false;
 }
 
 /**
