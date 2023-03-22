@@ -6,6 +6,7 @@ import * as path from 'path';
 import { rosApi } from '../ros/ros';
 import { xacro } from '../ros/utils'; 
 import { Disposable, window } from 'vscode';
+import * as extension from "../extension";
 
 export default class URDFPreview 
 {
@@ -143,7 +144,7 @@ export default class URDFPreview
 
         var previewFile = this._resource.toString();
 
-        console.log("URDF previewing: " + previewFile);
+        extension.outputChannel.appendLine("URDF previewing: " + previewFile);
 
         this._webview.webview.postMessage({ command: 'previewFile', previewFile: previewFile});
         this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });

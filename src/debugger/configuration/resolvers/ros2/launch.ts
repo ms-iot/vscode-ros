@@ -55,7 +55,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         // Manage the status of the ROS2 Daemon, starting one if not present
         if (await rosApi.getCoreStatus() == false) {
-            console.log("ROS Daemon is not active, attempting to start automatically");
+            extension.outputChannel.appendLine("ROS Daemon is not active, attempting to start automatically");
             rosApi.startCore();
 
             // Wait for the core to start up to a timeout
@@ -68,7 +68,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 await delay(interval_ms);
             }
 
-            console.log("Waited " + timeWaited + " for ROS2 Daemon to start. Proceeding without the Daemon.");
+            extension.outputChannel.appendLine("Waited " + timeWaited + " for ROS2 Daemon to start. Proceeding without the Daemon.");
         }
 
         const rosExecOptions: child_process.ExecOptions = {
@@ -78,8 +78,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             },
         };
 
-        console.log("Executing dumper with the following environment:");
-        console.log(rosExecOptions.env);
+        extension.outputChannel.appendLine("Executing dumper with the following environment:");
+        extension.outputChannel.appendLine(JSON.stringify(rosExecOptions.env));
 
         let ros2_launch_dumper = getExtensionFilePath(path.join("assets", "scripts", "ros2_launch_dumper.py"));
 
@@ -98,7 +98,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
 
         if (result.stderr) {
             // Having stderr output is not nessesarily a problem, but it is useful for debugging
-            console.log(`ROS2 launch processor produced stderr output:\r\n ${result.stderr}`);
+            extension.outputChannel.appendLine(`ROS2 launch processor produced stderr output:\r\n ${result.stderr}`);
         }        
 
         if (result.stdout.length == 0) {

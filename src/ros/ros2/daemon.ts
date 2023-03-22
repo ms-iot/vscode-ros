@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 
 import * as extension from "../../extension";
 import * as ros2_monitor from "./ros2-monitor"
+import { env } from "../../extension";
 
 /**
  * start the ROS2 daemon.
@@ -14,7 +15,8 @@ import * as ros2_monitor from "./ros2-monitor"
 export async function startDaemon() {
     const command: string = "ros2 daemon start";
     const exec = util.promisify(child_process.exec);
-    await exec(command, { env: this.env });
+    extension.outputChannel.appendLine("Attempting to start daemon with " + command);
+    await exec(command, { env: env });
 }
 
 /**
@@ -23,7 +25,7 @@ export async function startDaemon() {
 export async function stopDaemon() {
     const command: string = "ros2 daemon stop";
     const exec = util.promisify(child_process.exec);
-    await exec(command, { env: this.env });
+    await exec(command, { env: env });
 }
 
 /**
@@ -60,7 +62,7 @@ export class StatusBarItem {
             const result = await this.ros2cli.getNodeNamesAndNamespaces();
             status = true;
         } catch (error) {
-            // do nothing.
+            // Do nothing
         } finally {
             const statusIcon = status ? "$(check)" : "$(x)";
             let ros = "ROS";

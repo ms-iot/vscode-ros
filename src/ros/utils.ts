@@ -21,7 +21,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
         else {
             // Force login shell, so ROS sources correctly in containers.
             exportEnvCommand = `bash --login -c "source '${filename}' && env"`;
-            console.log ("executing " + exportEnvCommand);
+            extension.outputChannel.appendLine("Sourcing Environment using: " + exportEnvCommand);
         }
 
         let processOptions: child_process.ExecOptions = {
