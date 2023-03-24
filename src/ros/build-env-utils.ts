@@ -10,6 +10,7 @@ import * as telemetry from "../telemetry-helper";
 import { rosApi } from "./ros";
 
 const PYTHON_AUTOCOMPLETE_PATHS = "python.autoComplete.extraPaths";
+const PYTHON_ANALYSIS_PATHS = "python.analysis.extraPaths";
 
 /**
  * Creates config files which don't exist.
@@ -17,9 +18,14 @@ const PYTHON_AUTOCOMPLETE_PATHS = "python.autoComplete.extraPaths";
 export async function createConfigFiles() {
     const config = vscode.workspace.getConfiguration();
 
-    // Update the Python path if required.
+    // Update the Python autocomplete paths if required.
     if (config.get(PYTHON_AUTOCOMPLETE_PATHS, []).length === 0) {
-        updatePythonPathInternal();
+        updatePythonAutoCompletePathInternal();
+    }
+
+    // Update the Python analysis paths if required.
+    if (config.get(PYTHON_ANALYSIS_PATHS, []).length === 0) {
+        updatePythonAnalysisPathInternal();
     }
 
     const dir = path.join(vscode.workspace.rootPath, ".vscode");
@@ -93,12 +99,20 @@ export function updatePythonPath(context: vscode.ExtensionContext) {
     const reporter = telemetry.getReporter();
     reporter.sendTelemetryCommand(extension.Commands.UpdatePythonPath);
 
-    updatePythonPathInternal();
+    updatePythonAutoCompletePathInternal();
+    updatePythonAnalysisPathInternal();
 }
 
 /**
  * Updates the python autocomplete path to support ROS.
  */
-function updatePythonPathInternal() {
+function updatePythonAutoCompletePathInternal() {
     vscode.workspace.getConfiguration().update(PYTHON_AUTOCOMPLETE_PATHS, extension.env.PYTHONPATH.split(path.delimiter));
+}
+
+/**
+ * Updates the python analysis path to support ROS.
+ */
+function updatePythonAnalysisPathInternal() {
+  vscode.workspace.getConfiguration().update(PYTHON_ANALYSIS_PATHS, extension.env.PYTHONPATH.split(path.delimiter));
 }

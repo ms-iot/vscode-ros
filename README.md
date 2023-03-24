@@ -47,11 +47,9 @@ You can access the following commands from the [Visual Studio Code command palle
 | [Deep Dive - Episode 3](https://youtu.be/N2vqBvPQdhE) |  General Usage with ROS1 @ a Polyhobbyist |
 | [Deep Dive - Episode 4](https://youtu.be/k2TLdXHjVsU) |  General Usage with ROS2 @ a Polyhobbyist |
 | [Deep Dive - Episode 5](https://youtu.be/A6ABRdL0ckg) |  Debugging Python @ a Polyhobbyist |
-| Deep Dive - Episode 6 (coming soon) |  Debugging C++ @ a Polyhobbyist |
-| Deep Dive - Episode 7 (coming soon) |  Using with SSH @ a Polyhobbyist |
-| Deep Dive - Episode 8 (coming soon) |  Using with with Containers @ a Polyhobbyist |
-| Deep Dive - Episode 9 (coming soon) |  Advanced Debugging @ a Polyhobbyist |
-
+| [Deep Dive - Episode 6](https://youtu.be/uqqHgYsskJI) |  Debugging C++ @ a Polyhobbyist |
+| [Deep Dive - Episode 7](https://youtu.be/teA20AjBlG8) |  Using with SSH @ a Polyhobbyist |
+| [Deep Dive - Episode 8](https://youtu.be/JbBMF1aot5k) |  Using with with Containers @ a Polyhobbyist |
 
 ## Getting Started
 
