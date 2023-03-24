@@ -53,8 +53,8 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
             },
         };
 
-        console.log("Executing dumper with the following environment:");
-        console.log(rosExecOptions.env);
+        extension.outputChannel.appendLine("Executing dumper with the following environment:");
+        extension.outputChannel.appendLine(JSON.stringify(rosExecOptions.env, null, 2));
 
         let ros2_launch_dumper = getExtensionFilePath(path.join("assets", "scripts", "ros2_launch_dumper.py"));
 
