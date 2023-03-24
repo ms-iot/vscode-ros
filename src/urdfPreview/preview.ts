@@ -6,6 +6,7 @@ import * as path from 'path';
 import { rosApi } from '../ros/ros';
 import { xacro } from '../ros/utils'; 
 import { Disposable, window } from 'vscode';
+import * as extension from "../extension";
 
 export default class URDFPreview 
 {
@@ -111,39 +112,40 @@ export default class URDFPreview
         }
 
         var packageMap = await rosApi.getPackages();
+        if (packageMap != null) {
+            // replace package://(x) with fully resolved paths
+            var pattern =  /package:\/\/(.*?)\//g;
+            var match;
+            while (match = pattern.exec(urdfText)) {
+                var packagePath = await packageMap[match[1]]();
+                if (packagePath.charAt(0)  === '/') {
+                    // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
+                    // base path has a /, if not it adds it.
+                    // We are attempting to use a protocol handler as the base path - which causes this to fail.
+                    // basepath - vscode-webview-resource:
+                    // full path - /home/test/ros
+                    // vscode-webview-resource://home/test/ros.
+                    // It should be vscode-webview-resource:/home/test/ros.
+                    // So remove the first char.
 
-        // replace package://(x) with fully resolved paths
-        var pattern =  /package:\/\/(.*?)\//g;
-        var match;
-        while (match = pattern.exec(urdfText)) {
-            var packagePath = await packageMap[match[1]]();
-            if (packagePath.charAt(0)  === '/') {
-                // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
-                // base path has a /, if not it adds it.
-                // We are attempting to use a protocol handler as the base path - which causes this to fail.
-                // basepath - vscode-webview-resource:
-                // full path - /home/test/ros
-                // vscode-webview-resource://home/test/ros.
-                // It should be vscode-webview-resource:/home/test/ros.
-                // So remove the first char.
+                    packagePath = packagePath.substr(1);
+                }
+                let normPath = path.normalize(packagePath);
+                let vsPath = vscode.Uri.file(normPath);
+                let newUri = this._webview.webview.asWebviewUri(vsPath);
+                let hackThePath = newUri.toString().replace('https:', '');
 
-                packagePath = packagePath.substr(1);
+                // HACKHACK - the RosWebTools will alwayse prefix the paths with a '/' if we don't pass a prefix.
+                // to workaround this without changing RWT, we are stripping off the known protocol, and passing the
+                // resulting path into RWT with that known prefix as an option. Internally it will see that there is a prefix
+                // and combine them. 
+                urdfText = urdfText.replace('package://' + match[1], hackThePath);
             }
-            let normPath = path.normalize(packagePath);
-            let vsPath = vscode.Uri.file(normPath);
-            let newUri = this._webview.webview.asWebviewUri(vsPath);
-            let hackThePath = newUri.toString().replace('https:', '');
-
-            // HACKHACK - the RosWebTools will alwayse prefix the paths with a '/' if we don't pass a prefix.
-            // to workaround this without changing RWT, we are stripping off the known protocol, and passing the
-            // resulting path into RWT with that known prefix as an option. Internally it will see that there is a prefix
-            // and combine them. 
-            urdfText = urdfText.replace('package://' + match[1], hackThePath);
         }
 
         var previewFile = this._resource.toString();
 
-        console.log("URDF previewing: " + previewFile);
+        extension.outputChannel.appendLine("URDF previewing: " + previewFile);
 
         this._webview.webview.postMessage({ command: 'previewFile', previewFile: previewFile});
         this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });

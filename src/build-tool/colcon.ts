@@ -10,7 +10,14 @@ import * as common from "./common";
 import * as rosShell from "./ros-shell";
 
 function makeColcon(command: string, verb: string, args: string[], category?: string): vscode.Task {
-    const task = rosShell.make({type: command, command, args: [verb, '--symlink-install', '--event-handlers', 'console_cohesion+', '--base-paths', extension.baseDir, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
+    let installType = '--symlink-install';
+    if (process.platform === "win32") {
+
+        // Use Merge Install on Windows to support adminless builds and deployment.
+        installType = '--merge-install';
+    }
+
+        const task = rosShell.make({type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', extension.baseDir, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
                                category)
     task.problemMatchers = ["$catkin-gcc"];
 

@@ -45,7 +45,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
         // Manage the status of the ROS core, starting one if not present
         // The ROS core will continue to run until the VSCode window is closed
         if (await rosApi.getCoreStatus() == false) {
-            console.log("ROS Core is not active, attempting to start automatically");
+            extension.outputChannel.appendLine("ROS Core is not active, attempting to start automatically");
             rosApi.startCore();
 
             // Wait for the core to start up to a timeout
@@ -58,7 +58,7 @@ export class LaunchResolver implements vscode.DebugConfigurationProvider {
                 await delay(interval_ms);
             }
 
-            console.log("Waited " + timeWaited + " for ROS Core to start");
+            extension.outputChannel.appendLine("Waited " + timeWaited + " for ROS Core to start");
 
             if (timeWaited >= timeout_ms) {
                 throw new Error('Timed out (' + timeWaited / 1000 + ' seconds) waiting for ROS Core to start. Start ROSCore manually to avoid this error.');
