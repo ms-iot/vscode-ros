@@ -463,7 +463,7 @@
         "mocha": "^10.0.0",
         "ts-loader": "^9.4.2",
         "tslint": "^6.1.3",
-        "typescript": "^4.8.4",
+        "typescript": "^5.0.2",
         "vscode-test": "^1.6.1",
         "webpack": "^5.76.3",
         "webpack-cli": "^4.9.1"
