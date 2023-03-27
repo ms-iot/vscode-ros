@@ -447,7 +447,7 @@
         "sudo-prompt": "^9.2.1",
         "timers-browserify": "^2.0.12",
         "tmp": "^0.2.1",
-        "tslib": "^2.4.1",
+        "tslib": "^2.5.0",
         "xmlrpc": "^1.3.2"
     },
     "devDependencies": {
