@@ -11,12 +11,13 @@ export class RosDebugConfigurationProvider implements vscode.DebugConfigurationP
         folder: vscode.WorkspaceFolder | undefined,
         token?: vscode.CancellationToken): Promise<vscode.DebugConfiguration[]> {
         const type = await vscode.window.showQuickPick(
-            ["ROS: Launch", "ROS: Attach"], { placeHolder: "Choose a request type" });
+            ["ROS: Launch", "ROS: Debug Launch File", "ROS: Attach"], { placeHolder: "Choose a request type" });
         if (!type) {
             return [];
         }
 
         switch (type) {
+            case "ROS: Debug Launch File":
             case "ROS: Launch": {
                 const packageName = await vscode.window.showQuickPick(rosApi.getPackageNames(), {
                     placeHolder: "Choose a package",
@@ -32,13 +33,23 @@ export class RosDebugConfigurationProvider implements vscode.DebugConfigurationP
                 if (!launchFilePath) {
                     return [];
                 }
-                return [{
-                    name: "ROS: Launch",
-                    request: "launch",
-                    target: `${launchFilePath}`,
-                    launch: ["rviz", "gz", "gzclient", "gzserver"],
-                    type: "ros",
-                }];
+
+                if (type === "ROS: Debug Launch File") {
+                    return [{
+                        name: type,
+                        request: "debug_launch",
+                        target: `${launchFilePath}`,
+                        type: "ros",
+                    }];
+                } else {
+                    return [{
+                        name: type,
+                        request: "launch",
+                        target: `${launchFilePath}`,
+                        launch: ["rviz", "gz", "gzclient", "gzserver"],
+                        type: "ros",
+                    }];
+                }
             }
             case "ROS: Attach": {
                 return [{
