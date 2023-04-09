@@ -4,45 +4,64 @@
 
 const path = require('path');
 
-/**@type {import('webpack').Configuration}*/
-const config = {
-  target: 'node',
+/** @typedef {import('webpack').Configuration} WebpackConfig **/
 
-  entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
-  output: {
-    // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'extension.js',
-    libraryTarget: 'commonjs2',
-    devtoolModuleFilenameTemplate: '../[resource-path]'
+/** @type WebpackConfig */
+const baseConfig = {
+  mode: "none", // this leaves the source code as close as possible to the original (when packaging we set this to 'production')
+  externals: {
+    vscode: "commonjs vscode", // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
+    // modules added here also need to be added in the .vscodeignore file
   },
-  devtool: 'source-map',
+  resolve: {
+    extensions: [".ts", ".tsx", ".js"],
+  },
+  devtool: "source-map",
+  infrastructureLogging: {
+    level: "log", // enables logging required for problem matchers
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [{ loader: "ts-loader" }],
+      },
+    ],
+  }
+};
+
+// Config for extension source code (to be run in a Node-based context)
+/** @type WebpackConfig */
+const extensionConfig = {
+  ...baseConfig,
+  target: "node",
+  entry: "./src/extension.ts",
   externals: {
     vscode: 'commonjs vscode', // the vscode-module is created on-the-fly and must be excluded. Add other modules that cannot be webpack'ed, 📖 -> https://webpack.js.org/configuration/externals/
     'applicationinsights-native-metrics': 'commonjs applicationinsights-native-metrics' // ignored because we don't ship native module
   },
-  resolve: {
-    extensions: ['.ts', '.js'],
-//    preferRelative: true,
-    fallback: {
-      // Webpack 5 no longer polyfills Node.js core modules automatically.
-      // see https://webpack.js.org/configuration/resolve/#resolvefallback
-      // for the list of Node.js core module polyfills.
-    }  },
-    module: {
-      rules: [{
-        test: /\.ts$/,
-        exclude: /node_modules/,
-        use: [{
-            loader: 'ts-loader',
-            options: {
-                compilerOptions: {
-                    "module": "es6" // override `tsconfig.json` so that TypeScript emits native JavaScript modules.
-                }
-            }
-        }]
-      }]
-    },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "extension.js",
+    libraryTarget: "commonjs2",
+    devtoolModuleFilenameTemplate: '../[resource-path]'
+  },
 };
 
-module.exports = config;
+// Config for webview source code (to be run in a web-based context)
+/** @type WebpackConfig */
+const webviewConfig = {
+  ...baseConfig,
+  target: ["web", "es2022"],
+  entry: "./src/urdfPreview/URDFPreviewPanel.ts",
+  experiments: { outputModule: true, topLevelAwait: true },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "webview.js",
+    libraryTarget: "module",
+    chunkFormat: "module",
+  },
+};
+
+module.exports = [extensionConfig, webviewConfig];
