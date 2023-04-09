@@ -7,7 +7,7 @@ const vscode = acquireVsCodeApi();
 
 const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement; // Get the canvas element
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
-var scene = new BABYLON.Scene(engine);
+let scene : BABYLON.Scene | undefined = undefined;
 
 function applyAxisToTransform(scene : BABYLON.Scene, t : BABYLON.TransformNode | undefined) {
   if (t) {
@@ -33,20 +33,24 @@ function applyAxisToJoint(scene : BABYLON.Scene, robot : urdf.Robot, j : string)
 }
 
 var createScene = async function () {
+  scene = new BABYLON.Scene(engine);
+
   // This creates a basic Babylon Scene object (non-mesh)
     // Create a default ground and skybox.
-    const environment = scene.createDefaultEnvironment({
-      createGround: true,
-      createSkybox: false,
-      enableGroundMirror: true,
-      groundMirrorSizeRatio: 0.15
+  const environment = scene.createDefaultEnvironment({
+    createGround: true,
+    createSkybox: false,
+    enableGroundMirror: true,
+    groundMirrorSizeRatio: 0.15
   });
 
   scene.useRightHandedSystem = true;
   scene.clearColor = BABYLON.Color4.FromColor3(BABYLON.Color3.Black());// TODO (polyhobbyist) Make this configurable
 
+  var radius = 5; // TODO (polyhobbyist): make this configurable
+
   // This creates and positions a free camera (non-mesh)
-  var camera = new BABYLON.ArcRotateCamera("camera1", - Math.PI / 3, 5 * Math.PI / 12, 10, new BABYLON.Vector3(0, 2, 0), scene);
+  var camera = new BABYLON.ArcRotateCamera("camera1", - Math.PI / 3, 5 * Math.PI / 12, radius, new BABYLON.Vector3(0, 0, 0), scene);
   camera.wheelDeltaPercentage = 0.01;
   camera.minZ = 0.1;
 
@@ -77,9 +81,10 @@ async function applyURDF(urdfText) {
     var robot = await urdf.deserializeUrdfToRobot(urdfText);
     robot.create(scene);
   } catch (err) {
+    
     vscode.postMessage({
       command: "error",
-      text: err,
+      text: `Could not render URDF due to: ${err}\n${err.stack}`,
     });
   }
 
@@ -107,7 +112,7 @@ async function main() {
   });    
 
   engine.runRenderLoop(function () {
-    if (scene != null) {
+    if (scene != undefined) {
       scene.render();
     }
   });

@@ -35,7 +35,12 @@ export default class URDFPreview
             vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
             { 
                 enableScripts: true,
-                retainContextWhenHidden: true
+                retainContextWhenHidden: true,
+                localResourceRoots: [
+                  vscode.Uri.joinPath(context.extensionUri, "dist"),
+                  vscode.Uri.joinPath(context.extensionUri, "node_modules/babylon_ros/dist"),
+                  vscode.Uri.joinPath(context.extensionUri, "node_modules/babylonjs"),
+              ],
             }
         );
 
@@ -213,13 +218,10 @@ export default class URDFPreview
    * rendered within the webview panel
    */
     private _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
-        const webviewUri = this.getUri(webview, extensionUri, ["out", "webview.js"]);
+        const webviewUri = this.getUri(webview, extensionUri, ["dist", "webview.js"]);
         const webviewUriUrdf = this.getUri(webview, extensionUri, ["node_modules/babylon_ros/dist", "ros.js"]);
         const webviewUriBabylon = this.getUri(webview, extensionUri, ["node_modules/babylonjs", "babylon.max.js"]);
         const nonce = this.getNonce();
-
-        console.log(BABYLON.Engine.Version);
-        console.log(BABYLON.Engine.NpmPackage);
 
         // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
         return /*html*/ `
@@ -228,7 +230,7 @@ export default class URDFPreview
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                        <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'">
+                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'">
                 <style nonce="${nonce}">
                 html,
                 body {
