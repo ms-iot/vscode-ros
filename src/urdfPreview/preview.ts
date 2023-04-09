@@ -13,7 +13,7 @@ export default class URDFPreview
     private _resource: vscode.Uri;
     private _processing: boolean;
     private  _context: vscode.ExtensionContext;
-    private _disposable: Disposable;
+    private _disposables: Disposable[] = [];
     _urdfEditor: vscode.TextEditor;
     _webview: vscode.WebviewPanel;
 
@@ -55,13 +55,10 @@ export default class URDFPreview
 
         let subscriptions: Disposable[] = [];
 
-        const templateFilename = this._context.asAbsolutePath("templates/preview.html");
-        vscode.workspace.openTextDocument(templateFilename).then(doc => {
-            var previewText = doc.getText();
-            this._webview.webview.html = previewText;
+            // Set an event listener to listen for messages passed from the webview context
+        this._setWebviewMessageListener(this._webview.webview);
 
-            setTimeout(() => this.refresh(), 1000);
-        });
+        this._webview.webview.html = this._getWebviewContent(this._webview.webview, context.extensionUri);
 
         this._webview.onDidChangeViewState(e => {
             if (e.webviewPanel.active) {
@@ -81,7 +78,7 @@ export default class URDFPreview
             this.dispose();
         }, null, subscriptions);        
 
-        this._disposable = Disposable.from(...subscriptions);
+        this._disposables = subscriptions;
     }
 
     public get resource(): vscode.Uri {
@@ -98,59 +95,48 @@ export default class URDFPreview
         this._processing = true;
 
         var urdfText;
-        let ext = path.extname(this._resource.fsPath);
-        if (ext == ".xacro") {
-            try {
-                urdfText = await xacro(this._resource.fsPath);
-            } catch (err) {
-                vscode.window.showErrorMessage(err.message);
-            }
-        } else {
-            // at this point, the text document could have changed
-            var doc = await vscode.workspace.openTextDocument(this._resource.fsPath);
-            urdfText = doc.getText();
-        }
+        try {
+            urdfText = await xacro(this._resource.fsPath);
 
-        var packageMap = await rosApi.getPackages();
-        if (packageMap != null) {
-            // replace package://(x) with fully resolved paths
-            var pattern =  /package:\/\/(.*?)\//g;
-            var match;
-            while (match = pattern.exec(urdfText)) {
-                var packagePath = await packageMap[match[1]]();
-                if (packagePath.charAt(0)  === '/') {
-                    // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
-                    // base path has a /, if not it adds it.
-                    // We are attempting to use a protocol handler as the base path - which causes this to fail.
-                    // basepath - vscode-webview-resource:
-                    // full path - /home/test/ros
-                    // vscode-webview-resource://home/test/ros.
-                    // It should be vscode-webview-resource:/home/test/ros.
-                    // So remove the first char.
+            var packageMap = await rosApi.getPackages();
+            if (packageMap != null) {
+                // replace package://(x) with fully resolved paths
+                var pattern =  /package:\/\/(.*?)\//g;
+                var match;
+                while (match = pattern.exec(urdfText)) {
+                    var packagePath = await packageMap[match[1]]();
+                    if (packagePath.charAt(0)  === '/') {
+                        // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
+                        // base path has a /, if not it adds it.
+                        // We are attempting to use a protocol handler as the base path - which causes this to fail.
+                        // basepath - vscode-webview-resource:
+                        // full path - /home/test/ros
+                        // vscode-webview-resource://home/test/ros.
+                        // It should be vscode-webview-resource:/home/test/ros.
+                        // So remove the first char.
 
-                    packagePath = packagePath.substr(1);
+                        packagePath = packagePath.substr(1);
+                    }
+                    let normPath = path.normalize(packagePath);
+                    let vsPath = vscode.Uri.file(normPath);
+                    let newUri = this._webview.webview.asWebviewUri(vsPath);
+
+                    urdfText = urdfText.replace('package://' + match[1], newUri);
                 }
-                let normPath = path.normalize(packagePath);
-                let vsPath = vscode.Uri.file(normPath);
-                let newUri = this._webview.webview.asWebviewUri(vsPath);
-                let hackThePath = newUri.toString().replace('https:', '');
-
-                // HACKHACK - the RosWebTools will alwayse prefix the paths with a '/' if we don't pass a prefix.
-                // to workaround this without changing RWT, we are stripping off the known protocol, and passing the
-                // resulting path into RWT with that known prefix as an option. Internally it will see that there is a prefix
-                // and combine them. 
-                urdfText = urdfText.replace('package://' + match[1], hackThePath);
             }
+
+            var previewFile = this._resource.toString();
+
+            extension.outputChannel.appendLine("URDF previewing: " + previewFile);
+            extension.outputChannel.append(urdfText);
+
+            this._webview.webview.postMessage({ command: 'previewFile', previewFile: previewFile});
+            this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });
+
+            this._processing = false;
+        } catch (err) {
+            vscode.window.showErrorMessage(err.message);
         }
-
-        var previewFile = this._resource.toString();
-
-        extension.outputChannel.appendLine("URDF previewing: " + previewFile);
-
-        this._webview.webview.postMessage({ command: 'previewFile', previewFile: previewFile});
-        this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });
-
-        this._processing = false;
     }
 
     public static async revive(
@@ -158,7 +144,7 @@ export default class URDFPreview
         context: vscode.ExtensionContext,
         state: any,
     ): Promise<URDFPreview> {
-        const resource = vscode.Uri.parse(state.previewFile);
+        const resource = vscode.Uri.file(state.previewFile);
 
         const preview = new URDFPreview(
             webview,
@@ -199,11 +185,105 @@ export default class URDFPreview
     }
     
     public dispose() {
-        this._disposable.dispose();
+        while (this._disposables.length) {
+            const disposable = this._disposables.pop();
+            if (disposable) {
+                disposable.dispose();
+            }
+        }
+
         this._onDisposeEmitter.fire();
         this._onDisposeEmitter.dispose();
 
         this._onDidChangeViewStateEmitter.dispose();
         this._webview.dispose();    
     }
-}
+
+
+    /**
+   * Defines and returns the HTML that should be rendered within the webview panel.
+   *
+   * @remarks This is also the place where *references* to CSS and JavaScript files
+   * are created and inserted into the webview HTML.
+   *
+   * @param webview A reference to the extension webview
+   * @param extensionUri The URI of the directory containing the extension
+   * @returns A template string literal containing the HTML that should be
+   * rendered within the webview panel
+   */
+    private _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
+        const webviewUri = this.getUri(webview, extensionUri, ["dist", "webview.js"]);
+        const webviewUriUrdf = this.getUri(webview, extensionUri, ["node_modules/@polyhobbyist/babylon_ros/dist", "ros.js"]);
+        const webviewUriBabylon = this.getUri(webview, extensionUri, ["node_modules/babylonjs", "babylon.max.js"]);
+        const nonce = this.getNonce();
+
+        // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
+        return /*html*/ `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style nonce="${nonce}">
+                html,
+                body {
+                overflow: hidden;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                }
+
+                #renderCanvas {
+                width: 100%;
+                height: 100%;
+                touch-action: none;
+                }
+            </style>
+            <title>Hello World!</title>
+            </head>
+            <body>
+                <canvas id="renderCanvas" touch-action="none"></canvas>    
+                <script type="module" nonce="${nonce}" src="${webviewUriBabylon}"></script>
+                <script type="module" nonce="${nonce}" src="${webviewUri}"></script>
+            </body>
+            </html>
+        `;
+    }
+
+    private getNonce() {
+        let text = "";
+        const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for (let i = 0; i < 32; i++) {
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        return text;
+    }
+
+    private getUri(webview: vscode.Webview, extensionUri: vscode.Uri, pathList: string[]) {
+        return webview.asWebviewUri(vscode.Uri.joinPath(extensionUri, ...pathList));
+    }
+
+    private _setWebviewMessageListener(webview: vscode.Webview) {
+        webview.onDidReceiveMessage(
+        (message: any) => {
+            const command = message.command;
+            const text = message.text;
+    
+            switch (command) {
+            case "info":
+                vscode.window.showInformationMessage(text);
+                return;
+            case "error":
+                vscode.window.showErrorMessage(text);
+                return;
+            case "trace":
+            extension.outputChannel.appendLine(text);
+            return;
+            }
+        },
+        undefined,
+        this._disposables
+        );
+    }
+    }

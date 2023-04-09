@@ -63,7 +63,7 @@ jobs:
       - run: npm install
       - name: Build VSIX package
         run: |
-          npm install vsce -g
+          npm install @vscode/vsce -g
           npm run compile
       - name: Build Release VSIX package
         if: '!github.event.release.prerelease'
