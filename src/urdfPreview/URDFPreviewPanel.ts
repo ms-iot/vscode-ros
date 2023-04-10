@@ -1,6 +1,6 @@
 import * as BABYLON from 'babylonjs';
 import * as Materials from 'babylonjs-materials';
-import * as urdf from 'babylon_ros';
+import * as urdf from '@polyhobbyist/babylon_ros';
 
 // Get access to the VS Code API from within the webview context
 const vscode = acquireVsCodeApi();

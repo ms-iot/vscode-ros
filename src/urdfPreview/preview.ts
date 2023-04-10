@@ -37,10 +37,10 @@ export default class URDFPreview
                 enableScripts: true,
                 retainContextWhenHidden: true,
                 localResourceRoots: [
-                  vscode.Uri.joinPath(context.extensionUri, "dist"),
-                  vscode.Uri.joinPath(context.extensionUri, "node_modules/babylon_ros/dist"),
-                  vscode.Uri.joinPath(context.extensionUri, "node_modules/babylonjs"),
-              ],
+                    vscode.Uri.joinPath(context.extensionUri, "dist"),
+                    vscode.Uri.joinPath(context.extensionUri, "node_modules/babylon_ros/dist"),
+                    vscode.Uri.joinPath(context.extensionUri, "node_modules/babylonjs"),
+                ],
             }
         );
 
@@ -206,7 +206,7 @@ export default class URDFPreview
     }
 
 
-  /**
+    /**
    * Defines and returns the HTML that should be rendered within the webview panel.
    *
    * @remarks This is also the place where *references* to CSS and JavaScript files
@@ -219,7 +219,7 @@ export default class URDFPreview
    */
     private _getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
         const webviewUri = this.getUri(webview, extensionUri, ["dist", "webview.js"]);
-        const webviewUriUrdf = this.getUri(webview, extensionUri, ["node_modules/babylon_ros/dist", "ros.js"]);
+        const webviewUriUrdf = this.getUri(webview, extensionUri, ["node_modules/@polyhobbyist/babylon_ros/dist", "ros.js"]);
         const webviewUriBabylon = this.getUri(webview, extensionUri, ["node_modules/babylonjs", "babylon.max.js"]);
         const nonce = this.getNonce();
 
