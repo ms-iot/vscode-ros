@@ -35,12 +35,7 @@ export default class URDFPreview
             vscode.ViewColumn.Two, // Editor column to show the new webview panel in.
             { 
                 enableScripts: true,
-                retainContextWhenHidden: true,
-                localResourceRoots: [
-                    vscode.Uri.joinPath(context.extensionUri, "dist"),
-                    vscode.Uri.joinPath(context.extensionUri, "node_modules/babylon_ros/dist"),
-                    vscode.Uri.joinPath(context.extensionUri, "node_modules/babylonjs"),
-                ],
+                retainContextWhenHidden: true
             }
         );
 
@@ -59,6 +54,9 @@ export default class URDFPreview
         this._processing = false;
 
         let subscriptions: Disposable[] = [];
+
+            // Set an event listener to listen for messages passed from the webview context
+        this._setWebviewMessageListener(this._webview.webview);
 
         this._webview.webview.html = this._getWebviewContent(this._webview.webview, context.extensionUri);
 
@@ -122,19 +120,15 @@ export default class URDFPreview
                     let normPath = path.normalize(packagePath);
                     let vsPath = vscode.Uri.file(normPath);
                     let newUri = this._webview.webview.asWebviewUri(vsPath);
-                    let hackThePath = newUri.toString().replace('https:', '');
 
-                    // HACKHACK - the RosWebTools will alwayse prefix the paths with a '/' if we don't pass a prefix.
-                    // to workaround this without changing RWT, we are stripping off the known protocol, and passing the
-                    // resulting path into RWT with that known prefix as an option. Internally it will see that there is a prefix
-                    // and combine them. 
-                    urdfText = urdfText.replace('package://' + match[1], hackThePath);
+                    urdfText = urdfText.replace('package://' + match[1], newUri);
                 }
             }
 
             var previewFile = this._resource.toString();
 
             extension.outputChannel.appendLine("URDF previewing: " + previewFile);
+            extension.outputChannel.append(urdfText);
 
             this._webview.webview.postMessage({ command: 'previewFile', previewFile: previewFile});
             this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });
@@ -150,7 +144,7 @@ export default class URDFPreview
         context: vscode.ExtensionContext,
         state: any,
     ): Promise<URDFPreview> {
-        const resource = vscode.Uri.parse(state.previewFile);
+        const resource = vscode.Uri.file(state.previewFile);
 
         const preview = new URDFPreview(
             webview,
@@ -230,7 +224,6 @@ export default class URDFPreview
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline'">
                 <style nonce="${nonce}">
                 html,
                 body {

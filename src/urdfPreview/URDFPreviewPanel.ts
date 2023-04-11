@@ -9,6 +9,8 @@ const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement; // 
 const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
 let scene : BABYLON.Scene | undefined = undefined;
 
+let currentRobot : urdf.Robot | undefined = undefined;
+
 function applyAxisToTransform(scene : BABYLON.Scene, t : BABYLON.TransformNode | undefined) {
   if (t) {
     let a = new BABYLON.AxesViewer(scene, .5);
@@ -60,7 +62,7 @@ var createScene = async function () {
   camera.attachControl(canvas, true);
 
   var groundMaterial = new Materials.GridMaterial("groundMaterial", scene);
-  groundMaterial.majorUnitFrequency = 5;
+  groundMaterial.majorUnitFrequency = 1;
   groundMaterial.minorUnitVisibility = 0.5;
   groundMaterial.gridRatio = 2;
   groundMaterial.opacity = 0.8;
@@ -76,10 +78,24 @@ var createScene = async function () {
 
 async function applyURDF(urdfText) {
   try {
-    scene = await createScene();
+    if (currentRobot) {
+      currentRobot.dispose();
+      currentRobot = undefined;
+    }
 
-    var robot = await urdf.deserializeUrdfToRobot(urdfText);
-    robot.create(scene);
+    vscode.postMessage({
+      command: "trace",
+      text: `loading urdf`,
+    });
+
+
+    currentRobot = await urdf.deserializeUrdfToRobot(urdfText);
+    currentRobot.create(scene);
+
+    vscode.postMessage({
+      command: "trace",
+      text: `loaded urdf`,
+    });
   } catch (err) {
     
     vscode.postMessage({
@@ -99,6 +115,14 @@ async function applyURDF(urdfText) {
 // Main function that gets executed once the webview DOM loads
 async function main() {
 
+  scene = await createScene();
+
+  engine.runRenderLoop(function () {
+    if (scene != undefined) {
+      scene.render();
+    }
+  });
+  
   window.addEventListener('message', event => {
     const message = event.data; // The JSON data our extension sent
     switch (message.command) {
@@ -108,12 +132,6 @@ async function main() {
         case 'previewFile':
         vscode.setState({previewFile: message.previewFile});
         break;
-    }
-  });    
-
-  engine.runRenderLoop(function () {
-    if (scene != undefined) {
-      scene.render();
     }
   });
   
