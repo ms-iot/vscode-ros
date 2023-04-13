@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import * as Materials from 'babylonjs-materials';
 import * as urdf from '@polyhobbyist/babylon_ros';
+import * as ColladaFileLoader from '@polyhobbyist/babylon-collada-loader';
 
 // Get access to the VS Code API from within the webview context
 const vscode = acquireVsCodeApi();
@@ -36,6 +37,10 @@ function applyAxisToJoint(scene : BABYLON.Scene, robot : urdf.Robot, j : string)
 
 var createScene = async function () {
   scene = new BABYLON.Scene(engine);
+  if (BABYLON.SceneLoader) {
+    //Add this loader into the register plugin
+    BABYLON.SceneLoader.RegisterPlugin(new ColladaFileLoader.DAEFileLoader());
+  }
 
   // This creates a basic Babylon Scene object (non-mesh)
     // Create a default ground and skybox.
@@ -56,7 +61,7 @@ var createScene = async function () {
   camera.wheelDeltaPercentage = 0.01;
   camera.minZ = 0.1;
 
-  const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
+  const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
   // This attaches the camera to the canvas
   camera.attachControl(canvas, true);
