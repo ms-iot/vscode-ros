@@ -1,7 +1,5 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-import * as extension from "../../../extension";
-
 function removeAllChildElements(e) {
     while (e.firstChild) {
         e.removeChild(e.firstChild);
@@ -132,7 +130,6 @@ function initializeCoreMonitor() {
         removeAllChildElements(servicesElement);
 
         if (message.status) {
-            extension.outputChannel.appendLine("ROS online");
             coreStatus.textContent = "online";
 
             let parameters = JSON.parse(message.parameters);
@@ -153,7 +150,6 @@ function initializeCoreMonitor() {
             servicesElement.appendChild(generateServicesTable(systemState.services));
         }
         else {
-            extension.outputChannel.appendLine("ROS offline");
             coreStatus.textContent = "offline";
         }
     });

@@ -428,6 +428,7 @@
     "dependencies": {
         "@vscode/debugadapter": "^1.59.0",
         "@vscode/extension-telemetry": "^0.6.2",
+        "@vscode/webview-ui-toolkit": "^1.2.2",
         "assert": "^2.0.0",
         "buffer": "^6.0.3",
         "console-browserify": "^1.2.0",
