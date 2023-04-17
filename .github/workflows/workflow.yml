@@ -25,9 +25,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
       - run: npm install
   archive-vsix:
     runs-on: ubuntu-latest
@@ -36,9 +36,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
       - run: npm install
       - name: Build VSIX package
         run: |
@@ -57,15 +57,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
       - run: npm install
       - name: Build VSIX package
         run: |
           npm install vsce -g
           npm run compile
+      - name: Build Release VSIX package
+        if: '!github.event.release.prerelease'
+        run: |
           vsce package -o vscode-ros.vsix
-      - name: Publish VSIX package
+      - name: Build Prerelease VSIX package
+        if: 'github.event.release.prerelease'
+        run: |
+          vsce package --pre-release -o vscode-ros.vsix
+      - name: Publish Release VSIX package
+        if: '!github.event.release.prerelease'
         run: |
           vsce publish -p ${{secrets.MARKETPLACE_PUBLISHER_TOKEN}}
+      - name: Publish Prerelease VSIX package
+        if: 'github.event.release.prerelease'
+        run: |
+          vsce publish --pre-release -p ${{secrets.MARKETPLACE_PUBLISHER_TOKEN}}

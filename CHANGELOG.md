@@ -1,4 +1,10 @@
 # Changelog
+## 0.9.3
+zero change release to prime the pre-release channel for future test releases.
+
+## 0.9.2
+Hot fix for ROS1 Debugging
+
 ## 0.9.1
 * Revert change to filter XML and YAML files from launching.
 
