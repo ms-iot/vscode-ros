@@ -415,7 +415,7 @@
     },
     "scripts": {
         "package:dev": "vsce package -o vscode-ros-dev.vsix",
-        "compile": "tsc -p ./",
+        "compile": "npm run package",
         "lint": "eslint -p ./",
         "pretest": "npm run compile",
         "test": "node ./out/src/test/runTest.js",
@@ -423,7 +423,7 @@
         "webpack": "webpack --mode development",
         "watch": "webpack --mode development --watch",
         "package": "webpack --mode production --devtool hidden-source-map",
-        "test-compile": "tsc -p ./"
+        "test-compile": "npm run webpack"
     },
     "dependencies": {
         "@polyhobbyist/babylon_ros": "^0.0.1",
