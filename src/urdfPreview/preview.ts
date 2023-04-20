@@ -130,7 +130,7 @@ export default class URDFPreview
             extension.outputChannel.appendLine("URDF previewing: " + previewFile);
             extension.outputChannel.append(urdfText);
 
-            this._webview.webview.postMessage({ command: 'previewFile', previewFile: previewFile});
+            this._webview.webview.postMessage({ command: 'previewFile', previewFile: this._resource.path});
             this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });
 
             this._processing = false;
