@@ -94,6 +94,7 @@ export default class URDFPreview
     private async loadResource() {
         this._processing = true;
 
+        var packagesNotFound = [];
         var urdfText;
         try {
             urdfText = await xacro(this._resource.fsPath);
@@ -104,24 +105,31 @@ export default class URDFPreview
                 var pattern =  /package:\/\/(.*?)\//g;
                 var match;
                 while (match = pattern.exec(urdfText)) {
-                    var packagePath = await packageMap[match[1]]();
-                    if (packagePath.charAt(0)  === '/') {
-                        // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
-                        // base path has a /, if not it adds it.
-                        // We are attempting to use a protocol handler as the base path - which causes this to fail.
-                        // basepath - vscode-webview-resource:
-                        // full path - /home/test/ros
-                        // vscode-webview-resource://home/test/ros.
-                        // It should be vscode-webview-resource:/home/test/ros.
-                        // So remove the first char.
+                    if (packageMap.hasOwnProperty(match[1]) == false) {
+                        if (packagesNotFound.indexOf(match[1]) == -1) {
+                            extension.outputChannel.appendLine(`Package ${match[1]} not found in workspace.`);
+                            packagesNotFound.push(match[1]);
+                        }
+                    } else {
+                        var packagePath = await packageMap[match[1]]();
+                        if (packagePath.charAt(0)  === '/') {
+                            // inside of mesh re \source, the loader attempts to concatinate the base uri with the new path. It first checks to see if the
+                            // base path has a /, if not it adds it.
+                            // We are attempting to use a protocol handler as the base path - which causes this to fail.
+                            // basepath - vscode-webview-resource:
+                            // full path - /home/test/ros
+                            // vscode-webview-resource://home/test/ros.
+                            // It should be vscode-webview-resource:/home/test/ros.
+                            // So remove the first char.
 
-                        packagePath = packagePath.substr(1);
+                            packagePath = packagePath.substr(1);
+                        }
+                        let normPath = path.normalize(packagePath);
+                        let vsPath = vscode.Uri.file(normPath);
+                        let newUri = this._webview.webview.asWebviewUri(vsPath);
+
+                        urdfText = urdfText.replace('package://' + match[1], newUri);
                     }
-                    let normPath = path.normalize(packagePath);
-                    let vsPath = vscode.Uri.file(normPath);
-                    let newUri = this._webview.webview.asWebviewUri(vsPath);
-
-                    urdfText = urdfText.replace('package://' + match[1], newUri);
                 }
             }
 
@@ -136,6 +144,13 @@ export default class URDFPreview
             this._processing = false;
         } catch (err) {
             vscode.window.showErrorMessage(err.message);
+        }
+
+        if (packagesNotFound.length > 0) {
+            var packagesNotFoundList = packagesNotFound.join('\n');
+
+            packagesNotFoundList += '\n\nNOTE: If this occurs at startup, please try saving the open file to refresh.';
+            vscode.window.showErrorMessage("The following packages were not found in the workspace:\n" + packagesNotFoundList);
         }
     }
 
@@ -240,7 +255,7 @@ export default class URDFPreview
                 touch-action: none;
                 }
             </style>
-            <title>Hello World!</title>
+            <title>URDF Preview</title>
             </head>
             <body>
                 <canvas id="renderCanvas" touch-action="none"></canvas>    
