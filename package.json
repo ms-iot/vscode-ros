@@ -473,7 +473,7 @@
         "typescript": "^5.0.2",
         "vscode-test": "^1.6.1",
         "webpack": "^5.76.3",
-        "webpack-cli": "^5.0.1"
+        "webpack-cli": "^5.1.0"
     },
     "extensionDependencies": [
         "ms-python.python",
