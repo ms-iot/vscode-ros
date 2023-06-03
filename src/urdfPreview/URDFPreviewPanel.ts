@@ -2,6 +2,7 @@ import * as BABYLON from 'babylonjs';
 import * as Materials from 'babylonjs-materials';
 import * as urdf from '@polyhobbyist/babylon_ros';
 import * as ColladaFileLoader from '@polyhobbyist/babylon-collada-loader';
+import * as GUI from 'babylonjs-gui';
 
 // Get access to the VS Code API from within the webview context
 const vscode = acquireVsCodeApi();
@@ -12,28 +13,104 @@ let scene : BABYLON.Scene | undefined = undefined;
 
 let currentRobot : urdf.Robot | undefined = undefined;
 
-function applyAxisToTransform(scene : BABYLON.Scene, t : BABYLON.TransformNode | undefined) {
-  if (t) {
-    let a = new BABYLON.AxesViewer(scene, .5);
-    a.xAxis.parent = t;
-    a.yAxis.parent = t;
-    a.zAxis.parent = t;
+let ground : BABYLON.GroundMesh | undefined = undefined;
+let camera : BABYLON.ArcRotateCamera | undefined = undefined;
+let statusLabel = new GUI.TextBlock();
+
+let readyToRender : Boolean = false;
+
+let axisList : BABYLON.PositionGizmo[] = [];
+
+function addAxisToTransform(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, transform : BABYLON.TransformNode | undefined) {
+  if (transform) {
+    let axis = new BABYLON.PositionGizmo(layer);
+    axis.scaleRatio = 0.5
+    axis.attachedNode = transform;
+    axisList.push(axis);
+
+    let drag = () => {
+      if (transform) {
+        statusLabel.text = transform.name + 
+        "\nX: " + transform.position.x.toFixed(6) + 
+        "\nY: " + transform.position.y.toFixed(6) + 
+        "\nZ: " + transform.position.z.toFixed(6);
+        statusLabel.linkOffsetY = -100;
+      statusLabel.linkWithMesh(transform);
+      }
+    }
+
+    axis.xGizmo.dragBehavior.onDragObservable.add(drag);
+    axis.yGizmo.dragBehavior.onDragObservable.add(drag);
+    axis.zGizmo.dragBehavior.onDragObservable.add(drag);
+      
   }
 }
 
-function applyAxisToLink(scene : BABYLON.Scene, robot : urdf.Robot, l : string) {
-  let r = robot.links.get(l);
-  if (r && r.visuals[0].transform) {
-    applyAxisToTransform(scene, r.visuals[0].transform);
+function toggleAxisOnRobot(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, robot : urdf.Robot) {
+
+  if (axisList.length == 0) {
+    robot.joints.forEach((j) => {
+      addAxisToTransform(scene, layer, j.transform);
+    });
+    robot.links.forEach((l) => {
+      l.visuals.forEach((v) => {
+        addAxisToTransform(scene, layer, l.transform);
+      });
+    });
+  } else {
+    axisList.forEach((a) => {
+      a.dispose();
+    });
+    axisList = [];
   }
 }
 
-function applyAxisToJoint(scene : BABYLON.Scene, robot : urdf.Robot, j : string) {
-  let r = robot.joints.get(j);
-  if (r && r.transform) {
-    applyAxisToTransform(scene, r.transform);
+let rotationGizmos : BABYLON.RotationGizmo[] = [];
+
+function addRotationToTransform(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, transform : BABYLON.TransformNode | undefined) {
+  if (transform) {
+    let rotationGizmo = new BABYLON.RotationGizmo(layer);
+    rotationGizmo.scaleRatio = 0.5
+    rotationGizmo.attachedNode = transform;
+    rotationGizmos.push(rotationGizmo);
+
+    let drag = () => {
+      if (transform) {
+        statusLabel.text = transform.name + 
+        "\nR:" + transform.rotation.x.toFixed(6) + 
+        "\nP:" + transform.rotation.y.toFixed(6) + 
+        "\nY:" + transform.rotation.z.toFixed(6);
+        statusLabel.linkOffsetY = -100;
+      statusLabel.linkWithMesh(transform);
+      }
+    }
+
+    rotationGizmo.xGizmo.dragBehavior.onDragObservable.add(drag);
+    rotationGizmo.yGizmo.dragBehavior.onDragObservable.add(drag);
+    rotationGizmo.zGizmo.dragBehavior.onDragObservable.add(drag);
+  }
+
+}
+
+function toggleAxisRotationOnRobot(ui: GUI.AdvancedDynamicTexture, scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, robot : urdf.Robot) {
+  if (rotationGizmos.length == 0) {
+    robot.joints.forEach((j) => {
+      addRotationToTransform(scene, layer, j.transform);
+    });
+
+    robot.links.forEach((l) => {
+      l.visuals.forEach((v) => {
+        addRotationToTransform(scene, layer, v.transform);
+      });
+    });
+  } else {
+    rotationGizmos.forEach((a) => {
+      a.dispose();
+    });
+    rotationGizmos = [];
   }
 }
+
 
 var createScene = async function () {
   scene = new BABYLON.Scene(engine);
@@ -52,12 +129,11 @@ var createScene = async function () {
   });
 
   scene.useRightHandedSystem = true;
-  scene.clearColor = BABYLON.Color4.FromColor3(BABYLON.Color3.Black());// TODO (polyhobbyist) Make this configurable
+  scene.clearColor = BABYLON.Color4.FromColor3(BABYLON.Color3.Black());
 
-  var radius = 5; // TODO (polyhobbyist): make this configurable
-
+  
   // This creates and positions a free camera (non-mesh)
-  var camera = new BABYLON.ArcRotateCamera("camera1", - Math.PI / 3, 5 * Math.PI / 12, radius, new BABYLON.Vector3(0, 0, 0), scene);
+  camera = new BABYLON.ArcRotateCamera("camera1", - Math.PI / 3, 5 * Math.PI / 12, 1, new BABYLON.Vector3(0, 0, 0), scene);
   camera.wheelDeltaPercentage = 0.01;
   camera.minZ = 0.1;
 
@@ -67,19 +143,73 @@ var createScene = async function () {
   camera.attachControl(canvas, true);
 
   var groundMaterial = new Materials.GridMaterial("groundMaterial", scene);
-  groundMaterial.majorUnitFrequency = 1;
+  groundMaterial.majorUnitFrequency = 5;
   groundMaterial.minorUnitVisibility = 0.5;
-  groundMaterial.gridRatio = 2;
+  groundMaterial.gridRatio = 1;
   groundMaterial.opacity = 0.8;
   groundMaterial.useMaxLine = true;
-  groundMaterial.lineColor = BABYLON.Color3.Green();  // TODO (polyhobbyist) Make this configurable
+  groundMaterial.lineColor = BABYLON.Color3.Green();
+  groundMaterial.mainColor = BABYLON.Color3.Green();
 
-  var ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 50, height: 50}, scene);
+  ground = BABYLON.MeshBuilder.CreateGround("ground", {width: 50, height: 50}, scene);
   ground.material = groundMaterial;
+  ground.isPickable = false;
 
 
   return scene;
 };
+
+function createUI(scene : BABYLON.Scene) {
+  var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
+
+  statusLabel.color = "white";
+  statusLabel.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  statusLabel.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_CENTER;
+  statusLabel.resizeToFit = true;
+  statusLabel.outlineColor = "green";
+  statusLabel.outlineWidth = 2.0;
+  advancedTexture.addControl(statusLabel);
+
+  var toolbar = new GUI.StackPanel();
+  toolbar.paddingTop = "10px";
+  toolbar.paddingLeft = "10px";
+  toolbar.width = "300px";
+  toolbar.height = "50px";
+  toolbar.fontSize = "14px";
+  toolbar.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  toolbar.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  toolbar.isVertical = false;
+  advancedTexture.addControl(toolbar);
+
+
+  var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
+
+  const gizmoManager = new BABYLON.GizmoManager(scene);
+  gizmoManager.usePointerToAttachGizmos = false;
+
+  var button = GUI.Button.CreateSimpleButton("axisButton", "Axis");
+  button.width = 0.2;
+  button.height = "40px";
+  button.color = "white";
+  button.background = "green";
+  button.onPointerClickObservable.add(function() {
+
+    toggleAxisOnRobot(scene, utilLayer, currentRobot);
+  });
+  toolbar.addControl(button);
+
+  var buttonRotate = GUI.Button.CreateSimpleButton("rotatioButton", "Rotation");
+  buttonRotate.width = 0.2;
+  buttonRotate.height = "40px";
+  buttonRotate.color = "white";
+  buttonRotate.background = "green";
+  buttonRotate.onPointerClickObservable.add(function() {
+    toggleAxisRotationOnRobot(advancedTexture, scene, utilLayer, currentRobot);
+  });  
+
+  toolbar.addControl(buttonRotate);
+
+}
 
 async function applyURDF(urdfText) {
   try {
@@ -108,26 +238,14 @@ async function applyURDF(urdfText) {
       text: `Could not render URDF due to: ${err}\n${err.stack}`,
     });
   }
-
-  //applyAxisToTransform(scene, robot.transform);
-
-  //applyAxisToLink(scene, robot, "base_link");
-  //applyAxisToLink(scene, robot, "right_leg");
-
-  //applyAxisToJoint(scene, robot, "base_to_right_leg");
-
 }
+
 // Main function that gets executed once the webview DOM loads
 async function main() {
 
   scene = await createScene();
+  createUI(scene);
 
-  engine.runRenderLoop(function () {
-    if (scene != undefined) {
-      scene.render();
-    }
-  });
-  
   window.addEventListener('message', event => {
     const message = event.data; // The JSON data our extension sent
     switch (message.command) {
@@ -137,6 +255,22 @@ async function main() {
         case 'previewFile':
         vscode.setState({previewFile: message.previewFile});
         break;
+        case 'colors':
+          camera.radius = message.cameraRadius;
+          scene.clearColor = BABYLON.Color4.FromHexString(message.backgroundColor);
+          let gm = ground.material as Materials.GridMaterial;
+          gm.lineColor = BABYLON.Color3.FromHexString(message.gridLineColor);
+          gm.mainColor = BABYLON.Color3.FromHexString(message.gridMainColor);
+          gm.minorUnitVisibility = parseFloat(message.gridMinorOpacity);
+
+          readyToRender = true;
+          break;
+    }
+  });
+  
+  engine.runRenderLoop(function () {
+    if (scene != undefined && readyToRender) {
+      scene.render();
     }
   });
   
