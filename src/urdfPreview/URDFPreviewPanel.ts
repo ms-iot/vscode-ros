@@ -17,16 +17,34 @@ let ground : BABYLON.GroundMesh | undefined = undefined;
 let camera : BABYLON.ArcRotateCamera | undefined = undefined;
 let statusLabel = new GUI.TextBlock();
 
+function clearStatus() {
+  statusLabel.text = "";
+}
+
 let readyToRender : Boolean = false;
 
-let axisList : BABYLON.PositionGizmo[] = [];
+let jointAxisList : BABYLON.PositionGizmo[] = [];
+let linkAxisList : BABYLON.PositionGizmo[] = [];
 
-function addAxisToTransform(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, transform : BABYLON.TransformNode | undefined) {
+
+function clearAxisGizmos() {
+  linkAxisList.forEach((a) => {
+    a.dispose();
+  });
+  linkAxisList = [];
+
+  jointAxisList.forEach((a) => {
+    a.dispose();
+  });
+  jointAxisList = [];
+}
+
+function addAxisToTransform(list : BABYLON.PositionGizmo[], scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, transform : BABYLON.TransformNode | undefined) {
   if (transform) {
     let axis = new BABYLON.PositionGizmo(layer);
     axis.scaleRatio = 0.5
     axis.attachedNode = transform;
-    axisList.push(axis);
+    list.push(axis);
 
     let drag = () => {
       if (transform) {
@@ -46,33 +64,47 @@ function addAxisToTransform(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRe
   }
 }
 
-function toggleAxisOnRobot(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, robot : urdf.Robot) {
+function toggleAxisOnRobot(jointOrLink : Boolean, scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, robot : urdf.Robot) {
+  let whichAxis = jointOrLink ? jointAxisList : linkAxisList;
 
-  if (axisList.length == 0) {
-    robot.joints.forEach((j) => {
-      addAxisToTransform(scene, layer, j.transform);
-    });
-    robot.links.forEach((l) => {
-      l.visuals.forEach((v) => {
-        addAxisToTransform(scene, layer, l.transform);
+  if (whichAxis.length == 0) {
+    if (jointOrLink) {
+      robot.joints.forEach((j) => {
+        addAxisToTransform(whichAxis, scene, layer, j.transform);
       });
-    });
+    } else {
+      robot.links.forEach((l) => {
+        l.visuals.forEach((v) => {
+          addAxisToTransform(whichAxis, scene, layer, l.transform);
+        });
+      });
+    }
   } else {
-    axisList.forEach((a) => {
-      a.dispose();
-    });
-    axisList = [];
+    clearAxisGizmos();
+    clearStatus();
   }
 }
 
-let rotationGizmos : BABYLON.RotationGizmo[] = [];
+let jointRotationGizmos : BABYLON.RotationGizmo[] = [];
+let linkRotationGizmos : BABYLON.RotationGizmo[] = [];
 
-function addRotationToTransform(scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, transform : BABYLON.TransformNode | undefined) {
+function clearRotationGizmos() {
+  jointRotationGizmos.forEach((a) => {
+    a.dispose();
+  });
+  jointRotationGizmos = [];
+  linkRotationGizmos.forEach((a) => {
+    a.dispose();
+  });
+  linkRotationGizmos = [];
+}
+
+function addRotationToTransform(list : BABYLON.RotationGizmo[], scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, transform : BABYLON.TransformNode | undefined) {
   if (transform) {
     let rotationGizmo = new BABYLON.RotationGizmo(layer);
     rotationGizmo.scaleRatio = 0.5
     rotationGizmo.attachedNode = transform;
-    rotationGizmos.push(rotationGizmo);
+    list.push(rotationGizmo);
 
     let drag = () => {
       if (transform) {
@@ -92,22 +124,23 @@ function addRotationToTransform(scene : BABYLON.Scene, layer: BABYLON.UtilityLay
 
 }
 
-function toggleAxisRotationOnRobot(ui: GUI.AdvancedDynamicTexture, scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, robot : urdf.Robot) {
-  if (rotationGizmos.length == 0) {
-    robot.joints.forEach((j) => {
-      addRotationToTransform(scene, layer, j.transform);
-    });
-
-    robot.links.forEach((l) => {
-      l.visuals.forEach((v) => {
-        addRotationToTransform(scene, layer, v.transform);
+function toggleAxisRotationOnRobot(jointOrLink : Boolean, ui: GUI.AdvancedDynamicTexture, scene : BABYLON.Scene, layer: BABYLON.UtilityLayerRenderer, robot : urdf.Robot) {
+  let whichList = jointOrLink ? jointRotationGizmos : linkRotationGizmos;
+  if (whichList.length == 0) {
+    if (jointOrLink) {
+      robot.joints.forEach((j) => {
+        addRotationToTransform(whichList, scene, layer, j.transform);
       });
-    });
+    } else {
+      robot.links.forEach((l) => {
+        l.visuals.forEach((v) => {
+          addRotationToTransform(whichList, scene, layer, v.transform);
+        });
+      });
+    }
   } else {
-    rotationGizmos.forEach((a) => {
-      a.dispose();
-    });
-    rotationGizmos = [];
+    clearRotationGizmos();
+    clearStatus();
   }
 }
 
@@ -159,6 +192,24 @@ var createScene = async function () {
   return scene;
 };
 
+function resetCamera() {
+  camera.alpha = - Math.PI / 3;
+  camera.beta = 5 * Math.PI / 12;
+  camera.target = new BABYLON.Vector3(0, 0, 0);
+}
+
+function createButton(toolbar: GUI.StackPanel, name : string, text : string, scene : BABYLON.Scene, onClick : () => void) {
+  var button = GUI.Button.CreateSimpleButton(name, text);
+  button.width = "100px"
+  button.height = "20px";
+  button.color = "white";
+  button.cornerRadius = 5;
+  button.background = "green";
+  button.onPointerUpObservable.add(onClick);
+  toolbar.addControl(button);
+  return button;
+}
+
 function createUI(scene : BABYLON.Scene) {
   var advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI("UI");
 
@@ -173,7 +224,7 @@ function createUI(scene : BABYLON.Scene) {
   var toolbar = new GUI.StackPanel();
   toolbar.paddingTop = "10px";
   toolbar.paddingLeft = "10px";
-  toolbar.width = "300px";
+  toolbar.width = "500px";
   toolbar.height = "50px";
   toolbar.fontSize = "14px";
   toolbar.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
@@ -187,32 +238,31 @@ function createUI(scene : BABYLON.Scene) {
   const gizmoManager = new BABYLON.GizmoManager(scene);
   gizmoManager.usePointerToAttachGizmos = false;
 
-  var button = GUI.Button.CreateSimpleButton("axisButton", "Axis");
-  button.width = 0.2;
-  button.height = "40px";
-  button.color = "white";
-  button.background = "green";
-  button.onPointerClickObservable.add(function() {
-
-    toggleAxisOnRobot(scene, utilLayer, currentRobot);
+  createButton(toolbar, "jointAxisButton", "Joint Axis", scene, () => {
+    toggleAxisOnRobot(true, scene, utilLayer, currentRobot);
   });
-  toolbar.addControl(button);
 
-  var buttonRotate = GUI.Button.CreateSimpleButton("rotatioButton", "Rotation");
-  buttonRotate.width = 0.2;
-  buttonRotate.height = "40px";
-  buttonRotate.color = "white";
-  buttonRotate.background = "green";
-  buttonRotate.onPointerClickObservable.add(function() {
-    toggleAxisRotationOnRobot(advancedTexture, scene, utilLayer, currentRobot);
-  });  
+  createButton(toolbar, "linkAxisButton", "Link Axis", scene, () => {
+    toggleAxisOnRobot(false, scene, utilLayer, currentRobot);
+  });
 
-  toolbar.addControl(buttonRotate);
+  createButton(toolbar, "jointRotationButton", "Joint Rotation", scene, () => {  
+    toggleAxisRotationOnRobot(true, advancedTexture, scene, utilLayer, currentRobot);
+  });
+
+  createButton(toolbar, "linkRotationButton", "Link Rotation", scene, () => {  
+    toggleAxisRotationOnRobot(false, advancedTexture, scene, utilLayer, currentRobot);
+  });
 
 }
 
 async function applyURDF(urdfText) {
   try {
+    clearAxisGizmos();
+    clearRotationGizmos();
+    clearStatus();
+    resetCamera();
+
     if (currentRobot) {
       currentRobot.dispose();
       currentRobot = undefined;

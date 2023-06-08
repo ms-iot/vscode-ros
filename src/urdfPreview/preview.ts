@@ -61,13 +61,6 @@ export default class URDFPreview
 
         this._webview.webview.html = this._getWebviewContent(this._webview.webview, context.extensionUri);
 
-        this._webview.onDidChangeViewState(e => {
-            if (e.webviewPanel.active) {
-                setTimeout(() => this.refresh(), 1000);
-            }
-            this._onDidChangeViewStateEmitter.fire(e);
-        }, this, subscriptions);
-
         vscode.workspace.onDidSaveTextDocument(event => {
 
             if (event && this.isPreviewOf(event.uri)) {
