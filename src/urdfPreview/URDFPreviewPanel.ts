@@ -75,7 +75,7 @@ function toggleAxisOnRobot(jointOrLink : Boolean, scene : BABYLON.Scene, layer: 
     } else {
       robot.links.forEach((l) => {
         l.visuals.forEach((v) => {
-          addAxisToTransform(whichAxis, scene, layer, l.transform);
+          addAxisToTransform(whichAxis, scene, layer, v.transform);
         });
       });
     }
