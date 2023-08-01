@@ -172,7 +172,7 @@ A big ***Thank you!*** to everyone that have helped make this extension better!
 ### ROS Web Tools
 This extension leverages [ROS Web Tools](http://robotwebtools.github.io/) for URDF Previewing.
 
-*Russell Toris, Julius Kammerl, David Lu, Jihoon Lee, Odest Chadwicke Jenkins, Sarah Osentoski, Mitchell Wills, and Sonia Chernova. [Robot Web Tools: Efficient Messaging for Cloud Robotics](https://robotwebtools.github.io/pdf/paper.pdf). In Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2015*
+*Russell Toris, Julius Kammerl, David Lu, Jihoon Lee, Odest Chadwicke Jenkins, Sarah Osentoski, Mitchell Wills, and Sonia Chernova. [Robot Web Tools: Efficient Messaging for Cloud Robotics](http://robotwebtools.github.io/pdf/paper.pdf). In Proceedings of the IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS), 2015*
 
 
 <!-- link to files -->
