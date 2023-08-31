@@ -1,6 +1,6 @@
 {
     "name": "vscode-ros",
-    "version": "0.9.4",
+    "version": "0.9.5",
     "publisher": "ms-iot",
     "engines": {
         "vscode": "^1.69.0"
@@ -129,6 +129,36 @@
                     "type": "bool",
                     "default": false,
                     "description": "Specify if the extension should not capture the environment VSCode is running in to pass to child processes."
+                },
+                "ros.BackgroundColor": {
+                    "type": "string",
+                    "title": "Background Color",
+                    "default": "#000000",
+                    "description": "Background color of the URDF preview panel."
+                },
+                "ros.GridMainColor": {
+                    "type": "string",
+                    "title": "Grid Main Color",
+                    "default": "#00FF00",
+                    "description": "Color of the main grid in the URDF preview panel."
+                },
+                "ros.GridMinorColor": {
+                    "type": "string",
+                    "title": "Grid Minor Line Color",
+                    "default": "#001100",
+                    "description": "Color of the line grid in the URDF preview panel."
+                },
+                "ros.GridMinorOpacity": {
+                    "type": "number",
+                    "default": 0.5,
+                    "title": "Minor Grid Line Opacity",
+                    "description": "Minor grid line opacity between 0 and 1 in the URDF preview panel."
+                },
+                "ros.CameraDistanceToRobot": {
+                    "type": "number",
+                    "title": "Camera Distance to Robot",
+                    "default": 1,
+                    "description": "Distance in meters from the camera to the robot in the URDF preview panel."
                 }
             }
         },
@@ -426,7 +456,7 @@
         "test-compile": "npm run webpack"
     },
     "dependencies": {
-        "@polyhobbyist/babylon_ros": "^0.0.3",
+        "@polyhobbyist/babylon_ros": "^0.0.5",
         "@polyhobbyist/babylon-collada-loader": "^0.0.3",
         "@vscode/debugadapter": "^1.59.0",
         "@vscode/extension-telemetry": "^0.6.2",

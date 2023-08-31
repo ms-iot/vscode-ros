@@ -7,6 +7,7 @@ import { rosApi } from '../ros/ros';
 import { xacro } from '../ros/utils'; 
 import { Disposable, window } from 'vscode';
 import * as extension from "../extension";
+import * as vscode_utils from "../vscode-utils";
 
 export default class URDFPreview 
 {
@@ -60,13 +61,6 @@ export default class URDFPreview
 
         this._webview.webview.html = this._getWebviewContent(this._webview.webview, context.extensionUri);
 
-        this._webview.onDidChangeViewState(e => {
-            if (e.webviewPanel.active) {
-                setTimeout(() => this.refresh(), 1000);
-            }
-            this._onDidChangeViewStateEmitter.fire(e);
-        }, this, subscriptions);
-
         vscode.workspace.onDidSaveTextDocument(event => {
 
             if (event && this.isPreviewOf(event.uri)) {
@@ -78,6 +72,11 @@ export default class URDFPreview
             this.dispose();
         }, null, subscriptions);        
 
+        vscode.workspace.onDidChangeConfiguration(event => {
+            this.updateColors();
+        }, this, subscriptions);
+
+
         this._disposables = subscriptions;
     }
 
@@ -88,6 +87,20 @@ export default class URDFPreview
     public async refresh() {
         if (this._processing == false) {
             this.loadResource();
+        }
+    }
+
+    private updateColors() {
+        if (this._webview) {
+            const config = vscode_utils.getExtensionConfiguration();
+            this._webview.webview.postMessage({ 
+                command: 'colors', 
+                cameraRadius: config.get("CameraDistanceToRobot", "1.0"),
+                backgroundColor: config.get("BackgroundColor", "#000000"),
+                gridLineColor: config.get("GridMinorColor", "#00FF00"),
+                gridMainColor: config.get("GridMainColor", "#001100"),
+                gridMinorOpacity: config.get("GridMinorOpacity", "0.4")
+            });
         }
     }
 
@@ -137,6 +150,8 @@ export default class URDFPreview
 
             extension.outputChannel.appendLine("URDF previewing: " + previewFile);
             extension.outputChannel.append(urdfText);
+
+            this.updateColors();        
 
             this._webview.webview.postMessage({ command: 'previewFile', previewFile: this._resource.path});
             this._webview.webview.postMessage({ command: 'urdf', urdf: urdfText });
