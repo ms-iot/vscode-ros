@@ -463,7 +463,7 @@
         "@vscode/webview-ui-toolkit": "^1.2.2",
         "assert": "^2.0.0",
         "babylonjs": "^5.54.0",
-        "babylonjs-materials": "^5.54.0",
+        "babylonjs-materials": "^6.20.0",
         "buffer": "^6.0.3",
         "console-browserify": "^1.2.0",
         "constants-browserify": "^1.0.0",
