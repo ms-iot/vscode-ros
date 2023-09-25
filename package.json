@@ -456,8 +456,8 @@
         "test-compile": "npm run webpack"
     },
     "dependencies": {
-        "@polyhobbyist/babylon_ros": "^0.0.5",
-        "@polyhobbyist/babylon-collada-loader": "^0.0.3",
+        "@polyhobbyist/babylon_ros": "^0.0.6",
+        "@polyhobbyist/babylon-collada-loader": "^0.0.4",
         "@vscode/debugadapter": "^1.59.0",
         "@vscode/extension-telemetry": "^0.6.2",
         "@vscode/webview-ui-toolkit": "^1.2.2",

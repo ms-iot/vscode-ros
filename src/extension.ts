@@ -233,10 +233,12 @@ async function activateEnvironment(context: vscode.ExtensionContext) {
     await sourceRosAndWorkspace();
 
     if (typeof env.ROS_DISTRO === "undefined") {
+        processingWorkspace = false;
         return;
     }
 
     if (typeof env.ROS_VERSION === "undefined") {
+        processingWorkspace = false;
         return;
     }
 
@@ -377,28 +379,32 @@ async function sourceRosAndWorkspace(): Promise<void> {
             newEnv = process.env;
         }
     }
-    // Source the workspace setup over the top.
-    // TODO: we should test what's the build tool (catkin vs colcon).
-    let workspaceOverlayPath: string;
-    workspaceOverlayPath = path.join(`${baseDir}`, "devel_isolated");
-    if (!await pfs.exists(workspaceOverlayPath)) {
-        workspaceOverlayPath = path.join(`${baseDir}`, "devel");
-    }
-    if (!await pfs.exists(workspaceOverlayPath)) {
-        workspaceOverlayPath = path.join(`${baseDir}`, "install");
-    }
-    let wsSetupScript: string = path.format({
-        dir: workspaceOverlayPath,
-        name: "setup",
-        ext: setupScriptExt,
-    });
 
-    if (newEnv && typeof newEnv.ROS_DISTRO !== "undefined" && await pfs.exists(wsSetupScript)) {
-        try {
-            newEnv = await ros_utils.sourceSetupFile(wsSetupScript, newEnv);
-        } catch (_err) {
-            vscode.window.showErrorMessage("Failed to source the workspace setup file.");
+    let workspaceOverlayPath: string = "";
+    if (baseDir !== undefined) {
+        // Source the workspace setup over the top.
+        // TODO: we should test what's the build tool (catkin vs colcon).
+        workspaceOverlayPath = path.join(`${baseDir}`, "devel_isolated");
+        if (!await pfs.exists(workspaceOverlayPath)) {
+            workspaceOverlayPath = path.join(`${baseDir}`, "devel");
         }
+        if (!await pfs.exists(workspaceOverlayPath)) {
+            workspaceOverlayPath = path.join(`${baseDir}`, "install");
+        }
+        let wsSetupScript: string = path.format({
+            dir: workspaceOverlayPath,
+            name: "setup",
+            ext: setupScriptExt,
+        });
+
+        if (newEnv && typeof newEnv.ROS_DISTRO !== "undefined" && await pfs.exists(wsSetupScript)) {
+            try {
+                newEnv = await ros_utils.sourceSetupFile(wsSetupScript, newEnv);
+            } catch (_err) {
+                vscode.window.showErrorMessage("Failed to source the workspace setup file.");
+            }
+        }
+
     }
 
     env = newEnv;
