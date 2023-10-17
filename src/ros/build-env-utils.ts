@@ -50,7 +50,7 @@ export async function updateCppProperties(context: vscode.ExtensionContext): Pro
  */
 async function updateCppPropertiesInternal(): Promise<void> {
     let includes = await rosApi.getIncludeDirs();
-    const workspaceIncludes = await rosApi.getWorkspaceIncludeDirs(extension.baseDir);
+    const workspaceIncludes = await rosApi.getWorkspaceIncludeDirs(vscode.workspace.rootPath);
     includes = includes.concat(workspaceIncludes);
 
     if (process.platform === "linux") {

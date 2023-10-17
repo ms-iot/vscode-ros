@@ -18,7 +18,7 @@ function makeColcon(command: string, verb: string, args: string[], category?: st
         installType = '--merge-install';
     }
 
-        const task = rosShell.make({type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', extension.baseDir, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
+        const task = rosShell.make({type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', vscode.workspace.rootPath, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
                                category)
     task.problemMatchers = ["$catkin-gcc"];
 
