@@ -15,7 +15,7 @@ export function startCore(context: vscode.ExtensionContext) {
 
     let launchCoreCommand: string = "roscore";
     let processOptions: child_process.SpawnOptions = {
-        cwd: extension.baseDir,
+        cwd: vscode.workspace.rootPath,
         env: extension.env,
     };
 

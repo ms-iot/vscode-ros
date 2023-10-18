@@ -96,15 +96,12 @@ BuildTool.current = new NotImplementedBuildTool();
 export async function determineBuildTool(dir: string): Promise<boolean> {
     while (dir && path.dirname(dir) !== dir) {
         if (await CatkinMakeBuildTool.isApplicable(dir)) {
-            extension.setBaseDir(dir);
             BuildTool.current = new CatkinMakeBuildTool();
             return true;
         } else if (await CatkinToolsBuildTool.isApplicable(dir)) {
-            extension.setBaseDir(dir);
             BuildTool.current = new CatkinToolsBuildTool();
             return true;
         } else if (await ColconBuildTool.isApplicable(dir)) {
-            extension.setBaseDir(dir);
             BuildTool.current = new ColconBuildTool();
             return true;
         }

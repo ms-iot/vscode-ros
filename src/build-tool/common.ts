@@ -28,7 +28,7 @@ export async function _createPackage(createPkgCommand: (dependencies: string, na
         return;
     }
 
-    const cwd = typeof uri !== "undefined" ? uri.fsPath : `${extension.baseDir}/src`;
+    const cwd = typeof uri !== "undefined" ? uri.fsPath : `${vscode.workspace.rootPath}/src`;
     const opts = { cwd, env: extension.env };
 
     child_process.exec(createPkgCommand(dependencies, name), opts, (err, stdout, stderr) => {
