@@ -88,7 +88,7 @@ export class AttachResolver implements vscode.DebugConfigurationProvider {
             try {
                 if (os.platform() === "win32") {
                     const processOptions: child_process.ExecOptions = {
-                        cwd: extension.baseDir,
+                        cwd: vscode.workspace.rootPath,
                         env: await extension.resolvedEnv(),
                     };
 
