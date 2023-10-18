@@ -25,7 +25,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
         }
 
         let processOptions: child_process.ExecOptions = {
-            cwd: extension.baseDir,
+            cwd: vscode.workspace.rootPath,
             env: env,
         };
         child_process.exec(exportEnvCommand, processOptions, (error, stdout, _stderr) => {
@@ -49,7 +49,7 @@ export function sourceSetupFile(filename: string, env?: any): Promise<any> {
 export function xacro(filename: string): Promise<any> {
     return new Promise((resolve, reject) => {
         let processOptions = {
-            cwd: extension.baseDir,
+            cwd: vscode.workspace.rootPath,
             env: extension.env,
             windowsHide: false,
         };

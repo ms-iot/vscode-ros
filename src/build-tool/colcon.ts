@@ -8,6 +8,7 @@ import * as child_process from "child_process";
 import * as extension from "../extension";
 import * as common from "./common";
 import * as rosShell from "./ros-shell";
+import { env } from "process";
 
 function makeColcon(command: string, verb: string, args: string[], category?: string): vscode.Task {
     let installType = '--symlink-install';
@@ -17,7 +18,7 @@ function makeColcon(command: string, verb: string, args: string[], category?: st
         installType = '--merge-install';
     }
 
-        const task = rosShell.make({type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', extension.baseDir, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
+        const task = rosShell.make({type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', vscode.workspace.rootPath, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
                                category)
     task.problemMatchers = ["$catkin-gcc"];
 
@@ -53,7 +54,7 @@ export async function isApplicable(dir: string): Promise<boolean> {
         colconCommand = `colcon --log-base /dev/null list --base-paths ${srcDir}`;
     }
 
-    const { stdout, stderr } = await child_process.exec(colconCommand);
+    const { stdout, stderr } = await child_process.exec(colconCommand, { env: extension.env });
 
     // Does this workspace have packages?
     for await (const line of stdout) {

@@ -22,15 +22,6 @@ import * as debug_utils from "./debugger/utils";
 import { registerRosShellTaskProvider } from "./build-tool/ros-shell";
 
 /**
- * The catkin workspace base dir.
- */
-export let baseDir: string;
-
-export function setBaseDir(dir: string) {
-    baseDir = dir;
-}
-
-/**
  * The sourced ROS environment.
  */
 export let env: any;
@@ -192,7 +183,6 @@ export async function activate(context: vscode.ExtensionContext) {
         await activateEnvironment(context);
 
         return {
-            getBaseDir: () => baseDir,
             getEnv: () => env,
             onDidChangeEnv: (listener: () => any, thisArg: any) => onDidChangeEnv(listener, thisArg),
         };
@@ -233,12 +223,16 @@ async function activateEnvironment(context: vscode.ExtensionContext) {
     await sourceRosAndWorkspace();
 
     if (typeof env.ROS_DISTRO === "undefined") {
+        processingWorkspace = false;
         return;
     }
 
     if (typeof env.ROS_VERSION === "undefined") {
+        processingWorkspace = false;
         return;
     }
+
+    outputChannel.appendLine(`Determining build tool for workspace: ${vscode.workspace.rootPath}`);
 
     // Determine if we're in a catkin workspace.
     let buildToolDetected = await buildtool.determineBuildTool(vscode.workspace.rootPath);
@@ -255,6 +249,9 @@ async function activateEnvironment(context: vscode.ExtensionContext) {
     subscriptions.push(rosApi.activateCoreMonitor());
     if (buildToolDetected) {
         subscriptions.push(...buildtool.BuildTool.registerTaskProvider());
+    } else {
+        outputChannel.appendLine(`Build tool NOT detected`);
+
     }
     subscriptions.push(...registerRosShellTaskProvider());
 
@@ -300,6 +297,8 @@ async function sourceRosAndWorkspace(): Promise<void> {
     // Wait to atomicly switch by composing a new environment block then switching at the end.
     let newEnv = undefined;
 
+    outputChannel.appendLine("Sourcing ROS and Workspace");
+
     const kWorkspaceConfigTimeout = 30000; // ms
 
     let setupScriptExt: string;
@@ -328,6 +327,8 @@ async function sourceRosAndWorkspace(): Promise<void> {
             try {
                 newEnv = await ros_utils.sourceSetupFile(rosSetupScript, newEnv);
 
+                outputChannel.appendLine(`Sourced ${rosSetupScript}`);
+
                 attemptWorkspaceDiscovery = false;
             } catch (err) {
                 vscode.window.showErrorMessage(`A ROS setup script was provided, but could not source "${rosSetupScript}". Attempting standard discovery.`);
@@ -339,20 +340,37 @@ async function sourceRosAndWorkspace(): Promise<void> {
         let distro = config.get("distro", "");
 
         // Is there a distro defined either by setting or environment?
-        if (!distro && !process.env.ROS_DISTRO)
+        outputChannel.appendLine(`Current ROS_DISTRO environment variable: ${process.env.ROS_DISTRO}`);
+        if (!distro)
         {
             // No? Try to find one.
             const installedDistros = await ros_utils.getDistros();
             if (!installedDistros.length) {
+                outputChannel.appendLine(`No distros found.`);
+
                 throw new Error("ROS has not been found on this system.");
             } else if (installedDistros.length === 1) {
+                outputChannel.appendLine(`Only one distro, selecting ${installedDistros[0]}`);
                 
                 // if there is only one distro installed, directly choose it
                 config.update("distro", installedDistros[0]);
+                distro = installedDistros[0];
             } else {
+                outputChannel.appendLine(`Multiple distros found, prompting user to select one.`);
+                // dump installedDistros to outputChannel
+                outputChannel.appendLine(`Installed distros: ${installedDistros}`);
+
                 const message = "Unable to determine ROS distribution, please configure this workspace by adding \"ros.distro\": \"<ROS Distro>\" in settings.json";
                 await vscode.window.setStatusBarMessage(message, kWorkspaceConfigTimeout);
             }
+        }
+
+        if (process.env.ROS_DISTRO && process.env.ROS_DISTRO !== distro) {
+            outputChannel.appendLine(`ROS_DISTRO environment variable (${process.env.ROS_DISTRO}) does not match configured distro (${distro}).`);
+
+            outputChannel.appendLine(`Overriding the configured distro with the environment variable.`);
+
+            distro = process.env.ROS_DISTRO;
         }
 
         if (distro) {
@@ -369,6 +387,8 @@ async function sourceRosAndWorkspace(): Promise<void> {
                     name: "setup",
                     ext: setupScriptExt,
                 });
+
+                outputChannel.appendLine(`Sourcing ROS Distro: ${setupScript}`);
                 newEnv = await ros_utils.sourceSetupFile(setupScript, newEnv);
             } catch (err) {
                 vscode.window.showErrorMessage(`Could not source ROS setup script at "${setupScript}".`);
@@ -377,28 +397,37 @@ async function sourceRosAndWorkspace(): Promise<void> {
             newEnv = process.env;
         }
     }
+
+    let workspaceOverlayPath: string = "";
     // Source the workspace setup over the top.
-    // TODO: we should test what's the build tool (catkin vs colcon).
-    let workspaceOverlayPath: string;
-    workspaceOverlayPath = path.join(`${baseDir}`, "devel_isolated");
-    if (!await pfs.exists(workspaceOverlayPath)) {
-        workspaceOverlayPath = path.join(`${baseDir}`, "devel");
+
+    if (newEnv.ROS_VERSION === "1") {
+        workspaceOverlayPath = path.join(`${vscode.workspace.rootPath}`, "devel_isolated");
+        if (!await pfs.exists(workspaceOverlayPath)) {
+            workspaceOverlayPath = path.join(`${vscode.workspace.rootPath}`, "devel");
+        }
+    } else {    // FUTURE: Revisit if ROS_VERSION changes - not clear it will be called 3
+        if (!await pfs.exists(workspaceOverlayPath)) {
+            workspaceOverlayPath = path.join(`${vscode.workspace.rootPath}`, "install");
+        }
     }
-    if (!await pfs.exists(workspaceOverlayPath)) {
-        workspaceOverlayPath = path.join(`${baseDir}`, "install");
-    }
+
     let wsSetupScript: string = path.format({
         dir: workspaceOverlayPath,
         name: "setup",
         ext: setupScriptExt,
     });
 
-    if (newEnv && typeof newEnv.ROS_DISTRO !== "undefined" && await pfs.exists(wsSetupScript)) {
+    if (await pfs.exists(wsSetupScript)) {
+        outputChannel.appendLine(`Workspace overlay path: ${wsSetupScript}`);
+    
         try {
             newEnv = await ros_utils.sourceSetupFile(wsSetupScript, newEnv);
         } catch (_err) {
             vscode.window.showErrorMessage("Failed to source the workspace setup file.");
         }
+    } else {
+        outputChannel.appendLine(`Not sourcing workspace does not exist yet: ${wsSetupScript}. Need to build workspace.`);
     }
 
     env = newEnv;
