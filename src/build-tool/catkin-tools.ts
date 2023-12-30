@@ -7,8 +7,8 @@ import * as extension from "../extension";
 import * as common from "./common";
 import * as rosShell from "./ros-shell";
 
-function makeCatkin(command: string, args: string[], category?: string): vscode.Task {
-    const task = rosShell.make({type: command, command, args: ['--workspace', vscode.workspace.rootPath, ...args]}, category)
+function makeCatkin(name: string, command: string, args: string[], category?: string): vscode.Task {
+    const task = rosShell.make(name, {type: command, command, args: ['--workspace', vscode.workspace.rootPath, ...args]}, category)
     task.problemMatchers = ["$catkin-gcc"];
 
     return task;
@@ -19,10 +19,10 @@ function makeCatkin(command: string, args: string[], category?: string): vscode.
  */
 export class CatkinToolsProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        const make = makeCatkin('catkin', [], 'build');
+        const make = makeCatkin('Catkin Tools - Build', 'catkin', [], 'build');
         make.group = vscode.TaskGroup.Build;
 
-        const test = makeCatkin('catkin', ['--catkin-make-args', 'run_tests'], 'run_tests');
+        const test = makeCatkin('Catkin Tools - Test', 'catkin', ['--catkin-make-args', 'run_tests'], 'run_tests');
         test.group = vscode.TaskGroup.Test;
 
         return [make, test];
