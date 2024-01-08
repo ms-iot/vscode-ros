@@ -16,11 +16,11 @@ export class RosShellTaskProvider implements vscode.TaskProvider {
     }
 
     public defaultRosTasks(): vscode.Task[] {
-        const rosCore = make({type: 'ros', command: 'roscore'}, 'roscore');
+        const rosCore = make('ros core', {type: 'ros', command: 'roscore'}, 'roscore');
         rosCore.isBackground = true;
         rosCore.problemMatchers = ['$roscore'];
 
-        const rosLaunch = make({type: 'ros', command: 'roslaunch', args: ['package_name', 'launch_file.launch']}, 'roslaunch');
+        const rosLaunch = make('ros launch', {type: 'ros', command: 'roslaunch', args: ['package_name', 'launch_file.launch']}, 'roslaunch');
         rosLaunch.isBackground = true;
         rosLaunch.problemMatchers = ['$roslaunch'];
 
@@ -39,18 +39,18 @@ export function registerRosShellTaskProvider(): vscode.Disposable[] {
 }
 
 export function resolve(task: vscode.Task): vscode.Task {
-    const resolvedTask = make(task.definition as RosTaskDefinition);
+    let definition = task.definition as RosTaskDefinition
+    const resolvedTask = make(definition.command, definition);
 
     resolvedTask.isBackground = task.isBackground;
     resolvedTask.problemMatchers = task.problemMatchers;
     return resolvedTask;
 }
 
-export function make(definition: RosTaskDefinition, category?: string): vscode.Task {
+export function make(name: string, definition: RosTaskDefinition, category?: string): vscode.Task {
     definition.command = definition.command || definition.type; // Command can be missing in build tasks that have type==command
 
     const args = definition.args || [];
-    const name = category ? category : args.join(' ');
     const task = new vscode.Task(definition, vscode.TaskScope.Workspace, name, definition.command);
 
     task.execution = new vscode.ShellExecution(definition.command, args, {
