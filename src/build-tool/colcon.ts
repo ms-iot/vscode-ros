@@ -10,7 +10,7 @@ import * as common from "./common";
 import * as rosShell from "./ros-shell";
 import { env } from "process";
 
-function makeColcon(command: string, verb: string, args: string[], category?: string): vscode.Task {
+function makeColcon(name: string, command: string, verb: string, args: string[], category?: string): vscode.Task {
     let installType = '--symlink-install';
     if (process.platform === "win32") {
 
@@ -18,8 +18,7 @@ function makeColcon(command: string, verb: string, args: string[], category?: st
         installType = '--merge-install';
     }
 
-        const task = rosShell.make({type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', vscode.workspace.rootPath, `--cmake-args`, `-DCMAKE_BUILD_TYPE=RelWithDebInfo`,...args]},
-                               category)
+    const task = rosShell.make(name, {type: command, command, args: [verb, installType, '--event-handlers', 'console_cohesion+', '--base-paths', vscode.workspace.rootPath, `--cmake-args`, ...args]}, category)
     task.problemMatchers = ["$catkin-gcc"];
 
     return task;
@@ -30,13 +29,19 @@ function makeColcon(command: string, verb: string, args: string[], category?: st
  */
 export class ColconProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        const make = makeColcon('colcon', 'build', [], 'build');
+        const make = makeColcon('Colcon Build Release', 'colcon', 'build', [`-DCMAKE_BUILD_TYPE=RelWithDebInfo`], 'build');
         make.group = vscode.TaskGroup.Build;
 
-        const test = makeColcon('colcon', 'test', [], 'test');
+        const makeDebug = makeColcon('Colcon Build Debug', 'colcon', 'build', [`-DCMAKE_BUILD_TYPE=Debug`], 'build');
+        makeDebug.group = vscode.TaskGroup.Build;
+        
+        const test = makeColcon('Colcon Build Test Release', 'colcon', 'test', [`-DCMAKE_BUILD_TYPE=RelWithDebInfo`], 'test');
         test.group = vscode.TaskGroup.Test;
 
-        return [make, test];
+        const testDebug = makeColcon('Colcon Build Test Debug', 'colcon', 'test', [`-DCMAKE_BUILD_TYPE=Debug`], 'test');
+        test.group = vscode.TaskGroup.Test;
+
+        return [make, makeDebug, test, testDebug];
     }
 
     public resolveTask(task: vscode.Task, token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task> {
