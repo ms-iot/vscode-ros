@@ -7,8 +7,8 @@ import * as extension from "../extension";
 import * as common from "./common";
 import * as rosShell from "./ros-shell";
 
-function makeCatkin(command: string, args: string[], category?: string): vscode.Task {
-    const task = rosShell.make({type: command, command, args: ['--directory', vscode.workspace.rootPath, '-DCMAKE_BUILD_TYPE=RelWithDebInfo',...args]}, category)
+function makeCatkin(name: string, command: string, args: string[], category?: string): vscode.Task {
+    const task = rosShell.make(name, {type: command, command, args: ['--directory', vscode.workspace.rootPath, '-DCMAKE_BUILD_TYPE=RelWithDebInfo',...args]}, category)
     task.problemMatchers = ["$catkin-gcc"];
 
     return task;
@@ -18,10 +18,10 @@ function makeCatkin(command: string, args: string[], category?: string): vscode.
  */
 export class CatkinMakeProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        const make = makeCatkin('catkin_make', [], 'build');
+        const make = makeCatkin('Catkin Build', 'catkin_make', [], 'build');
         make.group = vscode.TaskGroup.Build;
 
-        const test = makeCatkin('catkin_make', ['run_tests'], 'run_tests');
+        const test = makeCatkin('Catkin Test', 'catkin_make', ['run_tests'], 'run_tests');
         test.group = vscode.TaskGroup.Test;
 
         return [make, test];
@@ -36,10 +36,10 @@ export class CatkinMakeProvider implements vscode.TaskProvider {
  */
 export class CatkinMakeIsolatedProvider implements vscode.TaskProvider {
     public provideTasks(token?: vscode.CancellationToken): vscode.ProviderResult<vscode.Task[]> {
-        const make = makeCatkin('catkin_make_isolated', [], 'build');
+        const make = makeCatkin('Catkin Build Isolated', 'catkin_make_isolated', [], 'build');
         make.group = vscode.TaskGroup.Build;
 
-        const test = makeCatkin('catkin_make_isolated', ['--catkin-make-args', 'run_tests'], 'run_tests');
+        const test = makeCatkin('Catkin Test Isolated', 'catkin_make_isolated', ['--catkin-make-args', 'run_tests'], 'run_tests');
         test.group = vscode.TaskGroup.Test;
 
         return [make, test];
