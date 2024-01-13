@@ -9,7 +9,7 @@ The [Visual Studio Code][vscode] Extension for ROS[^1] provides support for [Rob
 * Allows starting, stopping and viewing the ROS core status.
 * Automatically create `catkin_make` or `catkin build` build tasks.
 * Create catkin packages using `catkin_create_pkg` script or `catkin create pkg`.
-* Run `rosrun` or `roslaunch`
+* Run `rosrun`, `roslaunch`, or `ros2 launch`
 * Resolve dependencies with `rosdep` shortcut
 * Syntax highlighting for `.msg`, `.urdf` and other ROS files.
 * Automatically add the ROS C++ include and Python import paths.
@@ -83,8 +83,8 @@ Once this is created, you can use the play button in the title bar, or the "star
 Other Notes:
   * Create a new ROS launch file with just the nodes you'd like to debug, and a separate ROS launch file with all other ROS nodes.
   * Debugging a launch file with Gazebo or rviz is not supported as this time. Please split these out into separate launch files.
-  * ROS Run is not supported.
-  * Traditional XML launch files are supported for ROS1, and python based launch files are supported for ROS2.
+  * `ros2 run` is not supported.
+  * Traditional XML launch files are supported for ROS1, and both python and XML based launch files are supported for ROS2.
 
 ### Manually adding a launch file to an existing launch.json
 If you have an existing `launch.json` file (or if there is an extension conflict as mentioned above), you can manually add a launch configuration by adding a new block like this. 
