@@ -329,7 +329,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
                 // Replace all occurrences of '${workspaceFolder}' with the workspace string
                 rosSetupScript = rosSetupScript.replace(regex, vscode.workspace.workspaceFolders[0].uri.fsPath);
             } else {
-                vscode.window.showErrorMessage(`Multiple or No workspaces found, but the ROS setup script setting \"ros.rosSetupScript\" is configured with '${rosSetupScript}'`);
+                outputChannel.appendLine(`Multiple or no workspaces found, but the ROS setup script setting \"ros.rosSetupScript\" is configured with '${rosSetupScript}'`);
             }
         }
 
