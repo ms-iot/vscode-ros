@@ -240,7 +240,7 @@ async function activateEnvironment(context: vscode.ExtensionContext) {
     // http://www.ros.org/reps/rep-0149.html#environment-variables
     // Learn more about ROS_VERSION definition.
     selectROSApi(env.ROS_VERSION);
-    
+
     // Do this again, after the build tool has been determined.
     await sourceRosAndWorkspace();
 
@@ -322,8 +322,19 @@ async function sourceRosAndWorkspace(): Promise<void> {
     let attemptWorkspaceDiscovery = true;
 
     if (rosSetupScript) {
+        // Regular expression to match '${workspaceFolder}'
+        const regex = "\$\{workspaceFolder\}";
+        if (rosSetupScript.includes(regex)) {
+            if (vscode.workspace.workspaceFolders.length === 1) {
+                // Replace all occurrences of '${workspaceFolder}' with the workspace string
+                rosSetupScript = rosSetupScript.replace(regex, vscode.workspace.workspaceFolders[0].uri.fsPath);
+            } else {
+                vscode.window.showErrorMessage(`Multiple or No workspaces found, but the ROS setup script setting \"ros.rosSetupScript\" is configured with '${rosSetupScript}'`);
+            }
+        }
+
         // Try to support cases where the setup script doesn't make sense on different environments, such as host vs container.
-        if (await pfs.exists(rosSetupScript)){
+        if (await pfs.exists(rosSetupScript)) {
             try {
                 newEnv = await ros_utils.sourceSetupFile(rosSetupScript, newEnv);
 
@@ -335,14 +346,13 @@ async function sourceRosAndWorkspace(): Promise<void> {
             }
         }
     }
-    
+
     if (attemptWorkspaceDiscovery) {
         let distro = config.get("distro", "");
 
         // Is there a distro defined either by setting or environment?
         outputChannel.appendLine(`Current ROS_DISTRO environment variable: ${process.env.ROS_DISTRO}`);
-        if (!distro)
-        {
+        if (!distro) {
             // No? Try to find one.
             const installedDistros = await ros_utils.getDistros();
             if (!installedDistros.length) {
@@ -351,7 +361,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
                 throw new Error("ROS has not been found on this system.");
             } else if (installedDistros.length === 1) {
                 outputChannel.appendLine(`Only one distro, selecting ${installedDistros[0]}`);
-                
+
                 // if there is only one distro installed, directly choose it
                 config.update("distro", installedDistros[0]);
                 distro = installedDistros[0];
@@ -420,7 +430,7 @@ async function sourceRosAndWorkspace(): Promise<void> {
 
     if (await pfs.exists(wsSetupScript)) {
         outputChannel.appendLine(`Workspace overlay path: ${wsSetupScript}`);
-    
+
         try {
             newEnv = await ros_utils.sourceSetupFile(wsSetupScript, newEnv);
         } catch (_err) {
