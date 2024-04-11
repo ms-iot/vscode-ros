@@ -38,10 +38,10 @@ You can access the following commands from the [Visual Studio Code command palle
 
 | Name | Description |
 |---|:---|
-| [Attaching to a running ROS Node](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to attach VSCode to a running ROS node |
-| [Debugging all ROS Nodes in a launch file ](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to set up VSCode to debug the nodes in a ROS Launch file |
-| [ROSCON 2019 ROS Extension Talk Video](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667) | Walkthrough of VSCode from ROSCon 2019|
-| [Deep Dive - Episode 0](https://youtu.be/PBbEhRf8QjE) |  About the VSCode ROS extension @ a Polyhobbyist |
+| [Attaching to a running ROS Node](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to attach VS Code to a running ROS node |
+| [Debugging all ROS Nodes in a launch file ](https://github.com/ms-iot/vscode-ros/blob/master/doc/debug-support.md) | Learn how to set up VS Code to debug the nodes in a ROS Launch file |
+| [ROSCON 2019 ROS Extension Talk Video](https://vimeopro.com/osrfoundation/roscon-2019/video/379127667) | Walkthrough of VS Code from ROSCon 2019|
+| [Deep Dive - Episode 0](https://youtu.be/PBbEhRf8QjE) |  About the VS Code ROS extension @ a Polyhobbyist |
 | [Deep Dive - Episode 1](https://youtu.be/bupAju0UAMg) |  Installing on Windows & WSL @ a Polyhobbyist |
 | [Deep Dive - Episode 2](https://youtu.be/-NaEPoIg2Ds) |  Installing on Linux @ a Polyhobbyist |
 | [Deep Dive - Episode 3](https://youtu.be/N2vqBvPQdhE) |  General Usage with ROS1 @ a Polyhobbyist |
@@ -53,7 +53,7 @@ You can access the following commands from the [Visual Studio Code command palle
 
 ## Getting Started
 
-The VSCode ROS extension will attempt to detect and automatically configure the workspace for the appropriate ROS Distro.
+The VS Code ROS extension will attempt to detect and automatically configure the workspace for the appropriate ROS Distro.
 
 The extension will automatically start when you open a `catkin` or `colcon` workspace.
 The build system (e.g. catkin_make or catkin build) will automatically be confirmed from the hidden files associated with
@@ -65,20 +65,20 @@ each system.
 The Visual Studio Code extension for ROS supports launch debugging for ROS 1 and ROS 2 nodes, written in Python and C++. The ROS node or nodes to be debugged must be placed in a ROS launch file with the extension `.launch` for ROS1 or ROS2 or with the extension `.py` for ROS2. 
 
 ### Automatic creation of a launch.json with ROS Launch support
-`.vscode/launch.json` is a file which defines a debug launch configuration within VSCode. 
+`.vscode/launch.json` is a file which defines a debug launch configuration within VS Code. 
 
 To create a `.vscode/launch.json` with ROS debugging support 
 
   1. C++ or Python file is selected, vscode uses the selected file to seed the launch creation UI. 
   1. Click the `Run and Debug` tab on the left sidebar
   1. Select the link to create a `.vscode/launch.json` file. 
-  1. VSCode will drop down from the command pallet with a list of options, which includes 'ROS'. Select this option. 
+  1. VS Code will drop down from the command pallet with a list of options, which includes 'ROS'. Select this option. 
   1. In the next dialog, type the name of the ROS package containing a launch file you'd like to debug. 
   1. Then find the launch file.
 
 Once this is created, you can use the play button in the title bar, or the "start debugging" accelerator key, or from the command palle (CTRL-SHIFT-P), select `Debug: Start Debugging`.
 
-> NOTE: Other VSCode extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a new file called `.vscode/launch.json`, then use the manual option described below.
+> NOTE: Other VS Code extensions may interfere with the selection list. If you do not see ROS in the first drop down list, you'll need to create a new file called `.vscode/launch.json`, then use the manual option described below.
 
 Other Notes:
   * Create a new ROS launch file with just the nodes you'd like to debug, and a separate ROS launch file with all other ROS nodes.
@@ -109,10 +109,10 @@ The ROS Launch configuration block supports the following configuration:
 
 | Option | Description |
 |---|:---|
-| name | The name which will be displayed in the VSCode UI launch configuration |
+| name | The name which will be displayed in the VS Code UI launch configuration |
 | request | `launch` or `attach` for launching a ROS launch file, or attaching using the attach UI for Pyton or C++ |
 | target | the launch file path |
-| type | must be `ros` to indicate to VSCode that this is a ROS launch configuration |
+| type | must be `ros` to indicate to VS Code that this is a ROS launch configuration |
 | arguments | Arguments passed to roslaunch such as `map:=/foo.yaml'`|
 | symbolSearchPath | A semicolon delimited search path for Windows symbols, including ROS for Windows symbols downloaded from https://ros-win.visualstudio.com/ros-win/_build |
 | additionalSOLibSearchPath | A semicolon delimited search path for Linux symbols |
@@ -127,7 +127,7 @@ The ROS extension supports the following global settings, which can be overridde
 |---|:---|---|
 | ros.distro | ROS installation distro to be sourced | The Distribution to be sourced. On linux, this cause the extension to look for the ROS setup script in `/opt/ros/{distro}/setup.bash`. On Windows, `c:\opt\ros\{distro}\setup.bat` | 
 | ros.rosSetupScript | ROS workspace setup script. Overrides ros.distro. | If specified, this will cause the extension to source this script before generating the launch debugging or ROS terminal environment. This overrides the ros.distro, and can be used to specify user scripts or ROS installs in a different location. |
-| ros.isolateEnvironment | Specify if the extension should not capture the environment VSCode is running in to pass to child processes. | Off by default, This setting will prevent the ROS extension from capturing it's hosting environment in case this would conflict with the ROS environment. |
+| ros.isolateEnvironment | Specify if the extension should not capture the environment VS Code is running in to pass to child processes. | Off by default, This setting will prevent the ROS extension from capturing it's hosting environment in case this would conflict with the ROS environment. |
 
 Workspace example:
 
