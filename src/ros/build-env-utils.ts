@@ -84,7 +84,7 @@ async function updateCppPropertiesInternal(): Promise<void> {
         cppProperties.configurations[0].intelliSenseMode = "gcc-" + process.arch
         cppProperties.configurations[0].compilerPath = "/usr/bin/gcc"
         cppProperties.configurations[0].cStandard = "gnu11"
-        cppProperties.configurations[0].cppStandard = "c++14"
+        cppProperties.configurations[0].cppStandard = getCppStandard()
 
         // read the existing file
         try {
@@ -137,4 +137,30 @@ function updatePythonAutoCompletePathInternal() {
  */
 function updatePythonAnalysisPathInternal() {
     vscode.workspace.getConfiguration().update(PYTHON_ANALYSIS_PATHS, extension.env.PYTHONPATH.split(path.delimiter));
+}
+
+function getCppStandard() {
+    switch (vscode.workspace.getConfiguration().get("ros.distro"))
+    {
+        case "kinetic":
+        case "lunar":
+            return "c++11"
+        case "melodic":
+        case "noetic":
+        case "ardent":
+        case "bouncy":
+        case "crystal":
+        case "dashing":
+        case "eloquent":
+        case "foxy":
+            return "c++14"
+        case "galactic":
+        case "humble":
+        case "iron":
+        case "jazzy":
+        case "rolling":
+            return "c++17"
+        default:
+            return "c++17"
+    }
 }
