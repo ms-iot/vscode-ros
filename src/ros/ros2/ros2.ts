@@ -85,7 +85,9 @@ export class ROS2 implements ros.ROSApi {
             env: this.env,
             cwd: workspaceDir
         };
-        const result = await promisifiedExec(`colcon list -p --base-paths "${workspaceDir}"`, opts);
+        const isWin = process.platform === "win32";
+        const nullPath = isWin ? "nul" : "/dev/null";
+        const result = await promisifiedExec(`colcon list -p --base-paths "${workspaceDir}" --log-base ${nullPath}`, opts);
 
         // error out if we see anything from stderr.
         if (result.stderr) {
