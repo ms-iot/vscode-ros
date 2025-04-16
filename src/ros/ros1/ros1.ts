@@ -35,9 +35,10 @@ export class ROS1 implements ros.ROSApi {
             if (!err) {
                 const lines = out.trim().split(os.EOL).map(((line) => {
                     const info: string[] = line.split(" ");
-                    if (info.length === 2) {
-                        // each line should contain exactly 2 strings separated by 1 space
-                        return info;
+                    if (info.length >= 2) {
+                        // each line contains package name and path, separated by a space
+                        // the path might contain spaces, so we join the rest of the line
+                        return [info[0], info.slice(1).join(" ")];
                     }
                 }));
 
