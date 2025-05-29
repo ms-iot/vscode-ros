@@ -20,7 +20,7 @@ For team-managed projects (like this one), even if you have the access to make c
 After creating a fork of a repository, make sure to [configure a remote][git_configure_remote] first so the fork can sync up with the remote repository. For example, when working on a fork from this repository, do this first:
 
 ```batch
-git add upstream https://github.com/ms-iot/vscode-ros
+git remote add upstream https://github.com/ms-iot/vscode-ros
 ```
 
 *Note: the remote name does not need to be `upstream`, we are just using `upstream` as an example*
