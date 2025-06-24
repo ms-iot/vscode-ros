@@ -461,7 +461,7 @@
         "@vscode/debugadapter": "^1.59.0",
         "@vscode/extension-telemetry": "^0.6.2",
         "@vscode/webview-ui-toolkit": "^1.2.2",
-        "assert": "^2.0.0",
+        "assert": "^2.1.0",
         "babylonjs": "^6.37.1",
         "babylonjs-materials": "^6.37.1",
         "buffer": "^6.0.3",
